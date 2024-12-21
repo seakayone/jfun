@@ -16,6 +16,8 @@ class OptionTest {
         assertThat(option.isSome()).isTrue();
         assertThat(option.isNone()).isFalse();
         assertThat(option.get()).isEqualTo(42);
+        assertThat(option.contains(42)).isTrue();
+        assertThat(option.exists(a -> a.equals(42))).isTrue();
     }
 
     @Test
@@ -91,5 +93,12 @@ class OptionTest {
         Option<Integer> result = option.orElse(() -> Option.some(0));
         assertThat(result.isSome()).isTrue();
         assertThat(result.get()).isEqualTo(0);
+    }
+
+    @Test
+    void orElseWithNoneAndNone() {
+        Option<Integer> option = Option.none();
+        Option<Integer> result = option.orElse(() -> Option.none());
+        assertThat(result.isNone()).isTrue();
     }
 }

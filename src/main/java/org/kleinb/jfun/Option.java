@@ -26,6 +26,28 @@ public sealed interface Option<A> permits None, Some {
         return this instanceof None;
     }
 
+    default boolean contains(A value) {
+        switch (this) {
+            case Some(A v) -> {
+                return v.equals(value);
+            }
+            case None<A> _ -> {
+                return false;
+            }
+        }
+    }
+
+    default boolean exists(Predicate<A> f) {
+        switch (this) {
+            case Some(A value) -> {
+                return f.test(value);
+            }
+            case None<A> _ -> {
+                return false;
+            }
+        }
+    }
+
     default A get() {
         switch (this) {
             case Some(A value) -> {
