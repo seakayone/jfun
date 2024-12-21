@@ -7,7 +7,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public sealed interface Option<A> {
+public sealed interface Option<A> permits None, Some {
 
     static <A> Option<A> some(A value) {
         return new Some<>(value);
@@ -31,7 +31,7 @@ public sealed interface Option<A> {
             case Some(A value) -> {
                 return value;
             }
-            case None<A> __ -> {
+            case None<A> _ -> {
                 throw new NoSuchElementException();
             }
         }
@@ -42,7 +42,7 @@ public sealed interface Option<A> {
             case Some(A value) -> {
                 return f.apply(value);
             }
-            case None<A> __ -> {
+            case None<A> _ -> {
                 return none();
             }
         }
@@ -53,7 +53,7 @@ public sealed interface Option<A> {
             case Some(A value) -> {
                 return some(f.apply(value));
             }
-            case None<A> __ -> {
+            case None<A> _ -> {
                 return none();
             }
         }
@@ -64,7 +64,7 @@ public sealed interface Option<A> {
             case Some(A value) -> {
                 return some.apply(value);
             }
-            case None<A> __ -> {
+            case None<A> _ -> {
                 return none.get();
             }
         }
@@ -72,10 +72,10 @@ public sealed interface Option<A> {
 
     default Option<A> orElse(Supplier<Option<A>> other) {
         switch (this) {
-            case Some(A __) -> {
+            case Some(A _) -> {
                 return this;
             }
-            case None<A> __ -> {
+            case None<A> _ -> {
                 return other.get();
             }
         }
@@ -86,7 +86,7 @@ public sealed interface Option<A> {
             case Some(A value) -> {
                 return value;
             }
-            case None<A> __ -> {
+            case None<A> _ -> {
                 return other.get();
             }
         }
@@ -117,12 +117,5 @@ public sealed interface Option<A> {
     default Try<A> toTry(Supplier<Throwable> left) {
         return isSome() ? Try.success(get()) : Try.failure(new NoSuchElementException());
     }
-}
-
-record Some<A>(A value) implements Option<A> {
-}
-
-record None<A>() implements Option<A> {
-    public static final None<?> INSTANCE = new None<>();
 }
 
