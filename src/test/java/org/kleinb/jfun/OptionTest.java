@@ -76,4 +76,20 @@ class OptionTest {
         String result = option.fold(Object::toString, () -> "none");
         assertThat(result).isEqualTo("none");
     }
+
+    @Test
+    void orElseWithSome() {
+        Option<Integer> option = Option.some(42);
+        Option<Integer> result = option.orElse(() -> Option.some(0));
+        assertThat(result.isSome()).isTrue();
+        assertThat(result.get()).isEqualTo(42);
+    }
+
+    @Test
+    void orElseWithNone() {
+        Option<Integer> option = Option.none();
+        Option<Integer> result = option.orElse(() -> Option.some(0));
+        assertThat(result.isSome()).isTrue();
+        assertThat(result.get()).isEqualTo(0);
+    }
 }
