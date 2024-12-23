@@ -18,6 +18,15 @@ public sealed interface Option<A> permits None, Some {
         return (None<A>) None.INSTANCE;
     }
 
+    static <A> Option<A> of(A value) {
+        return value == null ? none() : some(value);
+    }
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    static <A> Option<A> ofOptional(Optional<A> optional) {
+        return optional.map(Option::some).orElseGet(Option::none);
+    }
+
     default boolean isSome() {
         return this instanceof Some;
     }
@@ -122,11 +131,11 @@ public sealed interface Option<A> permits None, Some {
         return filter(f.negate());
     }
 
+    // Conversion methods
+
     default List<A> toList() {
         return fold(List::of, List::of);
     }
-
-    // Conversion methods
 
     default Optional<A> toOptional() {
         return fold(Optional::of, Optional::empty);
@@ -136,7 +145,7 @@ public sealed interface Option<A> permits None, Some {
         return isSome() ? Either.right(get()) : Either.left(left.get());
     }
 
-    default Try<A> toTry(Supplier<Throwable> left) {
+    default Try<A> toTry() {
         return isSome() ? Try.success(get()) : Try.failure(new NoSuchElementException());
     }
 }

@@ -2,7 +2,7 @@ package org.kleinb.jfun;
 
 import java.util.function.Function;
 
-public sealed interface Either<A, B> {
+public sealed interface Either<A, B> permits Left, Right {
     static <A, B> Either<A, B> left(A value) {
         return new Left<>(value);
     }
@@ -19,40 +19,49 @@ public sealed interface Either<A, B> {
         return this instanceof Right;
     }
 
-    Either<B, A> swap();
+    default Either<B, A> swap() {
+        switch (this) {
+            case Left(A value) -> {
+                return right(value);
+            }
+            case Right(B value) -> {
+                return Either.left(value);
+            }
+        }
+    }
 
-    <C> C fold(Function<A, C> left, Function<B, C> right);
+    default <C> C fold(Function<A, C> left, Function<B, C> right) {
+        switch (this) {
+            case Left(A value) -> {
+                return left.apply(value);
+            }
+            case Right(B value) -> {
+                return right.apply(value);
+            }
+        }
+    }
 
+    @SuppressWarnings("unchecked")
     default <C> Either<A, C> map(Function<B, C> f) {
-        return flatMap(f.andThen(Either::right));
+        switch (this) {
+            case Left(A _) -> {
+                return (Left<A, C>) this;
+            }
+            case Right(B value) -> {
+                return Either.right(f.apply(value));
+            }
+        }
     }
 
+    @SuppressWarnings("unchecked")
     default <C> Either<A, C> flatMap(Function<B, Either<A, C>> f) {
-        return fold(Either::left, f);
-    }
-
-}
-
-record Left<A, B>(A value) implements Either<A, B> {
-    @Override
-    public Either<B, A> swap() {
-        return Either.right(value);
-    }
-
-    @Override
-    public <C> C fold(Function<A, C> left, Function<B, C> right) {
-        return left.apply(value);
-    }
-}
-
-record Right<A, B>(B value) implements Either<A, B> {
-    @Override
-    public Either<B, A> swap() {
-        return Either.left(value);
-    }
-
-    @Override
-    public <C> C fold(Function<A, C> left, Function<B, C> right) {
-        return right.apply(value);
+        switch (this) {
+            case Left(A _) -> {
+                return (Left<A, C>) this;
+            }
+            case Right(B value) -> {
+                return f.apply(value);
+            }
+        }
     }
 }

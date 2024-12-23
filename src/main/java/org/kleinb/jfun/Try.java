@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
-public sealed interface Try<A> {
+public sealed interface Try<A> permits Failure, Success {
 
     static <A> Try<A> of(ThrowingSupplier<A> supplier) {
         try {
@@ -39,9 +39,27 @@ public sealed interface Try<A> {
         return this instanceof Failure;
     }
 
-    A get();
+    default A get() {
+        switch (this) {
+            case Success(A value) -> {
+                return value;
+            }
+            case Failure<A> _ -> {
+                return TryOps.sneakyThrow(getFailure());
+            }
+        }
+    }
 
-    Throwable getFailure();
+    default Throwable getFailure() {
+        switch (this) {
+            case Success<A> _ -> {
+                return new NoSuchElementException("Success does not have a failure");
+            }
+            case Failure(Throwable e) -> {
+                return e;
+            }
+        }
+    }
 
     default Either<Throwable, A> toEither() {
         return isSuccess() ? Either.right(get()) : Either.left(getFailure());
@@ -53,30 +71,6 @@ public sealed interface Try<A> {
 
     default Optional<A> toOptional() {
         return isSuccess() ? Optional.of(get()) : Optional.empty();
-    }
-}
-
-record Success<A>(A value) implements Try<A> {
-    @Override
-    public A get() {
-        return value;
-    }
-
-    @Override
-    public Throwable getFailure() {
-        return new NoSuchElementException("Success does not have a failure");
-    }
-}
-
-record Failure<A>(Throwable error) implements Try<A> {
-    @Override
-    public A get() {
-        return TryOps.sneakyThrow(error);
-    }
-
-    @Override
-    public Throwable getFailure() {
-        return error;
     }
 }
 
