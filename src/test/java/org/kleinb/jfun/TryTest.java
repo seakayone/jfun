@@ -3,6 +3,7 @@ package org.kleinb.jfun;
 import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -319,5 +320,20 @@ class TryTest {
         var exception = new Exception("Boom");
         Try<Integer> actual = Try.failure(exception);
         assertThat(actual.toOptional()).isEqualTo(java.util.Optional.empty());
+    }
+
+    // .toList
+
+    @Test
+    void shouldConvertSuccessToList() {
+        Try<Integer> actual = Try.success(42);
+        assertThat(actual.toList()).isEqualTo(List.of(42));
+    }
+
+    @Test
+    void shouldConvertFailureToList() {
+        var exception = new Exception("Boom");
+        Try<Integer> actual = Try.failure(exception);
+        assertThat(actual.toList()).isEqualTo(List.of());
     }
 }

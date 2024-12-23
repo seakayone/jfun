@@ -1,5 +1,6 @@
 package org.kleinb.jfun;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -196,6 +197,17 @@ public sealed interface Try<A> permits Failure, Success {
             }
             case Failure<A> _ -> {
                 return Optional.empty();
+            }
+        }
+    }
+
+    default List<A> toList() {
+        switch (this) {
+            case Success(A value) -> {
+                return List.of(value);
+            }
+            case Failure<A> _ -> {
+                return List.of();
             }
         }
     }
