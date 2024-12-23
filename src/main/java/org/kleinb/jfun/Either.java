@@ -64,4 +64,26 @@ public sealed interface Either<A, B> permits Left, Right {
             }
         }
     }
+
+    default Option<B> toOption() {
+        switch (this) {
+            case Left(A _) -> {
+                return Option.none();
+            }
+            case Right(B value) -> {
+                return Option.some(value);
+            }
+        }
+    }
+
+    default Try<B> toTry(Function<A, Throwable> e) {
+        switch (this) {
+            case Left(A value) -> {
+                return Try.failure(e.apply(value));
+            }
+            case Right(B value) -> {
+                return Try.success(value);
+            }
+        }
+    }
 }

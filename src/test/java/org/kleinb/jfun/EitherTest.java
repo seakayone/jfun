@@ -1,5 +1,6 @@
 package org.kleinb.jfun;
 
+import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.Test;
 
 import java.util.function.Function;
@@ -107,6 +108,36 @@ class EitherTest {
     void shouldFoldLeft() {
         Either<Integer, String> either = Either.left(42);
         assertThat(either.fold(Function.identity(), Integer::valueOf)).isEqualTo(42);
+    }
+
+    // conversions
+    // .toOption
+    @Test
+    void shouldConvertRightToSome() {
+        Either<Integer, String> either = Either.right("42");
+        assertThat(either.toOption()).isEqualTo(Option.some("42"));
+    }
+
+    @Test
+    void shouldConvertLeftToNone() {
+        Either<Integer, String> either = Either.left(42);
+        assertThat(either.toOption()).isEqualTo(Option.none());
+    }
+
+    // .toTry
+    @Test
+    void shouldConvertRightToSuccess() {
+        Either<Integer, String> either = Either.right("42");
+        assertThat(either.toTry(i -> new RuntimeException("Failed with " + i))).isEqualTo(Try.success("42"));
+    }
+
+    @Test
+    void shouldConvertLeftToFailure() {
+        Either<Integer, String> either = Either.left(42);
+        assertThat(either.toTry(i -> new RuntimeException("Failed with " + i)))
+                .has(new Condition<>(Try::isFailure, "is failure"))
+                .has(new Condition<>(t -> t.getFailure().getMessage().equals("Failed with 42"), "has correct message"))
+        ;
     }
 
 }
