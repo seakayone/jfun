@@ -123,6 +123,18 @@ class OptionTest {
         assertThat(Option.none().fold(Object::toString, () -> "none")).isEqualTo("none");
     }
 
+    // .orNull
+
+    @Test
+    void shouldReturnSomeValue() {
+        assertThat(Option.some(42).orNull()).isEqualTo(42);
+    }
+
+    @Test
+    void shouldReturnNullForNone() {
+        assertThat(Option.none().orNull()).isNull();
+    }
+
     // .orElse
 
     @Test

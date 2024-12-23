@@ -101,6 +101,17 @@ public sealed interface Option<A> permits None, Some {
         }
     }
 
+    default A orNull() {
+        switch (this) {
+            case Some(A value) -> {
+                return value;
+            }
+            case None<A> _ -> {
+                return null;
+            }
+        }
+    }
+
     default Option<A> orElse(Supplier<Option<A>> other) {
         switch (this) {
             case Some(A _) -> {
