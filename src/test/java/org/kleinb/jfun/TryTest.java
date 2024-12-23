@@ -201,6 +201,7 @@ class TryTest {
     }
 
     // .recover
+
     @Test
     void shouldRecoverFailure() {
         var exception = new Exception("Boom");
@@ -215,6 +216,7 @@ class TryTest {
     }
 
     // .recoverWith
+
     @Test
     void shouldRecoverWithFailure() {
         var exception = new Exception("Boom");
@@ -229,6 +231,7 @@ class TryTest {
     }
 
     // .filter
+
     @Test
     void shouldFilterSuccess() {
         Try<Integer> actual = Try.success(42).filter(i -> i == 42);
@@ -248,6 +251,8 @@ class TryTest {
         assertThat(actual).has(new Condition<>(Try::isFailure, "is failure"))
                 .has(new Condition<>(t -> t.getFailure() instanceof NoSuchElementException, "is NoSuchElementException"));
     }
+
+    // .filterNot
 
     @Test
     void shouldFilterNotSuccess() {
@@ -270,7 +275,9 @@ class TryTest {
     }
 
     // conversion methods
+
     // .toOption
+
     @Test
     void shouldConvertSuccessToSome() {
         Try<Integer> actual = Try.success(42);
@@ -285,6 +292,7 @@ class TryTest {
     }
 
     // .toEither
+
     @Test
     void shouldConvertSuccessToRight() {
         Try<Integer> actual = Try.success(42);
