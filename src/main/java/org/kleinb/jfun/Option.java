@@ -152,13 +152,8 @@ public sealed interface Option<A> permits None, Some {
     }
 
     default Option<A> tap(Consumer<A> f) {
-        switch (this) {
-            case Some(A value) -> {
-                f.accept(value);
-
-            }
-            case None<A> _ -> {
-            }
+        if (this instanceof Some(A value)) {
+            f.accept(value);
         }
         return this;
     }

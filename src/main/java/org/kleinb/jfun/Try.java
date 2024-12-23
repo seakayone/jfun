@@ -190,23 +190,15 @@ public sealed interface Try<A> permits Failure, Success {
     }
 
     default Try<A> tap(Consumer<A> f) {
-        switch (this) {
-            case Success(A value) -> {
-                f.accept(value);
-            }
-            case Failure<A> _ -> {
-            }
+        if (this instanceof Success(A value)) {
+            f.accept(value);
         }
         return this;
     }
 
     default Try<A> tapFailure(Consumer<Throwable> f) {
-        switch (this) {
-            case Success<A> _ -> {
-            }
-            case Failure(Throwable t) -> {
-                f.accept(t);
-            }
+        if (this instanceof Failure(Throwable t)) {
+            f.accept(t);
         }
         return this;
     }
