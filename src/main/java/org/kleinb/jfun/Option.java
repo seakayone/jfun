@@ -102,13 +102,13 @@ public sealed interface Option<A> permits None, Some {
     }
 
 
-    default Option<A> orElse(Supplier<Option<A>> other) {
+    default Option<A> orElse(Supplier<Option<A>> or) {
         switch (this) {
             case Some(A _) -> {
                 return this;
             }
             case None<A> _ -> {
-                return other.get();
+                return or.get();
             }
         }
     }
@@ -124,13 +124,13 @@ public sealed interface Option<A> permits None, Some {
         }
     }
 
-    default A getOrElse(Supplier<A> other) {
+    default A getOrElse(A a) {
         switch (this) {
             case Some(A value) -> {
                 return value;
             }
             case None<A> _ -> {
-                return other.get();
+                return a;
             }
         }
     }

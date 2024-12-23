@@ -3,9 +3,11 @@ package org.kleinb.jfun;
 import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.Test;
 
+import java.util.NoSuchElementException;
 import java.util.function.Function;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 
 class EitherTest {
@@ -65,6 +67,7 @@ class EitherTest {
 
 
     // .map
+
     @Test
     void shouldMapRight() {
         Either<Integer, String> either = Either.right("42");
@@ -94,6 +97,48 @@ class EitherTest {
     void shouldFlatMapLeftToRight() {
         Either<String, Integer> either = Either.right(42);
         assertThat(either.flatMap(i -> Either.left(String.valueOf(i)))).isEqualTo(Either.left("42"));
+    }
+
+    // .get
+
+    @Test
+    void shouldGetRight() {
+        Either<Integer, String> either = Either.right("42");
+        assertThat(either.get()).isEqualTo("42");
+    }
+
+    @Test
+    void shouldGetLeft() {
+        Either<Integer, String> either = Either.left(42);
+        assertThatThrownBy(either::get).isInstanceOf(NoSuchElementException.class);
+    }
+
+    // .getOrElse
+
+    @Test
+    void shouldGetRightOrElse() {
+        Either<Integer, String> either = Either.right("42");
+        assertThat(either.getOrElse("0")).isEqualTo("42");
+    }
+
+    @Test
+    void shouldGetLeftOrElse() {
+        Either<Integer, String> either = Either.left(42);
+        assertThat(either.getOrElse("0")).isEqualTo("0");
+    }
+
+    // .orElse
+
+    @Test
+    void shouldReturnRight() {
+        Either<Integer, String> either = Either.right("42");
+        assertThat(either.orElse(() -> Either.right("0"))).isEqualTo(Either.right("42"));
+    }
+
+    @Test
+    void shouldReturnAlternative() {
+        Either<Integer, String> either = Either.left(42);
+        assertThat(either.orElse(() -> Either.right("0"))).isEqualTo(Either.right("0"));
     }
 
     // .fold
@@ -136,8 +181,6 @@ class EitherTest {
         Either<Integer, String> either = Either.left(42);
         assertThat(either.toTry(i -> new RuntimeException("Failed with " + i)))
                 .has(new Condition<>(Try::isFailure, "is failure"))
-                .has(new Condition<>(t -> t.getFailure().getMessage().equals("Failed with 42"), "has correct message"))
-        ;
+                .has(new Condition<>(t -> t.getFailure().getMessage().equals("Failed with 42"), "has correct message"));
     }
-
 }

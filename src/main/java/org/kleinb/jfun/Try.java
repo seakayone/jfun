@@ -81,13 +81,13 @@ public sealed interface Try<A> permits Failure, Success {
         }
     }
 
-    default Try<A> orElse(Supplier<Try<A>> defaultValue) {
+    default Try<A> orElse(Supplier<Try<A>> or) {
         switch (this) {
             case Success<A> _ -> {
                 return this;
             }
             case Failure<A> _ -> {
-                return defaultValue.get();
+                return or.get();
             }
         }
     }

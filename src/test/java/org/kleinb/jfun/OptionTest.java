@@ -155,12 +155,12 @@ class OptionTest {
     // .getOrElse
     @Test
     void shouldGetOrElseSomeValue() {
-        assertThat(Option.some(42).getOrElse(() -> 0)).isEqualTo(42);
+        assertThat(Option.some(42).getOrElse(0)).isEqualTo(42);
     }
 
     @Test
     void shouldGetOrElseNoneValue() {
-        assertThat(Option.none().getOrElse(() -> 42)).isEqualTo(42);
+        assertThat(Option.none().getOrElse(42)).isEqualTo(42);
     }
 
     // .contains

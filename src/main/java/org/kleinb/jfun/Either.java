@@ -1,6 +1,8 @@
 package org.kleinb.jfun;
 
+import java.util.NoSuchElementException;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public sealed interface Either<A, B> permits Left, Right {
     static <A, B> Either<A, B> left(A value) {
@@ -64,6 +66,41 @@ public sealed interface Either<A, B> permits Left, Right {
             }
         }
     }
+
+    default B get() {
+        switch (this) {
+            case Left(A _) -> {
+                throw new NoSuchElementException("get called on Left");
+            }
+            case Right(B value) -> {
+                return value;
+            }
+        }
+    }
+
+    default B getOrElse(B or) {
+        switch (this) {
+            case Left(A _) -> {
+                return or;
+            }
+            case Right(B value) -> {
+                return value;
+            }
+        }
+    }
+
+    default Either<A, B> orElse(Supplier<Either<A, B>> or) {
+        switch (this) {
+            case Left(A _) -> {
+                return or.get();
+            }
+            case Right(B value) -> {
+                return this;
+            }
+        }
+    }
+
+    // conversion methods
 
     default Option<B> toOption() {
         switch (this) {
