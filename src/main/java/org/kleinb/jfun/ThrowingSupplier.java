@@ -1,6 +1,6 @@
 package org.kleinb.jfun;
 
 @FunctionalInterface
-public interface ThrowingSupplier<T> {
-    T get() throws Throwable;
+public interface ThrowingSupplier<A> {
+    A get() throws Throwable;
 }

@@ -3,6 +3,7 @@ package org.kleinb.jfun;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public sealed interface Try<A> permits Failure, Success {
@@ -11,7 +12,7 @@ public sealed interface Try<A> permits Failure, Success {
         try {
             return success(supplier.get());
         } catch (Throwable t) {
-            return failure(t);
+            return Try.failure(t);
         }
     }
 
@@ -23,12 +24,19 @@ public sealed interface Try<A> permits Failure, Success {
         return of(callable::call);
     }
 
+    static Try<Void> ofRunnable(Runnable runnable) {
+        return of(() -> {
+            runnable.run();
+            return null;
+        });
+    }
+
     static <A> Try<A> success(A value) {
         return new Success<>(value);
     }
 
-    static <A> Try<A> failure(Throwable error) {
-        return new Failure<>(error);
+    static <A> Try<A> failure(Throwable t) {
+        return new Failure<>(t);
     }
 
     default boolean isSuccess() {
@@ -53,10 +61,46 @@ public sealed interface Try<A> permits Failure, Success {
     default Throwable getFailure() {
         switch (this) {
             case Success<A> _ -> {
-                return new NoSuchElementException("Success does not have a failure");
+                throw new NoSuchElementException("getFailure called on Success");
             }
             case Failure(Throwable e) -> {
                 return e;
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    default <B> Try<B> map(Function<A, B> f) {
+        switch (this) {
+            case Success(A value) -> {
+                return Try.success(f.apply(value));
+            }
+            case Failure<A> failure -> {
+                return (Failure<B>) failure;
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    default <B> Try<B> mapTry(ThrowingFunction<A, B> f) {
+        switch (this) {
+            case Success(A value) -> {
+                return Try.of(() -> f.apply(value));
+            }
+            case Failure<A> failure -> {
+                return (Failure<B>) failure;
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    default <B> Try<B> flatMap(Function<A, Try<B>> f) {
+        switch (this) {
+            case Success(A value) -> {
+                return f.apply(value);
+            }
+            case Failure<A> failure -> {
+                return (Failure<B>) failure;
             }
         }
     }

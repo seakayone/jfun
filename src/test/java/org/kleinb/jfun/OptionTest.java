@@ -127,12 +127,12 @@ class OptionTest {
 
     @Test
     void shouldReturnSomeValue() {
-        assertThat(Option.some(42).orNull()).isEqualTo(42);
+        assertThat(Option.some(42).getOrNull()).isEqualTo(42);
     }
 
     @Test
     void shouldReturnNullForNone() {
-        assertThat(Option.none().orNull()).isNull();
+        assertThat(Option.none().getOrNull()).isNull();
     }
 
     // .orElse

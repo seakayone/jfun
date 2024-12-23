@@ -1,0 +1,219 @@
+package org.kleinb.jfun;
+
+import org.junit.jupiter.api.Test;
+
+import java.util.NoSuchElementException;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+
+class TryTest {
+
+    // factory method
+    @Test
+    void shouldCreateAFailure() {
+        Try<Integer> actual = Try.of(() -> {
+            throw new RuntimeException("Boom");
+        });
+        assertThat(actual.getFailure()).isInstanceOf(RuntimeException.class).hasMessage("Boom");
+    }
+
+    @Test
+    void shouldCreateASuccess() {
+        assertThat(Try.of(() -> 1)).isEqualTo(Try.success(1));
+    }
+
+    @Test
+    void shouldRunSuccess() {
+        Runnable noOp = () -> {
+        };
+        assertThat(Try.ofRunnable(noOp)).isEqualTo(Try.success(null));
+    }
+
+    @Test
+    void shouldRunFailure() {
+        Try<Void> actual = Try.ofRunnable(() -> {
+            throw new RuntimeException("Boom");
+        });
+        assertThat(actual.getFailure()).isInstanceOf(RuntimeException.class).hasMessage("Boom");
+    }
+
+    @Test
+    void shouldCreateASuccessFromSupplier() {
+        assertThat(Try.ofSupplier(() -> 1)).isEqualTo(Try.success(1));
+    }
+
+    @Test
+    void shouldCreateAFailureFromSupplier() {
+        Try<Integer> actual = Try.ofSupplier(() -> {
+            throw new RuntimeException("Boom");
+        });
+        assertThat(actual.getFailure()).isInstanceOf(RuntimeException.class).hasMessage("Boom");
+    }
+
+    @Test
+    void shouldCreateASuccessFromCallable() {
+        assertThat(Try.ofCallable(() -> 1)).isEqualTo(Try.success(1));
+    }
+
+    @Test
+    void shouldCreateAFailureFromCallable() {
+        Try<Integer> actual = Try.ofCallable(() -> {
+            throw new RuntimeException("Boom");
+        });
+        assertThat(actual.getFailure()).isInstanceOf(RuntimeException.class).hasMessage("Boom");
+    }
+
+    // isSuccess, isFailure
+    @Test
+    void shouldReturnForSuccess() {
+        Try<Integer> actual = Try.success(42);
+        assertThat(actual.isSuccess()).isTrue();
+        assertThat(actual.isFailure()).isFalse();
+    }
+
+    @Test
+    void shouldReturnForFailure() {
+        Try<Integer> actual = Try.failure(new RuntimeException("Boom"));
+        assertThat(actual.isSuccess()).isFalse();
+        assertThat(actual.isFailure()).isTrue();
+    }
+
+
+    // get
+    @Test
+    void shouldGetSuccessValue() {
+        assertThat(Try.success(42).get()).isEqualTo(42);
+    }
+
+    @Test
+    void shouldThrowOnGetFailure() {
+        var exception = new Exception("Boom");
+        assertThatThrownBy(() -> Try.failure(exception).get()).isEqualTo(exception);
+    }
+
+    // .getFailure
+
+    @Test
+    void shouldGetFailure() {
+        var exception = new Exception("Boom");
+        assertThat(Try.failure(exception).getFailure()).isEqualTo(exception);
+    }
+
+    @Test
+    void shouldThrowOnGetSuccess() {
+        assertThatThrownBy(() -> Try.success(42).getFailure()).isInstanceOf(NoSuchElementException.class);
+    }
+
+    // .map
+
+    @Test
+    void shouldMapSuccess() {
+        Try<Integer> actual = Try.success("42").map(Integer::parseInt);
+        assertThat(actual).isEqualTo(Try.success(42));
+    }
+
+    @Test
+    void shouldMapFailure() {
+        var exception = new Exception("Boom");
+        Try<Integer> actual = Try.<Integer>failure(exception).map(i -> i + 1);
+        assertThat(actual).isEqualTo(Try.failure(exception));
+    }
+
+    @Test
+    void shouldThrowIfMapFunctionThrows() {
+        Try<Integer> actual = Try.success(42);
+        assertThatThrownBy(() -> actual.map(_ -> {
+            throw new RuntimeException();
+        })).isInstanceOf(RuntimeException.class);
+    }
+
+    // .mapTry
+    @Test
+    void shouldMapTrySuccess() {
+        Try<Integer> actual = Try.success("42").mapTry(Integer::parseInt);
+        assertThat(actual).isEqualTo(Try.success(42));
+    }
+
+    @Test
+    void shouldMapTryFailure() {
+        var exception = new Exception("Boom");
+        Try<Integer> actual = Try.<Integer>failure(exception).mapTry(i -> i + 1);
+        assertThat(actual).isEqualTo(Try.failure(exception));
+    }
+
+    @Test
+    void shouldMapTrySuccessToFailure() {
+        var exception = new Exception("Boom");
+        Try<Integer> actual = Try.success(42);
+        assertThat(actual.mapTry(_ -> {
+            throw exception;
+        })).isEqualTo(Try.failure(exception));
+    }
+
+    // .flatMap
+    @Test
+    void shouldFlatMapSuccess() {
+        Try<Integer> actual = Try.success("42").flatMap(_ -> Try.success(42));
+        assertThat(actual).isEqualTo(Try.success(42));
+    }
+
+    @Test
+    void shouldFlatMapFailure() {
+        var exception = new Exception("Boom");
+        Try<Integer> actual = Try.<String>failure(exception).flatMap(_ -> Try.success(42));
+        assertThat(actual).isEqualTo(Try.failure(exception));
+    }
+
+    @Test
+    void shouldThrowIfFlatMapFunctionThrows() {
+        Try<Integer> actual = Try.success(42);
+        assertThatThrownBy(() -> actual.flatMap(_ -> {
+            throw new RuntimeException();
+        })).isInstanceOf(RuntimeException.class);
+    }
+
+    // conversion methods
+    // .toOption
+    @Test
+    void shouldConvertSuccessToSome() {
+        Try<Integer> actual = Try.success(42);
+        assertThat(actual.toOption()).isEqualTo(Option.some(42));
+    }
+
+    @Test
+    void shouldConvertFailureToNone() {
+        var exception = new Exception("Boom");
+        Try<Integer> actual = Try.failure(exception);
+        assertThat(actual.toOption()).isEqualTo(Option.none());
+    }
+
+    // .toEither
+    @Test
+    void shouldConvertSuccessToRight() {
+        Try<Integer> actual = Try.success(42);
+        assertThat(actual.toEither()).isEqualTo(Either.right(42));
+    }
+
+    @Test
+    void shouldConvertFailureToLeft() {
+        var exception = new Exception("Boom");
+        Try<Integer> actual = Try.failure(exception);
+        assertThat(actual.toEither()).isEqualTo(Either.left(exception));
+    }
+
+    // .toOptional
+
+    @Test
+    void shouldConvertSuccessToOptional() {
+        Try<Integer> actual = Try.success(42);
+        assertThat(actual.toOptional()).isEqualTo(java.util.Optional.of(42));
+    }
+
+    @Test
+    void shouldConvertFailureToEmptyOptional() {
+        var exception = new Exception("Boom");
+        Try<Integer> actual = Try.failure(exception);
+        assertThat(actual.toOptional()).isEqualTo(java.util.Optional.empty());
+    }
+}
