@@ -200,6 +200,17 @@ public sealed interface Try<A> permits Failure, Success {
         return this;
     }
 
+    default Try<A> tapFailure(Consumer<Throwable> f) {
+        switch (this) {
+            case Success<A> _ -> {
+            }
+            case Failure(Throwable t) -> {
+                f.accept(t);
+            }
+        }
+        return this;
+    }
+
     // conversion methods
 
     default Either<Throwable, A> toEither() {

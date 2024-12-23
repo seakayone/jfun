@@ -253,6 +253,24 @@ class EitherTest {
         assertThat(actual).isEqualTo(Either.left(42));
     }
 
+    // .tapLeft
+
+    @Test
+    void shouldTapLeft() {
+        StringBuilder sb = new StringBuilder();
+        Either<Integer, String> actual = Either.<Integer, String>left(42).tapLeft(sb::append);
+        assertThat(sb.toString()).isEqualTo("42");
+        assertThat(actual).isEqualTo(Either.left(42));
+    }
+
+    @Test
+    void shouldNotTapRight() {
+        StringBuilder sb = new StringBuilder();
+        Either<Integer, String> actual = Either.<Integer, String>right("42").tapLeft(sb::append);
+        assertThat(sb.toString()).isEmpty();
+        assertThat(actual).isEqualTo(Either.right("42"));
+    }
+
     // conversion methods
 
     // .toOption

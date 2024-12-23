@@ -159,6 +159,17 @@ public sealed interface Either<A, B> permits Left, Right {
         return this;
     }
 
+    default Either<A, B> tapLeft(Consumer<A> f) {
+        switch (this) {
+            case Left(A value) -> {
+                f.accept(value);
+            }
+            case Right(B _) -> {
+            }
+        }
+        return this;
+    }
+
     // conversion methods
 
     default Option<B> toOption() {
