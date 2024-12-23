@@ -1,5 +1,6 @@
 package org.kleinb.jfun;
 
+import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.Test;
 
 import java.util.NoSuchElementException;
@@ -211,6 +212,61 @@ class TryTest {
     void shouldNotRecoverSuccess() {
         Try<Integer> actual = Try.success(42);
         assertThat(actual.recover(_ -> 0)).isEqualTo(Try.success(42));
+    }
+
+    // .recoverWith
+    @Test
+    void shouldRecoverWithFailure() {
+        var exception = new Exception("Boom");
+        Try<Integer> actual = Try.<Integer>failure(exception).recoverWith(_ -> Try.success(42));
+        assertThat(actual).isEqualTo(Try.success(42));
+    }
+
+    @Test
+    void shouldNotRecoverWithSuccess() {
+        Try<Integer> actual = Try.success(42);
+        assertThat(actual.recoverWith(_ -> Try.success(0))).isEqualTo(Try.success(42));
+    }
+
+    // .filter
+    @Test
+    void shouldFilterSuccess() {
+        Try<Integer> actual = Try.success(42).filter(i -> i == 42);
+        assertThat(actual).isEqualTo(Try.success(42));
+    }
+
+    @Test
+    void shouldNotFilterFailure() {
+        var exception = new Exception("Boom");
+        Try<Integer> actual = Try.<Integer>failure(exception).filter(i -> i == 42);
+        assertThat(actual).isEqualTo(Try.failure(exception));
+    }
+
+    @Test
+    void shouldFilterSuccessPredicateFalse() {
+        Try<Integer> actual = Try.success(42).filter(i -> i != 42);
+        assertThat(actual).has(new Condition<>(Try::isFailure, "is failure"))
+                .has(new Condition<>(t -> t.getFailure() instanceof NoSuchElementException, "is NoSuchElementException"));
+    }
+
+    @Test
+    void shouldFilterNotSuccess() {
+        Try<Integer> actual = Try.success(42).filterNot(i -> i == 42);
+        assertThat(actual).has(new Condition<>(Try::isFailure, "is failure"))
+                .has(new Condition<>(t -> t.getFailure() instanceof NoSuchElementException, "is NoSuchElementException"));
+    }
+
+    @Test
+    void shouldNotFilterNotFailure() {
+        var exception = new Exception("Boom");
+        Try<Integer> actual = Try.<Integer>failure(exception).filter(i -> i == 42);
+        assertThat(actual).isEqualTo(Try.failure(exception));
+    }
+
+    @Test
+    void shouldFilterSuccessPredicateTrue() {
+        Try<Integer> actual = Try.success(42).filterNot(i -> i != 42);
+        assertThat(actual).isEqualTo(Try.success(42));
     }
 
     // conversion methods

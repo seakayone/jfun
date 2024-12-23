@@ -4,6 +4,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public sealed interface Try<A> permits Failure, Success {
@@ -136,6 +137,32 @@ public sealed interface Try<A> permits Failure, Success {
                 return Try.success(f.apply(t));
             }
         }
+    }
+
+    default Try<A> recoverWith(Function<Throwable, Try<A>> f) {
+        switch (this) {
+            case Success<A> success -> {
+                return success;
+            }
+            case Failure(Throwable t) -> {
+                return f.apply(t);
+            }
+        }
+    }
+
+    default Try<A> filter(Predicate<A> f) {
+        switch (this) {
+            case Success(A value) -> {
+                return f.test(value) ? this : Try.failure(new NoSuchElementException("Predicate does not hold for " + value));
+            }
+            case Failure<A> _ -> {
+                return this;
+            }
+        }
+    }
+
+    default Try<A> filterNot(Predicate<A> f) {
+        return filter(f.negate());
     }
 
     default Either<Throwable, A> toEither() {
