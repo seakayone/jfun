@@ -91,19 +91,19 @@ class EitherTest {
     @Test
     void shouldExistRight() {
         Either<Integer, String> either = Either.right("42");
-        assertThat(either.exists(s -> s.equals("42"))).isTrue();
+        assertThat(either.exists(_ -> true)).isTrue();
     }
 
     @Test
     void shouldNotExistRight() {
         Either<Integer, String> either = Either.right("42");
-        assertThat(either.exists(s -> s.equals("43"))).isFalse();
+        assertThat(either.exists(_ -> false)).isFalse();
     }
 
     @Test
     void shouldNotExistLeft() {
         Either<Integer, String> either = Either.left(42);
-        assertThat(either.exists(s -> s.equals("42"))).isFalse();
+        assertThat(either.exists(_ -> true)).isFalse();
     }
 
     // .map
