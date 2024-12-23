@@ -65,7 +65,6 @@ class EitherTest {
         assertThat(Either.right(42).swap()).isEqualTo(Either.left(42));
     }
 
-
     // .map
 
     @Test
@@ -153,6 +152,46 @@ class EitherTest {
     void shouldFoldLeft() {
         Either<Integer, String> either = Either.left(42);
         assertThat(either.fold(Function.identity(), Integer::valueOf)).isEqualTo(42);
+    }
+
+    // filterToOption
+
+    @Test
+    void shouldFilterRightToSome() {
+        Either<Integer, String> either = Either.right("42");
+        assertThat(either.filterToOption(s -> s.equals("42"))).isEqualTo(Option.some("42"));
+    }
+
+    @Test
+    void shouldFilterRightToNone() {
+        Either<Integer, String> either = Either.right("42");
+        assertThat(either.filterToOption(s -> s.equals("43"))).isEqualTo(Option.none());
+    }
+
+    @Test
+    void shouldFilterLeftToNone() {
+        Either<Integer, String> either = Either.left(42);
+        assertThat(either.filterToOption(s -> s.equals("42"))).isEqualTo(Option.none());
+    }
+
+    // filterOrElse
+
+    @Test
+    void shouldFilterRightOrElsePredicateTrue() {
+        Either<Integer, String> either = Either.right("42");
+        assertThat(either.filterOrElse(s -> s.equals("42"), "0")).isEqualTo("42");
+    }
+
+    @Test
+    void shouldFilterRightOrElsePredicateFalse() {
+        Either<Integer, String> either = Either.right("42");
+        assertThat(either.filterOrElse(s -> s.equals("0"), "0")).isEqualTo("0");
+    }
+
+    @Test
+    void shouldFilterLeftOrElse() {
+        Either<Integer, String> either = Either.left(42);
+        assertThat(either.filterOrElse(s -> s.equals("42"), "0")).isEqualTo("0");
     }
 
     // conversions

@@ -2,6 +2,7 @@ package org.kleinb.jfun;
 
 import java.util.NoSuchElementException;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public sealed interface Either<A, B> permits Left, Right {
@@ -96,6 +97,28 @@ public sealed interface Either<A, B> permits Left, Right {
             }
             case Right(B value) -> {
                 return this;
+            }
+        }
+    }
+
+    default Option<B> filterToOption(Predicate<B> p) {
+        switch (this) {
+            case Left(A _) -> {
+                return Option.none();
+            }
+            case Right(B value) -> {
+                return p.test(value) ? Option.some(value) : Option.none();
+            }
+        }
+    }
+
+    default B filterOrElse(Predicate<B> p, B or) {
+        switch (this) {
+            case Left(A _) -> {
+                return or;
+            }
+            case Right(B value) -> {
+                return p.test(value) ? value : or;
             }
         }
     }
