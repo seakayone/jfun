@@ -79,8 +79,8 @@ class TryTest {
         assertThat(actual.isFailure()).isTrue();
     }
 
-
     // get
+
     @Test
     void shouldGetSuccessValue() {
         assertThat(Try.success(42).get()).isEqualTo(42);
@@ -90,6 +90,32 @@ class TryTest {
     void shouldThrowOnGetFailure() {
         var exception = new Exception("Boom");
         assertThatThrownBy(() -> Try.failure(exception).get()).isEqualTo(exception);
+    }
+
+    // .getOrElse
+
+    @Test
+    void shouldGetSuccessValueOrElse() {
+        assertThat(Try.success(42).getOrElse(0)).isEqualTo(42);
+    }
+
+    @Test
+    void shouldGetFailureValueOrElse() {
+        var exception = new Exception("Boom");
+        assertThat(Try.failure(exception).getOrElse(0)).isEqualTo(0);
+    }
+
+    // .orElse
+    @Test
+    void shouldReturnSuccess() {
+        Try<Integer> actual = Try.success(42).orElse(() -> Try.success(0));
+        assertThat(actual).isEqualTo(Try.success(42));
+    }
+
+    @Test
+    void shouldReturnAlternative() {
+        Try<Integer> actual = Try.<Integer>failure(new Exception("Boom")).orElse(() -> Try.success(0));
+        assertThat(actual).isEqualTo(Try.success(0));
     }
 
     // .getFailure
@@ -171,6 +197,20 @@ class TryTest {
         assertThatThrownBy(() -> actual.flatMap(_ -> {
             throw new RuntimeException();
         })).isInstanceOf(RuntimeException.class);
+    }
+
+    // .recover
+    @Test
+    void shouldRecoverFailure() {
+        var exception = new Exception("Boom");
+        Try<Integer> actual = Try.<Integer>failure(exception).recover(_ -> 42);
+        assertThat(actual).isEqualTo(Try.success(42));
+    }
+
+    @Test
+    void shouldNotRecoverSuccess() {
+        Try<Integer> actual = Try.success(42);
+        assertThat(actual.recover(_ -> 0)).isEqualTo(Try.success(42));
     }
 
     // conversion methods

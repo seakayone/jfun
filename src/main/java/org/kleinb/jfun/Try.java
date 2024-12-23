@@ -58,6 +58,17 @@ public sealed interface Try<A> permits Failure, Success {
         }
     }
 
+    default A getOrElse(A defaultValue) {
+        switch (this) {
+            case Success(A value) -> {
+                return value;
+            }
+            case Failure<A> _ -> {
+                return defaultValue;
+            }
+        }
+    }
+
     default Throwable getFailure() {
         switch (this) {
             case Success<A> _ -> {
@@ -65,6 +76,17 @@ public sealed interface Try<A> permits Failure, Success {
             }
             case Failure(Throwable e) -> {
                 return e;
+            }
+        }
+    }
+
+    default Try<A> orElse(Supplier<Try<A>> defaultValue) {
+        switch (this) {
+            case Success<A> _ -> {
+                return this;
+            }
+            case Failure<A> _ -> {
+                return defaultValue.get();
             }
         }
     }
@@ -101,6 +123,17 @@ public sealed interface Try<A> permits Failure, Success {
             }
             case Failure<A> failure -> {
                 return (Failure<B>) failure;
+            }
+        }
+    }
+
+    default Try<A> recover(Function<Throwable, A> f) {
+        switch (this) {
+            case Success<A> success -> {
+                return success;
+            }
+            case Failure(Throwable t) -> {
+                return Try.success(f.apply(t));
             }
         }
     }
