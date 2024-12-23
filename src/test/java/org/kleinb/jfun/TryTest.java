@@ -306,6 +306,25 @@ class TryTest {
         assertThat(actual).isEqualTo(Try.success(42));
     }
 
+    // .tap
+
+    @Test
+    void shouldTapSuccess() {
+        StringBuilder sb = new StringBuilder();
+        Try<Integer> actual = Try.success(42).tap(sb::append);
+        assertThat(sb.toString()).isEqualTo("42");
+        assertThat(actual).isEqualTo(Try.success(42));
+    }
+
+    @Test
+    void shouldNotTapFailure() {
+        StringBuilder sb = new StringBuilder();
+        Exception exception = new Exception("Boom");
+        Try<Integer> actual = Try.<Integer>failure(exception).tap(sb::append);
+        assertThat(sb.toString()).isEmpty();
+        assertThat(actual).isEqualTo(Try.failure(exception));
+    }
+
     // conversion methods
 
     // .toOption

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -186,6 +187,17 @@ public sealed interface Try<A> permits Failure, Success {
 
     default Try<A> filterNot(Predicate<A> f) {
         return filter(f.negate());
+    }
+
+    default Try<A> tap(Consumer<A> f) {
+        switch (this) {
+            case Success(A value) -> {
+                f.accept(value);
+            }
+            case Failure<A> _ -> {
+            }
+        }
+        return this;
     }
 
     // conversion methods

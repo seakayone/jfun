@@ -3,6 +3,7 @@ package org.kleinb.jfun;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -148,6 +149,18 @@ public sealed interface Option<A> permits None, Some {
 
     default Option<A> filterNot(Predicate<A> f) {
         return filter(f.negate());
+    }
+
+    default Option<A> tap(Consumer<A> f) {
+        switch (this) {
+            case Some(A value) -> {
+                f.accept(value);
+
+            }
+            case None<A> _ -> {
+            }
+        }
+        return this;
     }
 
     // Conversion methods

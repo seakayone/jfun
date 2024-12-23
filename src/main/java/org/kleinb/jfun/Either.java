@@ -3,6 +3,7 @@ package org.kleinb.jfun;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -145,6 +146,17 @@ public sealed interface Either<A, B> permits Left, Right {
                 return p.test(value) ? value : or;
             }
         }
+    }
+
+    default Either<A, B> tap(Consumer<B> f) {
+        switch (this) {
+            case Left(A _) -> {
+            }
+            case Right(B value) -> {
+                f.accept(value);
+            }
+        }
+        return this;
     }
 
     // conversion methods

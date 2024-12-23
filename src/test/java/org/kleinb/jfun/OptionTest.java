@@ -227,6 +227,24 @@ class OptionTest {
         assertThat(Option.none().filterNot(i -> i.equals(42))).isEqualTo(Option.none());
     }
 
+    // .tap
+
+    @Test
+    void shouldTapSome() {
+        StringBuilder sb = new StringBuilder();
+        Option<Integer> actual = Option.some(42).tap(sb::append);
+        assertThat(sb.toString()).isEqualTo("42");
+        assertThat(actual).isEqualTo(Option.some(42));
+    }
+
+    @Test
+    void shouldNotTapNone() {
+        StringBuilder sb = new StringBuilder();
+        Option<Integer> actual = Option.<Integer>none().tap(sb::append);
+        assertThat(sb.toString()).isEmpty();
+        assertThat(actual).isEqualTo(Option.none());
+    }
+
     // conversion methods
     // .toList
     @Test
