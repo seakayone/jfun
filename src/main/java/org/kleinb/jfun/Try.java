@@ -165,6 +165,8 @@ public sealed interface Try<A> permits Failure, Success {
         return filter(f.negate());
     }
 
+    // conversion methods
+
     default Either<Throwable, A> toEither() {
         switch (this) {
             case Success(A value) -> {
