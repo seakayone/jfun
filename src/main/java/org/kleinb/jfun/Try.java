@@ -166,15 +166,36 @@ public sealed interface Try<A> permits Failure, Success {
     }
 
     default Either<Throwable, A> toEither() {
-        return isSuccess() ? Either.right(get()) : Either.left(getFailure());
+        switch (this) {
+            case Success(A value) -> {
+                return Either.right(value);
+            }
+            case Failure(Throwable t) -> {
+                return Either.left(t);
+            }
+        }
     }
 
     default Option<A> toOption() {
-        return isSuccess() ? Option.some(get()) : Option.none();
+        switch (this) {
+            case Success(A value) -> {
+                return Option.some(value);
+            }
+            case Failure<A> _ -> {
+                return Option.none();
+            }
+        }
     }
 
     default Optional<A> toOptional() {
-        return isSuccess() ? Optional.of(get()) : Optional.empty();
+        switch (this) {
+            case Success(A value) -> {
+                return Optional.of(value);
+            }
+            case Failure<A> _ -> {
+                return Optional.empty();
+            }
+        }
     }
 }
 
