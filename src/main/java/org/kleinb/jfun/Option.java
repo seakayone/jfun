@@ -136,7 +136,14 @@ public sealed interface Option<A> permits None, Some {
     }
 
     default Option<A> filter(Predicate<A> f) {
-        return flatMap(a -> f.test(a) ? this : none());
+        switch (this) {
+            case Some(A value) -> {
+                return f.test(value) ? this : none();
+            }
+            case None<A> _ -> {
+                return none();
+            }
+        }
     }
 
     default Option<A> filterNot(Predicate<A> f) {
@@ -146,19 +153,47 @@ public sealed interface Option<A> permits None, Some {
     // Conversion methods
 
     default List<A> toList() {
-        return fold(List::of, List::of);
+        switch (this) {
+            case Some(A value) -> {
+                return List.of(value);
+            }
+            case None<A> _ -> {
+                return List.of();
+            }
+        }
     }
 
     default Optional<A> toOptional() {
-        return fold(Optional::of, Optional::empty);
+        switch (this) {
+            case Some(A value) -> {
+                return Optional.of(value);
+            }
+            case None<A> _ -> {
+                return Optional.empty();
+            }
+        }
     }
 
     default <B> Either<B, A> toRight(Supplier<B> left) {
-        return isSome() ? Either.right(get()) : Either.left(left.get());
+        switch (this) {
+            case Some(A value) -> {
+                return Either.right(value);
+            }
+            case None<A> _ -> {
+                return Either.left(left.get());
+            }
+        }
     }
 
     default Try<A> toTry() {
-        return isSome() ? Try.success(get()) : Try.failure(new NoSuchElementException());
+        switch (this) {
+            case Some(A value) -> {
+                return Try.success(value);
+            }
+            case None<A> _ -> {
+                return Try.failure(new NoSuchElementException());
+            }
+        }
     }
 }
 
