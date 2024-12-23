@@ -3,6 +3,7 @@ package org.kleinb.jfun;
 import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
 
@@ -194,8 +195,10 @@ class EitherTest {
         assertThat(either.filterOrElse(s -> s.equals("42"), "0")).isEqualTo("0");
     }
 
-    // conversions
+    // conversion methods
+
     // .toOption
+
     @Test
     void shouldConvertRightToSome() {
         Either<Integer, String> either = Either.right("42");
@@ -208,7 +211,36 @@ class EitherTest {
         assertThat(either.toOption()).isEqualTo(Option.none());
     }
 
+    // .toOptional
+
+    @Test
+    void shouldConvertRightToOptional() {
+        Either<Integer, String> either = Either.right("42");
+        assertThat(either.toOptional()).isEqualTo(java.util.Optional.of("42"));
+    }
+
+    @Test
+    void shouldConvertLeftToEmptyOptional() {
+        Either<Integer, String> either = Either.left(42);
+        assertThat(either.toOptional()).isEqualTo(java.util.Optional.empty());
+    }
+
+    // .toList
+
+    @Test
+    void shouldConvertRightToList() {
+        Either<Integer, String> either = Either.right("42");
+        assertThat(either.toList()).isEqualTo(List.of("42"));
+    }
+
+    @Test
+    void shouldConvertLeftToList() {
+        Either<Integer, String> either = Either.left(42);
+        assertThat(either.toList()).isEqualTo(List.of());
+    }
+
     // .toTry
+
     @Test
     void shouldConvertRightToSuccess() {
         Either<Integer, String> either = Either.right("42");

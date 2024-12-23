@@ -1,6 +1,8 @@
 package org.kleinb.jfun;
 
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -132,6 +134,28 @@ public sealed interface Either<A, B> permits Left, Right {
             }
             case Right(B value) -> {
                 return Option.some(value);
+            }
+        }
+    }
+
+    default Optional<B> toOptional() {
+        switch (this) {
+            case Left(A _) -> {
+                return Optional.empty();
+            }
+            case Right(B value) -> {
+                return Optional.of(value);
+            }
+        }
+    }
+
+    default List<B> toList() {
+        switch (this) {
+            case Left(A _) -> {
+                return List.of();
+            }
+            case Right(B value) -> {
+                return List.of(value);
             }
         }
     }
