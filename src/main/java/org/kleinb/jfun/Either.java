@@ -35,6 +35,28 @@ public sealed interface Either<A, B> permits Left, Right {
         }
     }
 
+    default boolean contains(B elem) {
+        switch (this) {
+            case Left(A _) -> {
+                return false;
+            }
+            case Right(B b) -> {
+                return b.equals(elem);
+            }
+        }
+    }
+
+    default boolean exists(Predicate<B> f) {
+        switch (this) {
+            case Left(A _) -> {
+                return false;
+            }
+            case Right(B value) -> {
+                return f.test(value);
+            }
+        }
+    }
+
     default <C> C fold(Function<A, C> left, Function<B, C> right) {
         switch (this) {
             case Left(A value) -> {

@@ -66,6 +66,46 @@ class EitherTest {
         assertThat(Either.right(42).swap()).isEqualTo(Either.left(42));
     }
 
+    // .contains
+
+    @Test
+    void shouldContainRight() {
+        Either<Integer, String> either = Either.right("42");
+        assertThat(either.contains("42")).isTrue();
+    }
+
+    @Test
+    void shouldNotContainLeft() {
+        Either<String, String> either = Either.left("42");
+        assertThat(either.contains("42")).isFalse();
+    }
+
+    @Test
+    void shouldNotContainRight() {
+        Either<Integer, String> either = Either.right("42");
+        assertThat(either.contains("43")).isFalse();
+    }
+
+    // .exists
+
+    @Test
+    void shouldExistRight() {
+        Either<Integer, String> either = Either.right("42");
+        assertThat(either.exists(s -> s.equals("42"))).isTrue();
+    }
+
+    @Test
+    void shouldNotExistRight() {
+        Either<Integer, String> either = Either.right("42");
+        assertThat(either.exists(s -> s.equals("43"))).isFalse();
+    }
+
+    @Test
+    void shouldNotExistLeft() {
+        Either<Integer, String> either = Either.left(42);
+        assertThat(either.exists(s -> s.equals("42"))).isFalse();
+    }
+
     // .map
 
     @Test
