@@ -93,6 +93,28 @@ public sealed interface Try<A> permits Failure, Success {
         }
     }
 
+    default boolean contains(A value) {
+        switch (this) {
+            case Success(A v) -> {
+                return v.equals(value);
+            }
+            case Failure<A> _ -> {
+                return false;
+            }
+        }
+    }
+
+    default boolean exists(Predicate<A> f) {
+        switch (this) {
+            case Success(A value) -> {
+                return f.test(value);
+            }
+            case Failure<A> _ -> {
+                return false;
+            }
+        }
+    }
+
     @SuppressWarnings("unchecked")
     default <B> Try<B> map(Function<A, B> f) {
         switch (this) {

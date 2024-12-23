@@ -94,6 +94,36 @@ class TryTest {
         assertThatThrownBy(() -> Try.failure(exception).get()).isEqualTo(exception);
     }
 
+    // .contains
+
+    @Test
+    void shouldContainSuccess() {
+        Try<Integer> actual = Try.success(42);
+        assertThat(actual.contains(42)).isTrue();
+    }
+
+    @Test
+    void shouldNotContainFailure() {
+        var exception = new Exception("Boom");
+        Try<Integer> actual = Try.failure(exception);
+        assertThat(actual.contains(42)).isFalse();
+    }
+
+    // .exists
+
+    @Test
+    void shouldExistSuccess() {
+        Try<Integer> actual = Try.success(42);
+        assertThat(actual.exists(i -> i == 42)).isTrue();
+    }
+
+    @Test
+    void shouldNotExistFailure() {
+        var exception = new Exception("Boom");
+        Try<Integer> actual = Try.failure(exception);
+        assertThat(actual.exists(i -> i == 42)).isFalse();
+    }
+
     // .getOrElse
 
     @Test
@@ -108,6 +138,7 @@ class TryTest {
     }
 
     // .orElse
+
     @Test
     void shouldReturnSuccess() {
         Try<Integer> actual = Try.success(42).orElse(() -> Try.success(0));
