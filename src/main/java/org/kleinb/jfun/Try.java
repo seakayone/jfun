@@ -152,6 +152,17 @@ public sealed interface Try<A> permits Failure, Success {
         }
     }
 
+    default <B> B fold(Function<A, B> success, Function<Throwable, B> failure) {
+        switch (this) {
+            case Success(A value) -> {
+                return success.apply(value);
+            }
+            case Failure(Throwable t) -> {
+                return failure.apply(t);
+            }
+        }
+    }
+
     default Try<A> recover(Function<Throwable, A> f) {
         switch (this) {
             case Success<A> success -> {
@@ -201,6 +212,10 @@ public sealed interface Try<A> permits Failure, Success {
             f.accept(t);
         }
         return this;
+    }
+
+    default Try<A> tapBoth(Consumer<A> fa, Consumer<Throwable> ft) {
+        return tap(fa).tapFailure(ft);
     }
 
     // conversion methods

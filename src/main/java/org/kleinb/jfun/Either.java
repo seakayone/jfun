@@ -58,7 +58,7 @@ public sealed interface Either<A, B> permits Left, Right {
         }
     }
 
-    default <C> C fold(Function<A, C> left, Function<B, C> right) {
+    default <C> C fold(Function<B, C> right, Function<A, C> left) {
         switch (this) {
             case Left(A value) -> {
                 return left.apply(value);
@@ -162,6 +162,10 @@ public sealed interface Either<A, B> permits Left, Right {
         return this;
     }
 
+    default Either<A, B> tapBoth(Consumer<A> fa, Consumer<B> fb) {
+        return tapLeft(fa).tap(fb);
+    }
+
     // conversion methods
 
     default Option<B> toOption() {
@@ -204,6 +208,17 @@ public sealed interface Either<A, B> permits Left, Right {
             }
             case Right(B value) -> {
                 return Try.success(value);
+            }
+        }
+    }
+
+    default Validation<A, B> toValidation() {
+        switch (this) {
+            case Left(A value) -> {
+                return Validation.invalid(value);
+            }
+            case Right(B value) -> {
+                return Validation.valid(value);
             }
         }
     }

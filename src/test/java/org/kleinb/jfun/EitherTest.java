@@ -186,13 +186,13 @@ class EitherTest {
     @Test
     void shouldFoldRight() {
         Either<Integer, String> either = Either.right("42");
-        assertThat(either.fold(Function.identity(), Integer::valueOf)).isEqualTo(42);
+        assertThat(either.fold(Integer::valueOf, Function.identity())).isEqualTo(42);
     }
 
     @Test
     void shouldFoldLeft() {
         Either<Integer, String> either = Either.left(42);
-        assertThat(either.fold(Function.identity(), Integer::valueOf)).isEqualTo(42);
+        assertThat(either.fold(Integer::valueOf, Function.identity())).isEqualTo(42);
     }
 
     // filterToOption
@@ -271,6 +271,24 @@ class EitherTest {
         assertThat(actual).isEqualTo(Either.right("42"));
     }
 
+    // .tapBoth
+
+    @Test
+    void shouldTapBothRight() {
+        StringBuilder sb = new StringBuilder();
+        Either<Integer, String> actual = Either.<Integer, String>right("42").tapBoth(sb::append, sb::append);
+        assertThat(sb.toString()).isEqualTo("42");
+        assertThat(actual).isEqualTo(Either.right("42"));
+    }
+
+    @Test
+    void shouldTapBothLeft() {
+        StringBuilder sb = new StringBuilder();
+        Either<Integer, String> actual = Either.<Integer, String>left(42).tapBoth(sb::append, sb::append);
+        assertThat(sb.toString()).isEqualTo("42");
+        assertThat(actual).isEqualTo(Either.left(42));
+    }
+
     // conversion methods
 
     // .toOption
@@ -329,5 +347,19 @@ class EitherTest {
         assertThat(either.toTry(i -> new RuntimeException("Failed with " + i)))
                 .has(new Condition<>(Try::isFailure, "is failure"))
                 .has(new Condition<>(t -> t.getFailure().getMessage().equals("Failed with 42"), "has correct message"));
+    }
+
+    // .toValidation
+
+    @Test
+    void shouldConvertRightToValid() {
+        Either<Integer, String> either = Either.right("42");
+        assertThat(either.toValidation()).isEqualTo(Validation.valid("42"));
+    }
+
+    @Test
+    void shouldConvertLeftToInvalid() {
+        Either<Integer, String> either = Either.left(42);
+        assertThat(either.toValidation()).isEqualTo(Validation.invalid(42));
     }
 }
