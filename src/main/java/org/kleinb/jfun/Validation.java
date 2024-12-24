@@ -314,4 +314,15 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
       }
     }
   }
+
+  default Option<A> toOption() {
+    switch (this) {
+      case Valid(A value) -> {
+        return Option.some(value);
+      }
+      case Invalid<E, A> _ -> {
+        return Option.none();
+      }
+    }
+  }
 }

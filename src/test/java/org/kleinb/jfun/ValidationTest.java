@@ -551,4 +551,18 @@ class ValidationTest {
     Validation<String, Integer> invalid = Validation.invalid("error");
     assertThat(invalid.toEither()).isEqualTo(Either.left(List.of("error")));
   }
+
+  // .toOption
+
+  @Test
+  void shouldConvertValidToSome() {
+    Validation<String, Integer> valid = Validation.valid(42);
+    assertThat(valid.toOption()).isEqualTo(Option.some(42));
+  }
+
+  @Test
+  void shouldConvertInvalidToNone() {
+    Validation<String, Integer> invalid = Validation.invalid("error");
+    assertThat(invalid.toOption()).isEqualTo(Option.none());
+  }
 }
