@@ -5,6 +5,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.function.Predicate;
 import org.junit.jupiter.api.Test;
 
 class ValidationTest {
@@ -299,6 +300,242 @@ class ValidationTest {
     var actual = invalid.tapBoth(sb::append, it -> sb.append(it.size()));
     assertThat(sb.toString()).isEqualTo("1");
     assertThat(actual).isEqualTo(invalid);
+  }
+
+  // .validateWith
+
+  @Test
+  void shouldValidateWithValid() {
+    var actual =
+        Validation.validateWith(
+            Validation.fromPredicate("Name is empty", Predicate.not(String::isEmpty), "John Doe"),
+            Validation.fromPredicate("Age is negative", i -> i > 0, 42),
+            Tuple::of);
+    assertThat(actual).isEqualTo(Validation.valid(Tuple.of("John Doe", 42)));
+  }
+
+  @Test
+  void shouldRetainAllErrorsValidateWithInvalid() {
+    var actual =
+        Validation.validateWith(
+            Validation.fromPredicate("Name is empty", Predicate.not(String::isEmpty), ""),
+            Validation.fromPredicate("Age is negative", i -> i > 0, -42),
+            Tuple::of);
+    assertThat(actual).isEqualTo(Validation.invalid(List.of("Name is empty", "Age is negative")));
+  }
+
+  @Test
+  void shouldValidateWithValid3() {
+    var actual =
+        Validation.validateWith(
+            Validation.fromPredicate("Name is empty", Predicate.not(String::isEmpty), "John Doe"),
+            Validation.fromPredicate("Age is negative", i -> i > 0, 42),
+            Validation.fromPredicate("Email is invalid", s -> s.contains("@"), "a@bL"),
+            Tuple::of);
+    assertThat(actual).isEqualTo(Validation.valid(Tuple.of("John Doe", 42, "a@bL")));
+  }
+
+  @Test
+  void shouldRetainAllErrorsValidateWithInvalid3() {
+    var actual =
+        Validation.validateWith(
+            Validation.fromPredicate("Name is empty", Predicate.not(String::isEmpty), ""),
+            Validation.fromPredicate("Age is negative", i -> i > 0, -42),
+            Validation.fromPredicate("Email is invalid", s -> s.contains("@"), "a"),
+            Tuple::of);
+    assertThat(actual)
+        .isEqualTo(
+            Validation.invalid(List.of("Name is empty", "Age is negative", "Email is invalid")));
+  }
+
+  @Test
+  void shouldValidateWithValid4() {
+    var actual =
+        Validation.validateWith(
+            Validation.fromPredicate("Name is empty", Predicate.not(String::isEmpty), "John Doe"),
+            Validation.fromPredicate("Age is negative", i -> i > 0, 42),
+            Validation.fromPredicate("Email is invalid", s -> s.contains("@"), "a@bL"),
+            Validation.fromPredicate("Phone is invalid", s -> s.startsWith("+"), "+123"),
+            Tuple::of);
+    assertThat(actual).isEqualTo(Validation.valid(Tuple.of("John Doe", 42, "a@bL", "+123")));
+  }
+
+  @Test
+  void shouldRetainAllErrorsValidateWithInvalid4() {
+    var actual =
+        Validation.validateWith(
+            Validation.fromPredicate("Name is empty", Predicate.not(String::isEmpty), ""),
+            Validation.fromPredicate("Age is negative", i -> i > 0, -42),
+            Validation.fromPredicate("Email is invalid", s -> s.contains("@"), "a"),
+            Validation.fromPredicate("Phone is invalid", s -> s.startsWith("+"), "123"),
+            Tuple::of);
+    assertThat(actual)
+        .isEqualTo(
+            Validation.invalid(
+                List.of(
+                    "Name is empty", "Age is negative", "Email is invalid", "Phone is invalid")));
+  }
+
+  @Test
+  void shouldValidateWithValid5() {
+    var actual =
+        Validation.validateWith(
+            Validation.fromPredicate("Name is empty", Predicate.not(String::isEmpty), "John Doe"),
+            Validation.fromPredicate("Age is negative", i -> i > 0, 42),
+            Validation.fromPredicate("Email is invalid", s -> s.contains("@"), "a@bL"),
+            Validation.fromPredicate("Phone is invalid", s -> s.startsWith("+"), "+123"),
+            Validation.fromPredicate("Country is invalid", s -> s.length() == 2, "DE"),
+            Tuple::of);
+    assertThat(actual).isEqualTo(Validation.valid(Tuple.of("John Doe", 42, "a@bL", "+123", "DE")));
+  }
+
+  @Test
+  void shouldRetainAllErrorsValidateWithInvalid5() {
+    var actual =
+        Validation.validateWith(
+            Validation.fromPredicate("Name is empty", Predicate.not(String::isEmpty), ""),
+            Validation.fromPredicate("Age is negative", i -> i > 0, -42),
+            Validation.fromPredicate("Email is invalid", s -> s.contains("@"), "a"),
+            Validation.fromPredicate("Phone is invalid", s -> s.startsWith("+"), "123"),
+            Validation.fromPredicate("Country is invalid", s -> s.length() == 2, "D"),
+            Tuple::of);
+    assertThat(actual)
+        .isEqualTo(
+            Validation.invalid(
+                List.of(
+                    "Name is empty",
+                    "Age is negative",
+                    "Email is invalid",
+                    "Phone is invalid",
+                    "Country is invalid")));
+  }
+
+  @Test
+  void shouldValidateWithValid6() {
+    var actual =
+        Validation.validateWith(
+            Validation.fromPredicate("Name is empty", Predicate.not(String::isEmpty), "John Doe"),
+            Validation.fromPredicate("Age is negative", i -> i > 0, 42),
+            Validation.fromPredicate("Email is invalid", s -> s.contains("@"), "a@bL"),
+            Validation.fromPredicate("Phone is invalid", s -> s.startsWith("+"), "+123"),
+            Validation.fromPredicate("Country is invalid", s -> s.length() == 2, "DE"),
+            Validation.fromPredicate("City is invalid", s -> s.length() > 2, "Berlin"),
+            Tuple::of);
+    assertThat(actual)
+        .isEqualTo(Validation.valid(Tuple.of("John Doe", 42, "a@bL", "+123", "DE", "Berlin")));
+  }
+
+  @Test
+  void shouldRetainAllErrorsValidateWithInvalid6() {
+    var actual =
+        Validation.validateWith(
+            Validation.fromPredicate("Name is empty", Predicate.not(String::isEmpty), ""),
+            Validation.fromPredicate("Age is negative", i -> i > 0, -42),
+            Validation.fromPredicate("Email is invalid", s -> s.contains("@"), "a"),
+            Validation.fromPredicate("Phone is invalid", s -> s.startsWith("+"), "123"),
+            Validation.fromPredicate("Country is invalid", s -> s.length() == 2, "D"),
+            Validation.fromPredicate("City is invalid", s -> s.length() > 2, "B"),
+            Tuple::of);
+    assertThat(actual)
+        .isEqualTo(
+            Validation.invalid(
+                List.of(
+                    "Name is empty",
+                    "Age is negative",
+                    "Email is invalid",
+                    "Phone is invalid",
+                    "Country is invalid",
+                    "City is invalid")));
+  }
+
+  @Test
+  void shouldValidateWithValid7() {
+    var actual =
+        Validation.validateWith(
+            Validation.fromPredicate("Name is empty", Predicate.not(String::isEmpty), "John Doe"),
+            Validation.fromPredicate("Age is negative", i -> i > 0, 42),
+            Validation.fromPredicate("Email is invalid", s -> s.contains("@"), "a@bL"),
+            Validation.fromPredicate("Phone is invalid", s -> s.startsWith("+"), "+123"),
+            Validation.fromPredicate("Country is invalid", s -> s.length() == 2, "DE"),
+            Validation.fromPredicate("City is invalid", s -> s.length() > 2, "Berlin"),
+            Validation.fromPredicate("Street is invalid", s -> s.length() > 3, "Karl-Marx-Str."),
+            Tuple::of);
+    assertThat(actual)
+        .isEqualTo(
+            Validation.valid(
+                Tuple.of("John Doe", 42, "a@bL", "+123", "DE", "Berlin", "Karl-Marx-Str.")));
+  }
+
+  @Test
+  void shouldRetainAllErrorsValidateWithInvalid7() {
+    var actual =
+        Validation.validateWith(
+            Validation.fromPredicate("Name is empty", Predicate.not(String::isEmpty), ""),
+            Validation.fromPredicate("Age is negative", i -> i > 0, -42),
+            Validation.fromPredicate("Email is invalid", s -> s.contains("@"), "a"),
+            Validation.fromPredicate("Phone is invalid", s -> s.startsWith("+"), "123"),
+            Validation.fromPredicate("Country is invalid", s -> s.length() == 2, "D"),
+            Validation.fromPredicate("City is invalid", s -> s.length() > 2, "B"),
+            Validation.fromPredicate("Street is invalid", s -> s.length() > 3, ""),
+            Tuple::of);
+    assertThat(actual)
+        .isEqualTo(
+            Validation.invalid(
+                List.of(
+                    "Name is empty",
+                    "Age is negative",
+                    "Email is invalid",
+                    "Phone is invalid",
+                    "Country is invalid",
+                    "City is invalid",
+                    "Street is invalid")));
+  }
+
+  @Test
+  void shouldValidateWithValid8() {
+    var actual =
+        Validation.validateWith(
+            Validation.fromPredicate("Name is empty", Predicate.not(String::isEmpty), "John Doe"),
+            Validation.fromPredicate("Age is negative", i -> i > 0, 42),
+            Validation.fromPredicate("Email is invalid", s -> s.contains("@"), "a@bL"),
+            Validation.fromPredicate("Phone is invalid", s -> s.startsWith("+"), "+123"),
+            Validation.fromPredicate("Country is invalid", s -> s.length() == 2, "DE"),
+            Validation.fromPredicate("City is invalid", s -> s.length() > 2, "Berlin"),
+            Validation.fromPredicate("Street is invalid", s -> s.length() > 3, "Karl-Marx-Str."),
+            Validation.fromPredicate("Zip is invalid", s -> s.length() == 5, "12345"),
+            Tuple::of);
+    assertThat(actual)
+        .isEqualTo(
+            Validation.valid(
+                Tuple.of(
+                    "John Doe", 42, "a@bL", "+123", "DE", "Berlin", "Karl-Marx-Str.", "12345")));
+  }
+
+  @Test
+  void shouldRetainAllErrorsValidateWithInvalid8() {
+    var actual =
+        Validation.validateWith(
+            Validation.fromPredicate("Name is empty", Predicate.not(String::isEmpty), ""),
+            Validation.fromPredicate("Age is negative", i -> i > 0, -42),
+            Validation.fromPredicate("Email is invalid", s -> s.contains("@"), "a"),
+            Validation.fromPredicate("Phone is invalid", s -> s.startsWith("+"), "123"),
+            Validation.fromPredicate("Country is invalid", s -> s.length() == 2, "D"),
+            Validation.fromPredicate("City is invalid", s -> s.length() > 2, "B"),
+            Validation.fromPredicate("Street is invalid", s -> s.length() > 3, ""),
+            Validation.fromPredicate("Zip is invalid", s -> s.length() == 5, "1234"),
+            Tuple::of);
+    assertThat(actual)
+        .isEqualTo(
+            Validation.invalid(
+                List.of(
+                    "Name is empty",
+                    "Age is negative",
+                    "Email is invalid",
+                    "Phone is invalid",
+                    "Country is invalid",
+                    "City is invalid",
+                    "Street is invalid",
+                    "Zip is invalid")));
   }
 
   // .toEither
