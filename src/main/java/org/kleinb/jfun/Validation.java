@@ -168,7 +168,7 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
         return value;
       }
       case Invalid<E, A> _ -> {
-        throw new NoSuchElementException();
+        throw new NoSuchElementException("get called on Invalid");
       }
     }
   }
@@ -179,53 +179,25 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
         return error;
       }
       case Valid<E, A> _ -> {
-        throw new NoSuchElementException();
+        throw new NoSuchElementException("getError called on Valid");
       }
     }
   }
 
-  default A getOrElse(A defaultValue) {
-    switch (this) {
-      case Valid(A value) -> {
-        return value;
-      }
-      case Invalid<E, A> _ -> {
-        return defaultValue;
-      }
-    }
+  default A getOrElse(A or) {
+    return (this instanceof Valid(A value)) ? value : or;
   }
 
-  default A getOrElse(Supplier<A> defaultValue) {
-    switch (this) {
-      case Valid(A value) -> {
-        return value;
-      }
-      case Invalid<E, A> _ -> {
-        return defaultValue.get();
-      }
-    }
+  default A getOrElse(Supplier<A> or) {
+    return (this instanceof Valid(A value)) ? value : or.get();
   }
 
   default Validation<E, A> orElse(Validation<E, A> or) {
-    switch (this) {
-      case Valid<E, A> valid -> {
-        return valid;
-      }
-      case Invalid<E, A> _ -> {
-        return or;
-      }
-    }
+    return (this instanceof Valid<E, A>) ? this : or;
   }
 
   default Validation<E, A> orElse(Supplier<Validation<E, A>> or) {
-    switch (this) {
-      case Valid<E, A> valid -> {
-        return valid;
-      }
-      case Invalid<E, A> _ -> {
-        return or.get();
-      }
-    }
+    return (this instanceof Valid<E, A>) ? this : or.get();
   }
 
   default Validation<A, List<E>> swap() {
@@ -241,38 +213,19 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
 
   @SuppressWarnings("unchecked")
   default <B> Validation<E, B> map(Function<A, B> f) {
-    switch (this) {
-      case Valid(A value) -> {
-        return valid(f.apply(value));
-      }
-      case Invalid<E, A> invalid -> {
-        return (Invalid<E, B>) invalid;
-      }
-    }
+    return (this instanceof Valid(A value)) ? valid(f.apply(value)) : (Invalid<E, B>) this;
   }
 
   @SuppressWarnings("unchecked")
   default <B> Validation<B, A> mapError(Function<E, B> f) {
-    switch (this) {
-      case Valid<E, A> valid -> {
-        return (Validation<B, A>) valid;
-      }
-      case Invalid(List<E> error) -> {
-        return invalid(error.stream().map(f).toList());
-      }
-    }
+    return (this instanceof Invalid<E, A>(List<E> errs))
+        ? invalid(errs.stream().map(f).toList())
+        : (Valid<B, A>) this;
   }
 
   @SuppressWarnings("unchecked")
   default <B> Validation<E, B> flatMap(Function<A, Validation<E, B>> f) {
-    switch (this) {
-      case Valid(A value) -> {
-        return f.apply(value);
-      }
-      case Invalid<E, A> invalid -> {
-        return (Invalid<E, B>) invalid;
-      }
-    }
+    return (this instanceof Valid(A value)) ? f.apply(value) : (Invalid<E, B>) this;
   }
 
   default <B> B fold(Function<A, B> valid, Function<List<E>, B> invalid) {
@@ -305,35 +258,14 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
   }
 
   default Either<List<E>, A> toEither() {
-    switch (this) {
-      case Valid(A value) -> {
-        return Either.right(value);
-      }
-      case Invalid<E, A>(List<E> error) -> {
-        return Either.left(error);
-      }
-    }
+    return fold(Either::right, Either::left);
   }
 
   default Option<A> toOption() {
-    switch (this) {
-      case Valid(A value) -> {
-        return Option.some(value);
-      }
-      case Invalid<E, A> _ -> {
-        return Option.none();
-      }
-    }
+    return fold(Option::some, _ -> Option.none());
   }
 
   default Try<A> toTry(Function<List<E>, Throwable> e) {
-    switch (this) {
-      case Valid(A value) -> {
-        return Try.success(value);
-      }
-      case Invalid(List<E> errs) -> {
-        return Try.failure(e.apply(errs));
-      }
-    }
+    return fold(Try::success, errs -> Try.failure(e.apply(errs)));
   }
 }

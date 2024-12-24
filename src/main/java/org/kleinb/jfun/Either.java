@@ -38,7 +38,7 @@ public sealed interface Either<A, B> permits Left, Right {
   }
 
   default boolean contains(B elem) {
-    return exists(b -> Objects.equals(b,elem));
+    return exists(b -> Objects.equals(b, elem));
   }
 
   default boolean exists(Predicate<B> f) {
