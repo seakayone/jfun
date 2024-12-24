@@ -2,6 +2,7 @@ package org.kleinb.jfun;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
@@ -52,105 +53,50 @@ public sealed interface Try<A> permits Failure, Success {
   }
 
   default A get() {
-    switch (this) {
-      case Success(A value) -> {
-        return value;
-      }
-      case Failure<A> _ -> {
-        return TryOps.sneakyThrow(getFailure());
-      }
+    if (this instanceof Success(A value)) {
+      return value;
+    } else {
+      return TryOps.sneakyThrow(getFailure());
     }
   }
 
-  default A getOrElse(A defaultValue) {
-    switch (this) {
-      case Success(A value) -> {
-        return value;
-      }
-      case Failure<A> _ -> {
-        return defaultValue;
-      }
-    }
+  default A getOrElse(A or) {
+    return isSuccess() ? get() : or;
   }
 
   default Throwable getFailure() {
-    switch (this) {
-      case Success<A> _ -> {
-        throw new NoSuchElementException("getFailure called on Success");
-      }
-      case Failure(Throwable e) -> {
-        return e;
-      }
+    if (this instanceof Failure(Throwable t)) {
+      return t;
+    } else {
+      throw new NoSuchElementException("getFailure called on Success");
     }
   }
 
   default Try<A> orElse(Supplier<Try<A>> or) {
-    switch (this) {
-      case Success<A> _ -> {
-        return this;
-      }
-      case Failure<A> _ -> {
-        return or.get();
-      }
-    }
+    return isSuccess() ? this : or.get();
   }
 
   default boolean contains(A value) {
-    switch (this) {
-      case Success(A v) -> {
-        return v.equals(value);
-      }
-      case Failure<A> _ -> {
-        return false;
-      }
-    }
+    return exists(a -> Objects.equals(a, value));
   }
 
   default boolean exists(Predicate<A> f) {
-    switch (this) {
-      case Success(A value) -> {
-        return f.test(value);
-      }
-      case Failure<A> _ -> {
-        return false;
-      }
-    }
+    return (this instanceof Success(A value)) && f.test(value);
   }
 
   @SuppressWarnings("unchecked")
   default <B> Try<B> map(Function<A, B> f) {
-    switch (this) {
-      case Success(A value) -> {
-        return Try.success(f.apply(value));
-      }
-      case Failure<A> failure -> {
-        return (Failure<B>) failure;
-      }
-    }
+    return (this instanceof Success(A value)) ? Try.success(f.apply(value)) : (Failure<B>) this;
   }
 
   @SuppressWarnings("unchecked")
   default <B> Try<B> mapTry(ThrowingFunction<A, B> f) {
-    switch (this) {
-      case Success(A value) -> {
-        return Try.of(() -> f.apply(value));
-      }
-      case Failure<A> failure -> {
-        return (Failure<B>) failure;
-      }
-    }
+    return (this instanceof Success(A value)) ? Try.of(() -> f.apply(value)) : (Failure<B>) this;
   }
 
   @SuppressWarnings("unchecked")
   default <B> Try<B> flatMap(Function<A, Try<B>> f) {
-    switch (this) {
-      case Success(A value) -> {
-        return f.apply(value);
-      }
-      case Failure<A> failure -> {
-        return (Failure<B>) failure;
-      }
-    }
+    return (this instanceof Success(A value)) ? f.apply(value) : (Failure<B>) this;
   }
 
   default <B> B fold(Function<A, B> success, Function<Throwable, B> failure) {
@@ -165,25 +111,11 @@ public sealed interface Try<A> permits Failure, Success {
   }
 
   default Try<A> recover(Function<Throwable, A> f) {
-    switch (this) {
-      case Success<A> success -> {
-        return success;
-      }
-      case Failure(Throwable t) -> {
-        return Try.success(f.apply(t));
-      }
-    }
+    return (this instanceof Failure(Throwable t)) ? Try.success(f.apply(t)) : this;
   }
 
   default Try<A> recoverWith(Function<Throwable, Try<A>> f) {
-    switch (this) {
-      case Success<A> success -> {
-        return success;
-      }
-      case Failure(Throwable t) -> {
-        return f.apply(t);
-      }
-    }
+    return (this instanceof Failure(Throwable t)) ? f.apply(t) : this;
   }
 
   default Try<A> filter(Predicate<A> f) {
@@ -193,8 +125,8 @@ public sealed interface Try<A> permits Failure, Success {
             ? this
             : Try.failure(new NoSuchElementException("Predicate does not hold for " + value));
       }
-      case Failure<A> _ -> {
-        return this;
+      case Failure<A> failure -> {
+        return failure;
       }
     }
   }
@@ -224,47 +156,19 @@ public sealed interface Try<A> permits Failure, Success {
   // conversion methods
 
   default Either<Throwable, A> toEither() {
-    switch (this) {
-      case Success(A value) -> {
-        return Either.right(value);
-      }
-      case Failure(Throwable t) -> {
-        return Either.left(t);
-      }
-    }
+    return fold(Either::right, Either::left);
   }
 
   default Option<A> toOption() {
-    switch (this) {
-      case Success(A value) -> {
-        return Option.some(value);
-      }
-      case Failure<A> _ -> {
-        return Option.none();
-      }
-    }
+    return fold(Option::some, _ -> Option.none());
   }
 
   default Optional<A> toOptional() {
-    switch (this) {
-      case Success(A value) -> {
-        return Optional.of(value);
-      }
-      case Failure<A> _ -> {
-        return Optional.empty();
-      }
-    }
+    return fold(Optional::of, _ -> Optional.empty());
   }
 
   default List<A> toList() {
-    switch (this) {
-      case Success(A value) -> {
-        return List.of(value);
-      }
-      case Failure<A> _ -> {
-        return List.of();
-      }
-    }
+    return fold(List::of, _ -> List.of());
   }
 }
 

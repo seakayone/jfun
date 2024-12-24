@@ -2,6 +2,7 @@ package org.kleinb.jfun;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -37,113 +38,47 @@ public sealed interface Option<A> permits None, Some {
   }
 
   default boolean contains(A value) {
-    switch (this) {
-      case Some(A v) -> {
-        return v.equals(value);
-      }
-      case None<A> _ -> {
-        return false;
-      }
-    }
+    return exists(a -> Objects.equals(a, value));
   }
 
   default boolean exists(Predicate<A> f) {
-    switch (this) {
-      case Some(A value) -> {
-        return f.test(value);
-      }
-      case None<A> _ -> {
-        return false;
-      }
-    }
+    return (this instanceof Some(A value)) && f.test(value);
   }
 
   default A get() {
-    switch (this) {
-      case Some(A value) -> {
-        return value;
-      }
-      case None<A> _ -> {
-        throw new NoSuchElementException();
-      }
+    if (this instanceof Some(A value)) {
+      return value;
+    } else {
+      throw new NoSuchElementException("get called on None");
     }
   }
 
   default <B> Option<B> flatMap(Function<A, Option<B>> f) {
-    switch (this) {
-      case Some(A value) -> {
-        return f.apply(value);
-      }
-      case None<A> _ -> {
-        return none();
-      }
-    }
+    return (this instanceof Some(A value)) ? f.apply(value) : none();
   }
 
   default <B> Option<B> map(Function<A, B> f) {
-    switch (this) {
-      case Some(A value) -> {
-        return some(f.apply(value));
-      }
-      case None<A> _ -> {
-        return none();
-      }
-    }
+    return (this instanceof Some(A value)) ? some(f.apply(value)) : none();
   }
 
   default <C> C fold(Function<A, C> some, Supplier<C> none) {
-    switch (this) {
-      case Some(A value) -> {
-        return some.apply(value);
-      }
-      case None<A> _ -> {
-        return none.get();
-      }
-    }
+    return (this instanceof Some(A value)) ? some.apply(value) : none.get();
   }
 
   default Option<A> orElse(Supplier<Option<A>> or) {
-    switch (this) {
-      case Some(A _) -> {
-        return this;
-      }
-      case None<A> _ -> {
-        return or.get();
-      }
-    }
+    return isSome() ? this : or.get();
   }
 
   default A getOrNull() {
-    switch (this) {
-      case Some(A value) -> {
-        return value;
-      }
-      case None<A> _ -> {
-        return null;
-      }
-    }
+    return (this instanceof Some(A value)) ? value : null;
   }
 
   default A getOrElse(A a) {
-    switch (this) {
-      case Some(A value) -> {
-        return value;
-      }
-      case None<A> _ -> {
-        return a;
-      }
-    }
+    return (this instanceof Some(A value)) ? value : a;
   }
 
   default Option<A> filter(Predicate<A> f) {
-    switch (this) {
-      case Some(A value) -> {
-        return f.test(value) ? this : none();
-      }
-      case None<A> _ -> {
-        return none();
-      }
-    }
+    return (this instanceof Some(A value) && f.test(value)) ? this : none();
   }
 
   default Option<A> filterNot(Predicate<A> f) {
@@ -160,46 +95,18 @@ public sealed interface Option<A> permits None, Some {
   // Conversion methods
 
   default List<A> toList() {
-    switch (this) {
-      case Some(A value) -> {
-        return List.of(value);
-      }
-      case None<A> _ -> {
-        return List.of();
-      }
-    }
+    return fold(List::of, List::of);
   }
 
   default Optional<A> toOptional() {
-    switch (this) {
-      case Some(A value) -> {
-        return Optional.of(value);
-      }
-      case None<A> _ -> {
-        return Optional.empty();
-      }
-    }
+    return fold(Optional::of, Optional::empty);
   }
 
   default <B> Either<B, A> toRight(Supplier<B> left) {
-    switch (this) {
-      case Some(A value) -> {
-        return Either.right(value);
-      }
-      case None<A> _ -> {
-        return Either.left(left.get());
-      }
-    }
+    return fold(Either::right, () -> Either.left(left.get()));
   }
 
   default Try<A> toTry() {
-    switch (this) {
-      case Some(A value) -> {
-        return Try.success(value);
-      }
-      case None<A> _ -> {
-        return Try.failure(new NoSuchElementException());
-      }
-    }
+    return fold(Try::success, () -> Try.failure(new NoSuchElementException()));
   }
 }
