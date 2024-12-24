@@ -2,6 +2,7 @@ package org.kleinb.jfun;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -28,7 +29,7 @@ public sealed interface Either<A, B> permits Left, Right {
   default Either<B, A> swap() {
     switch (this) {
       case Left(A value) -> {
-        return right(value);
+        return Either.right(value);
       }
       case Right(B value) -> {
         return Either.left(value);
@@ -37,25 +38,11 @@ public sealed interface Either<A, B> permits Left, Right {
   }
 
   default boolean contains(B elem) {
-    switch (this) {
-      case Left(A _) -> {
-        return false;
-      }
-      case Right(B b) -> {
-        return b.equals(elem);
-      }
-    }
+    return exists(b -> Objects.equals(b,elem));
   }
 
   default boolean exists(Predicate<B> f) {
-    switch (this) {
-      case Left(A _) -> {
-        return false;
-      }
-      case Right(B value) -> {
-        return f.test(value);
-      }
-    }
+    return this instanceof Right(B value) && f.test(value);
   }
 
   default <C> C fold(Function<B, C> right, Function<A, C> left) {
@@ -71,81 +58,39 @@ public sealed interface Either<A, B> permits Left, Right {
 
   @SuppressWarnings("unchecked")
   default <C> Either<A, C> map(Function<B, C> f) {
-    switch (this) {
-      case Left(A _) -> {
-        return (Left<A, C>) this;
-      }
-      case Right(B value) -> {
-        return Either.right(f.apply(value));
-      }
-    }
+    return (this instanceof Right(B value)) ? Either.right(f.apply(value)) : (Left<A, C>) this;
   }
 
   @SuppressWarnings("unchecked")
   default <C> Either<A, C> flatMap(Function<B, Either<A, C>> f) {
-    switch (this) {
-      case Left(A _) -> {
-        return (Left<A, C>) this;
-      }
-      case Right(B value) -> {
-        return f.apply(value);
-      }
-    }
+    return (this instanceof Right(B value)) ? f.apply(value) : (Left<A, C>) this;
   }
 
   default B get() {
     switch (this) {
-      case Left(A _) -> {
-        throw new NoSuchElementException("get called on Left");
-      }
       case Right(B value) -> {
         return value;
+      }
+      case Left(A _) -> {
+        throw new NoSuchElementException("get called on Left");
       }
     }
   }
 
   default B getOrElse(B or) {
-    switch (this) {
-      case Left(A _) -> {
-        return or;
-      }
-      case Right(B value) -> {
-        return value;
-      }
-    }
+    return (this instanceof Right(B value)) ? value : or;
   }
 
   default Either<A, B> orElse(Supplier<Either<A, B>> or) {
-    switch (this) {
-      case Left(A _) -> {
-        return or.get();
-      }
-      case Right(B value) -> {
-        return this;
-      }
-    }
+    return (this instanceof Right(B value)) ? this : or.get();
   }
 
   default Option<B> filterToOption(Predicate<B> p) {
-    switch (this) {
-      case Left(A _) -> {
-        return Option.none();
-      }
-      case Right(B value) -> {
-        return p.test(value) ? Option.some(value) : Option.none();
-      }
-    }
+    return (this instanceof Right(B value) && p.test(value)) ? Option.some(value) : Option.none();
   }
 
   default B filterOrElse(Predicate<B> p, B or) {
-    switch (this) {
-      case Left(A _) -> {
-        return or;
-      }
-      case Right(B value) -> {
-        return p.test(value) ? value : or;
-      }
-    }
+    return (this instanceof Right(B value) && p.test(value)) ? value : or;
   }
 
   default Either<A, B> tap(Consumer<B> f) {
@@ -169,57 +114,22 @@ public sealed interface Either<A, B> permits Left, Right {
   // conversion methods
 
   default Option<B> toOption() {
-    switch (this) {
-      case Left(A _) -> {
-        return Option.none();
-      }
-      case Right(B value) -> {
-        return Option.some(value);
-      }
-    }
+    return fold(Option::some, _ -> Option.none());
   }
 
   default Optional<B> toOptional() {
-    switch (this) {
-      case Left(A _) -> {
-        return Optional.empty();
-      }
-      case Right(B value) -> {
-        return Optional.of(value);
-      }
-    }
+    return fold(Optional::of, _ -> Optional.empty());
   }
 
   default List<B> toList() {
-    switch (this) {
-      case Left(A _) -> {
-        return List.of();
-      }
-      case Right(B value) -> {
-        return List.of(value);
-      }
-    }
+    return fold(List::of, _ -> List.of());
   }
 
   default Try<B> toTry(Function<A, Throwable> e) {
-    switch (this) {
-      case Left(A value) -> {
-        return Try.failure(e.apply(value));
-      }
-      case Right(B value) -> {
-        return Try.success(value);
-      }
-    }
+    return fold(Try::success, a -> Try.failure(e.apply(a)));
   }
 
   default Validation<A, B> toValidation() {
-    switch (this) {
-      case Left(A value) -> {
-        return Validation.invalid(value);
-      }
-      case Right(B value) -> {
-        return Validation.valid(value);
-      }
-    }
+    return fold(Validation::valid, Validation::invalid);
   }
 }
