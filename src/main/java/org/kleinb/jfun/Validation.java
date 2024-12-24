@@ -325,4 +325,15 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
       }
     }
   }
+
+  default Try<A> toTry(Function<List<E>, Throwable> e) {
+    switch (this) {
+      case Valid(A value) -> {
+        return Try.success(value);
+      }
+      case Invalid(List<E> errs) -> {
+        return Try.failure(e.apply(errs));
+      }
+    }
+  }
 }

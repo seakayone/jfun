@@ -565,4 +565,19 @@ class ValidationTest {
     Validation<String, Integer> invalid = Validation.invalid("error");
     assertThat(invalid.toOption()).isEqualTo(Option.none());
   }
+
+  // .toTry
+
+  @Test
+  void shouldConvertValidToSuccess() {
+    Validation<String, Integer> valid = Validation.valid(42);
+    assertThat(valid.toTry(_ -> new RuntimeException())).isEqualTo(Try.success(42));
+  }
+
+  @Test
+  void shouldConvertInvalidToFailure() {
+    var exception = new RuntimeException("error");
+    Validation<String, Integer> invalid = Validation.invalid("error");
+    assertThat(invalid.toTry(_ -> exception)).isEqualTo(Try.failure(exception));
+  }
 }
