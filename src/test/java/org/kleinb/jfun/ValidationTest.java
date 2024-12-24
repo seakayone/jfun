@@ -1,314 +1,317 @@
 package org.kleinb.jfun;
 
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.NoSuchElementException;
-
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
+import java.util.List;
+import java.util.NoSuchElementException;
+import org.junit.jupiter.api.Test;
+
 class ValidationTest {
 
-    // factory methods, construction
+  // factory methods, construction
 
-    @Test
-    void shouldCreateValid() {
-        Validation<?, Integer> actual = Validation.valid(42);
-        assertThat(actual).isInstanceOf(Valid.class);
-    }
+  @Test
+  void shouldCreateValid() {
+    Validation<?, Integer> actual = Validation.valid(42);
+    assertThat(actual).isInstanceOf(Valid.class);
+  }
 
-    @Test
-    void shouldCreateInvalid() {
-        Validation<String, ?> actual = Validation.invalid("error");
-        assertThat(actual).isInstanceOf(Invalid.class);
-    }
+  @Test
+  void shouldCreateInvalid() {
+    Validation<String, ?> actual = Validation.invalid("error");
+    assertThat(actual).isInstanceOf(Invalid.class);
+  }
 
-    @Test
-    void shouldCreateFromRight() {
-        Validation<String, Integer> actual = Validation.fromEither(Either.right(42));
-        assertThat(actual).isInstanceOf(Valid.class);
-    }
+  @Test
+  void shouldCreateFromRight() {
+    Validation<String, Integer> actual = Validation.fromEither(Either.right(42));
+    assertThat(actual).isInstanceOf(Valid.class);
+  }
 
-    @Test
-    void shouldCreateFromLeft() {
-        Validation<String, Integer> actual = Validation.fromEither(Either.left("error"));
-        assertThat(actual).isEqualTo(Validation.invalid("error"));
-    }
+  @Test
+  void shouldCreateFromLeft() {
+    Validation<String, Integer> actual = Validation.fromEither(Either.left("error"));
+    assertThat(actual).isEqualTo(Validation.invalid("error"));
+  }
 
-    @Test
-    void shouldCreateFromTrySuccess() {
-        Validation<Throwable, Integer> actual = Validation.fromTry(Try.success(42));
-        assertThat(actual).isEqualTo(Validation.valid(42));
-    }
+  @Test
+  void shouldCreateFromTrySuccess() {
+    Validation<Throwable, Integer> actual = Validation.fromTry(Try.success(42));
+    assertThat(actual).isEqualTo(Validation.valid(42));
+  }
 
-    @Test
-    void shouldCreateFromTryFailure() {
-        Exception exception = new RuntimeException("error");
-        Validation<Throwable, Integer> actual = Validation.fromTry(Try.failure(exception));
-        assertThat(actual).isEqualTo(Validation.invalid(exception));
-    }
+  @Test
+  void shouldCreateFromTryFailure() {
+    Exception exception = new RuntimeException("error");
+    Validation<Throwable, Integer> actual = Validation.fromTry(Try.failure(exception));
+    assertThat(actual).isEqualTo(Validation.invalid(exception));
+  }
 
-    @Test
-    void shouldCreateFromPredicate() {
-        Validation<String, Integer> actual = Validation.fromPredicate("Not greater than zero", i -> i > 0, 42);
-        assertThat(actual).isEqualTo(Validation.valid(42));
-    }
+  @Test
+  void shouldCreateFromPredicate() {
+    Validation<String, Integer> actual =
+        Validation.fromPredicate("Not greater than zero", i -> i > 0, 42);
+    assertThat(actual).isEqualTo(Validation.valid(42));
+  }
 
-    @Test
-    void shouldCreateFromPredicateInvalid() {
-        Validation<String, Integer> actual = Validation.fromPredicate("Not greater than zero", i -> i > 0, -42);
-        assertThat(actual).isEqualTo(Validation.invalid("Not greater than zero"));
-    }
+  @Test
+  void shouldCreateFromPredicateInvalid() {
+    Validation<String, Integer> actual =
+        Validation.fromPredicate("Not greater than zero", i -> i > 0, -42);
+    assertThat(actual).isEqualTo(Validation.invalid("Not greater than zero"));
+  }
 
-    // .isValid , .isInvalid
-    @Test
-    void shouldCheckValid() {
-        Validation<?, Integer> valid = Validation.valid(42);
-        assertThat(valid.isValid()).isTrue();
-        assertThat(valid.isInvalid()).isFalse();
-    }
+  // .isValid , .isInvalid
+  @Test
+  void shouldCheckValid() {
+    Validation<?, Integer> valid = Validation.valid(42);
+    assertThat(valid.isValid()).isTrue();
+    assertThat(valid.isInvalid()).isFalse();
+  }
 
-    @Test
-    void shouldCheckInvalid() {
-        Validation<String, ?> invalid = Validation.invalid("error");
-        assertThat(invalid.isValid()).isFalse();
-        assertThat(invalid.isInvalid()).isTrue();
-    }
+  @Test
+  void shouldCheckInvalid() {
+    Validation<String, ?> invalid = Validation.invalid("error");
+    assertThat(invalid.isValid()).isFalse();
+    assertThat(invalid.isInvalid()).isTrue();
+  }
 
-    // .get
+  // .get
 
-    @Test
-    void shouldGetValidValue() {
-        Validation<?, Integer> valid = Validation.valid(42);
-        assertThat(valid.get()).isEqualTo(42);
-    }
+  @Test
+  void shouldGetValidValue() {
+    Validation<?, Integer> valid = Validation.valid(42);
+    assertThat(valid.get()).isEqualTo(42);
+  }
 
-    @Test
-    void shouldThrowOnGetInvalid() {
-        Validation<String, ?> invalid = Validation.invalid("error");
-        assertThatThrownBy(invalid::get).isInstanceOf(NoSuchElementException.class);
-    }
+  @Test
+  void shouldThrowOnGetInvalid() {
+    Validation<String, ?> invalid = Validation.invalid("error");
+    assertThatThrownBy(invalid::get).isInstanceOf(NoSuchElementException.class);
+  }
 
-    // .getError
+  // .getError
 
-    @Test
-    void shouldGetInvalidError() {
-        Validation<String, ?> invalid = Validation.invalid("error");
-        assertThat(invalid.getError()).isEqualTo(List.of("error"));
-    }
+  @Test
+  void shouldGetInvalidError() {
+    Validation<String, ?> invalid = Validation.invalid("error");
+    assertThat(invalid.getError()).isEqualTo(List.of("error"));
+  }
 
-    @Test
-    void shouldThrowOnGetErrorValid() {
-        Validation<?, Integer> valid = Validation.valid(42);
-        assertThatThrownBy(valid::getError).isInstanceOf(NoSuchElementException.class);
-    }
+  @Test
+  void shouldThrowOnGetErrorValid() {
+    Validation<?, Integer> valid = Validation.valid(42);
+    assertThatThrownBy(valid::getError).isInstanceOf(NoSuchElementException.class);
+  }
 
-    // .getOrElse
+  // .getOrElse
 
-    @Test
-    void shouldGetOrElseValid() {
-        Validation<?, Integer> valid = Validation.valid(42);
-        assertThat(valid.getOrElse(0)).isEqualTo(42);
-    }
+  @Test
+  void shouldGetOrElseValid() {
+    Validation<?, Integer> valid = Validation.valid(42);
+    assertThat(valid.getOrElse(0)).isEqualTo(42);
+  }
 
-    @Test
-    void shouldGetOrElseInvalid() {
-        Validation<String, String> invalid = Validation.invalid("error");
-        assertThat(invalid.getOrElse("42")).isEqualTo("42");
-    }
+  @Test
+  void shouldGetOrElseInvalid() {
+    Validation<String, String> invalid = Validation.invalid("error");
+    assertThat(invalid.getOrElse("42")).isEqualTo("42");
+  }
 
-    @Test
-    void shouldGetOrElseSupplierValid() {
-        Validation<?, Integer> valid = Validation.valid(42);
-        assertThat(valid.getOrElse(() -> 0)).isEqualTo(42);
-    }
+  @Test
+  void shouldGetOrElseSupplierValid() {
+    Validation<?, Integer> valid = Validation.valid(42);
+    assertThat(valid.getOrElse(() -> 0)).isEqualTo(42);
+  }
 
-    @Test
-    void shouldGetOrElseSupplierInvalid() {
-        Validation<String, String> invalid = Validation.invalid("error");
-        assertThat(invalid.getOrElse(() -> "42")).isEqualTo("42");
-    }
+  @Test
+  void shouldGetOrElseSupplierInvalid() {
+    Validation<String, String> invalid = Validation.invalid("error");
+    assertThat(invalid.getOrElse(() -> "42")).isEqualTo("42");
+  }
 
-    // .orElse
+  // .orElse
 
-    @Test
-    void shouldReturnValidOnOrElseValid() {
-        Validation<String, Integer> valid = Validation.valid(42);
-        Validation<String, Integer> or = Validation.invalid("error");
-        assertThat(valid.orElse(or)).isEqualTo(valid);
-    }
+  @Test
+  void shouldReturnValidOnOrElseValid() {
+    Validation<String, Integer> valid = Validation.valid(42);
+    Validation<String, Integer> or = Validation.invalid("error");
+    assertThat(valid.orElse(or)).isEqualTo(valid);
+  }
 
-    @Test
-    void shouldReturnOrOnOrElseInvalid() {
-        Validation<String, Integer> invalid = Validation.invalid("error");
-        Validation<String, Integer> or = Validation.valid(42);
-        assertThat(invalid.orElse(or)).isEqualTo(or);
-    }
+  @Test
+  void shouldReturnOrOnOrElseInvalid() {
+    Validation<String, Integer> invalid = Validation.invalid("error");
+    Validation<String, Integer> or = Validation.valid(42);
+    assertThat(invalid.orElse(or)).isEqualTo(or);
+  }
 
-    @Test
-    void shouldReturnValidOnOrElseSupplierValid() {
-        Validation<String, Integer> valid = Validation.valid(42);
-        Validation<String, Integer> or = Validation.invalid("error");
-        assertThat(valid.orElse(() -> or)).isEqualTo(valid);
-    }
+  @Test
+  void shouldReturnValidOnOrElseSupplierValid() {
+    Validation<String, Integer> valid = Validation.valid(42);
+    Validation<String, Integer> or = Validation.invalid("error");
+    assertThat(valid.orElse(() -> or)).isEqualTo(valid);
+  }
 
-    @Test
-    void shouldReturnOrOnOrElseSupplierInvalid() {
-        Validation<String, Integer> invalid = Validation.invalid("error");
-        Validation<String, Integer> or = Validation.valid(42);
-        assertThat(invalid.orElse(() -> or)).isEqualTo(or);
-    }
+  @Test
+  void shouldReturnOrOnOrElseSupplierInvalid() {
+    Validation<String, Integer> invalid = Validation.invalid("error");
+    Validation<String, Integer> or = Validation.valid(42);
+    assertThat(invalid.orElse(() -> or)).isEqualTo(or);
+  }
 
-    // .swap
+  // .swap
 
-    @Test
-    void shouldSwapValid() {
-        Validation<String, Integer> valid = Validation.valid(42);
-        assertThat(valid.swap()).isEqualTo(Validation.invalid(42));
-    }
+  @Test
+  void shouldSwapValid() {
+    Validation<String, Integer> valid = Validation.valid(42);
+    assertThat(valid.swap()).isEqualTo(Validation.invalid(42));
+  }
 
-    @Test
-    void shouldSwapInvalid() {
-        Validation<String, Integer> invalid = Validation.invalid("error");
-        assertThat(invalid.swap()).isEqualTo(Validation.valid(List.of("error")));
-    }
+  @Test
+  void shouldSwapInvalid() {
+    Validation<String, Integer> invalid = Validation.invalid("error");
+    assertThat(invalid.swap()).isEqualTo(Validation.valid(List.of("error")));
+  }
 
-    // .map
+  // .map
 
-    @Test
-    void shouldMapValid() {
-        Validation<String, Integer> valid = Validation.valid(42);
-        assertThat(valid.map(String::valueOf)).isEqualTo(Validation.valid("42"));
-    }
+  @Test
+  void shouldMapValid() {
+    Validation<String, Integer> valid = Validation.valid(42);
+    assertThat(valid.map(String::valueOf)).isEqualTo(Validation.valid("42"));
+  }
 
-    @Test
-    void shouldMapInvalid() {
-        Validation<String, Integer> invalid = Validation.invalid("error");
-        assertThat(invalid.map(String::valueOf)).isEqualTo(Validation.invalid("error"));
-    }
+  @Test
+  void shouldMapInvalid() {
+    Validation<String, Integer> invalid = Validation.invalid("error");
+    assertThat(invalid.map(String::valueOf)).isEqualTo(Validation.invalid("error"));
+  }
 
-    // .mapError
+  // .mapError
 
-    @Test
-    void shouldMapErrorValid() {
-        Validation<String, Integer> valid = Validation.valid(42);
-        assertThat(valid.mapError(String::length)).isEqualTo(Validation.valid(42));
-    }
+  @Test
+  void shouldMapErrorValid() {
+    Validation<String, Integer> valid = Validation.valid(42);
+    assertThat(valid.mapError(String::length)).isEqualTo(Validation.valid(42));
+  }
 
-    @Test
-    void shouldMapErrorInvalid() {
-        Validation<String, Integer> invalid = Validation.invalid("error");
-        assertThat(invalid.mapError(String::length)).isEqualTo(Validation.invalid(5));
-    }
+  @Test
+  void shouldMapErrorInvalid() {
+    Validation<String, Integer> invalid = Validation.invalid("error");
+    assertThat(invalid.mapError(String::length)).isEqualTo(Validation.invalid(5));
+  }
 
-    // .flatMap
+  // .flatMap
 
-    @Test
-    void shouldFlatMapValid() {
-        Validation<String, Integer> valid = Validation.valid(42);
-        assertThat(valid.flatMap(i -> Validation.valid(String.valueOf(i)))).isEqualTo(Validation.valid("42"));
-    }
+  @Test
+  void shouldFlatMapValid() {
+    Validation<String, Integer> valid = Validation.valid(42);
+    assertThat(valid.flatMap(i -> Validation.valid(String.valueOf(i))))
+        .isEqualTo(Validation.valid("42"));
+  }
 
-    @Test
-    void shouldFlatMapInvalid() {
-        Validation<String, Integer> invalid = Validation.invalid("error");
-        assertThat(invalid.flatMap(i -> Validation.valid(String.valueOf(i)))).isEqualTo(Validation.invalid("error"));
-    }
+  @Test
+  void shouldFlatMapInvalid() {
+    Validation<String, Integer> invalid = Validation.invalid("error");
+    assertThat(invalid.flatMap(i -> Validation.valid(String.valueOf(i))))
+        .isEqualTo(Validation.invalid("error"));
+  }
 
-    @Test
-    void shouldFlatMapValidInvalid() {
-        Validation<String, Integer> valid = Validation.valid(42);
-        assertThat(valid.flatMap(_ -> Validation.invalid("error"))).isEqualTo(Validation.invalid("error"));
-    }
+  @Test
+  void shouldFlatMapValidInvalid() {
+    Validation<String, Integer> valid = Validation.valid(42);
+    assertThat(valid.flatMap(_ -> Validation.invalid("error")))
+        .isEqualTo(Validation.invalid("error"));
+  }
 
-    // .fold
-    @Test
-    void shouldFoldValid() {
-        Validation<String, Integer> valid = Validation.valid(42);
-        Integer actual = valid.fold(i -> i, List::size);
-        assertThat(actual).isEqualTo(42);
-    }
+  // .fold
+  @Test
+  void shouldFoldValid() {
+    Validation<String, Integer> valid = Validation.valid(42);
+    Integer actual = valid.fold(i -> i, List::size);
+    assertThat(actual).isEqualTo(42);
+  }
 
-    @Test
-    void shouldFoldInvalid() {
-        Validation<String, Integer> invalid = Validation.invalid("error");
-        Integer actual = invalid.fold(i -> i, List::size);
-        assertThat(actual).isEqualTo(1);
-    }
+  @Test
+  void shouldFoldInvalid() {
+    Validation<String, Integer> invalid = Validation.invalid("error");
+    Integer actual = invalid.fold(i -> i, List::size);
+    assertThat(actual).isEqualTo(1);
+  }
 
-    // .tap
+  // .tap
 
-    @Test
-    void shouldTapValid() {
-        Validation<String, Integer> valid = Validation.valid(42);
-        StringBuilder sb = new StringBuilder();
-        var actual = valid.tap(sb::append);
-        assertThat(sb.toString()).isEqualTo("42");
-        assertThat(actual).isEqualTo(valid);
-    }
+  @Test
+  void shouldTapValid() {
+    Validation<String, Integer> valid = Validation.valid(42);
+    StringBuilder sb = new StringBuilder();
+    var actual = valid.tap(sb::append);
+    assertThat(sb.toString()).isEqualTo("42");
+    assertThat(actual).isEqualTo(valid);
+  }
 
-    @Test
-    void shouldNotTapInvalid() {
-        Validation<String, Integer> invalid = Validation.invalid("error");
-        StringBuilder sb = new StringBuilder();
-        var actual = invalid.tap(sb::append);
-        assertThat(sb.toString()).isEmpty();
-        assertThat(actual).isEqualTo(invalid);
-    }
+  @Test
+  void shouldNotTapInvalid() {
+    Validation<String, Integer> invalid = Validation.invalid("error");
+    StringBuilder sb = new StringBuilder();
+    var actual = invalid.tap(sb::append);
+    assertThat(sb.toString()).isEmpty();
+    assertThat(actual).isEqualTo(invalid);
+  }
 
-    // .tapError
+  // .tapError
 
-    @Test
-    void shouldTapErrorValid() {
-        Validation<String, Integer> valid = Validation.valid(42);
-        StringBuilder sb = new StringBuilder();
-        var actual = valid.tapError(sb::append);
-        assertThat(sb.toString()).isEmpty();
-        assertThat(actual).isEqualTo(valid);
-    }
+  @Test
+  void shouldTapErrorValid() {
+    Validation<String, Integer> valid = Validation.valid(42);
+    StringBuilder sb = new StringBuilder();
+    var actual = valid.tapError(sb::append);
+    assertThat(sb.toString()).isEmpty();
+    assertThat(actual).isEqualTo(valid);
+  }
 
-    @Test
-    void shouldTapErrorInvalid() {
-        Validation<String, Integer> invalid = Validation.invalid("error");
-        StringBuilder sb = new StringBuilder();
-        var actual = invalid.tapError(it -> sb.append(it.size()));
-        assertThat(sb.toString()).isEqualTo("1");
-        assertThat(actual).isEqualTo(invalid);
-    }
+  @Test
+  void shouldTapErrorInvalid() {
+    Validation<String, Integer> invalid = Validation.invalid("error");
+    StringBuilder sb = new StringBuilder();
+    var actual = invalid.tapError(it -> sb.append(it.size()));
+    assertThat(sb.toString()).isEqualTo("1");
+    assertThat(actual).isEqualTo(invalid);
+  }
 
-    // .tapBoth
+  // .tapBoth
 
-    @Test
-    void shouldTapBothValid() {
-        Validation<String, Integer> valid = Validation.valid(42);
-        StringBuilder sb = new StringBuilder();
-        var actual = valid.tapBoth(sb::append, sb::append);
-        assertThat(sb.toString()).isEqualTo("42");
-        assertThat(actual).isEqualTo(valid);
-    }
+  @Test
+  void shouldTapBothValid() {
+    Validation<String, Integer> valid = Validation.valid(42);
+    StringBuilder sb = new StringBuilder();
+    var actual = valid.tapBoth(sb::append, sb::append);
+    assertThat(sb.toString()).isEqualTo("42");
+    assertThat(actual).isEqualTo(valid);
+  }
 
-    @Test
-    void shouldTapBothInvalid() {
-        Validation<String, Integer> invalid = Validation.invalid("error");
-        StringBuilder sb = new StringBuilder();
-        var actual = invalid.tapBoth(sb::append, it -> sb.append(it.size()));
-        assertThat(sb.toString()).isEqualTo("1");
-        assertThat(actual).isEqualTo(invalid);
-    }
+  @Test
+  void shouldTapBothInvalid() {
+    Validation<String, Integer> invalid = Validation.invalid("error");
+    StringBuilder sb = new StringBuilder();
+    var actual = invalid.tapBoth(sb::append, it -> sb.append(it.size()));
+    assertThat(sb.toString()).isEqualTo("1");
+    assertThat(actual).isEqualTo(invalid);
+  }
 
-    // .toEither
+  // .toEither
 
-    @Test
-    void shouldConvertValidToRight() {
-        Validation<String, Integer> valid = Validation.valid(42);
-        assertThat(valid.toEither()).isEqualTo(Either.right(42));
-    }
+  @Test
+  void shouldConvertValidToRight() {
+    Validation<String, Integer> valid = Validation.valid(42);
+    assertThat(valid.toEither()).isEqualTo(Either.right(42));
+  }
 
-    @Test
-    void shouldConvertInvalidToLeft() {
-        Validation<String, Integer> invalid = Validation.invalid("error");
-        assertThat(invalid.toEither()).isEqualTo(Either.left(List.of("error")));
-    }
-
+  @Test
+  void shouldConvertInvalidToLeft() {
+    Validation<String, Integer> invalid = Validation.invalid("error");
+    assertThat(invalid.toEither()).isEqualTo(Either.left(List.of("error")));
+  }
 }
