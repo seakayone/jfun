@@ -1,4 +1,7 @@
 package org.kleinb.jfun;
 
-public record Invalid<E, A>(E error) implements Validation<E, A> {
+
+import java.util.List;
+
+public record Invalid<E, A>(List<E> error) implements Validation<E, A> {
 }

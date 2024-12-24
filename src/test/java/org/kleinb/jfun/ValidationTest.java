@@ -2,6 +2,7 @@ package org.kleinb.jfun;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -48,6 +49,18 @@ class ValidationTest {
         assertThat(actual).isEqualTo(Validation.invalid(exception));
     }
 
+    @Test
+    void shouldCreateFromPredicate() {
+        Validation<String, Integer> actual = Validation.fromPredicate("Not greater than zero", i -> i > 0, 42);
+        assertThat(actual).isEqualTo(Validation.valid(42));
+    }
+
+    @Test
+    void shouldCreateFromPredicateInvalid() {
+        Validation<String, Integer> actual = Validation.fromPredicate("Not greater than zero", i -> i > 0, -42);
+        assertThat(actual).isEqualTo(Validation.invalid("Not greater than zero"));
+    }
+
     // .isValid , .isInvalid
     @Test
     void shouldCheckValid() {
@@ -82,7 +95,7 @@ class ValidationTest {
     @Test
     void shouldGetInvalidError() {
         Validation<String, ?> invalid = Validation.invalid("error");
-        assertThat(invalid.getError()).isEqualTo("error");
+        assertThat(invalid.getError()).isEqualTo(List.of("error"));
     }
 
     @Test
@@ -158,7 +171,7 @@ class ValidationTest {
     @Test
     void shouldSwapInvalid() {
         Validation<String, Integer> invalid = Validation.invalid("error");
-        assertThat(invalid.swap()).isEqualTo(Validation.valid("error"));
+        assertThat(invalid.swap()).isEqualTo(Validation.valid(List.of("error")));
     }
 
     // .map
@@ -213,13 +226,15 @@ class ValidationTest {
     @Test
     void shouldFoldValid() {
         Validation<String, Integer> valid = Validation.valid(42);
-        assertThat(valid.fold(i -> i, String::length)).isEqualTo(42);
+        Integer actual = valid.fold(i -> i, List::size);
+        assertThat(actual).isEqualTo(42);
     }
 
     @Test
     void shouldFoldInvalid() {
         Validation<String, Integer> invalid = Validation.invalid("error");
-        assertThat(invalid.fold(i -> i, String::length)).isEqualTo(5);
+        Integer actual = invalid.fold(i -> i, List::size);
+        assertThat(actual).isEqualTo(1);
     }
 
     // .tap
@@ -257,8 +272,8 @@ class ValidationTest {
     void shouldTapErrorInvalid() {
         Validation<String, Integer> invalid = Validation.invalid("error");
         StringBuilder sb = new StringBuilder();
-        var actual = invalid.tapError(sb::append);
-        assertThat(sb.toString()).isEqualTo("error");
+        var actual = invalid.tapError(it -> sb.append(it.size()));
+        assertThat(sb.toString()).isEqualTo("1");
         assertThat(actual).isEqualTo(invalid);
     }
 
@@ -277,8 +292,8 @@ class ValidationTest {
     void shouldTapBothInvalid() {
         Validation<String, Integer> invalid = Validation.invalid("error");
         StringBuilder sb = new StringBuilder();
-        var actual = invalid.tapBoth(sb::append, sb::append);
-        assertThat(sb.toString()).isEqualTo("error");
+        var actual = invalid.tapBoth(sb::append, it -> sb.append(it.size()));
+        assertThat(sb.toString()).isEqualTo("1");
         assertThat(actual).isEqualTo(invalid);
     }
 
@@ -293,7 +308,7 @@ class ValidationTest {
     @Test
     void shouldConvertInvalidToLeft() {
         Validation<String, Integer> invalid = Validation.invalid("error");
-        assertThat(invalid.toEither()).isEqualTo(Either.left("error"));
+        assertThat(invalid.toEither()).isEqualTo(Either.left(List.of("error")));
     }
 
 }
