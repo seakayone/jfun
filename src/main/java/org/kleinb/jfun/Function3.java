@@ -1,22 +1,27 @@
 package org.kleinb.jfun;
 
 @FunctionalInterface
-public interface Function3<B, C, D, A> {
-  A apply(B b, C c, D d);
+public interface Function3<A, B, C, Z> {
 
-  default Function1<B, Function1<C, Function1<D, A>>> curried() {
-    return b -> c -> d -> apply(b, c, d);
+  static <A, B, C, Z> Function3<A, B, C, Z> constant(Z value) {
+    return (_, _, _) -> value;
   }
 
-  default Function1<Tuple3<B, C, D>, A> tupled() {
+  Z apply(A a, B b, C c);
+
+  default Function1<A, Function1<B, Function1<C, Z>>> curried() {
+    return a -> b -> c -> apply(a, b, c);
+  }
+
+  default Function1<Tuple3<A, B, C>, Z> tupled() {
     return t -> apply(t._1(), t._2(), t._3());
   }
 
-  default <E> Function3<B, C, D, E> andThen(Function1<A, E> after) {
-    return (b, c, d) -> after.apply(apply(b, c, d));
+  default <E> Function3<A, B, C, E> andThen(Function1<? super Z, ? extends E> after) {
+    return (a, b, c) -> after.apply(apply(a, b, c));
   }
 
-  default <E> Function3<E, C, D, A> compose(Function1<E, B> before) {
-    return (e, c, d) -> apply(before.apply(e), c, d);
+  default <E> Function3<E, B, C, Z> compose(Function1<? super E, ? extends A> before) {
+    return (e, b, c) -> apply(before.apply(e), b, c);
   }
 }

@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 
 public sealed interface Try<A> permits Failure, Success {
 
-  static <A> Try<A> of(ThrowingSupplier<A> supplier) {
+  static <A> Try<A> of(ThrowingSupplier<? extends A> supplier) {
     try {
       return success(supplier.get());
     } catch (Throwable t) {
@@ -20,11 +20,11 @@ public sealed interface Try<A> permits Failure, Success {
     }
   }
 
-  static <A> Try<A> ofSupplier(Supplier<A> callable) {
+  static <A> Try<A> ofSupplier(Supplier<? extends A> callable) {
     return of(callable::get);
   }
 
-  static <A> Try<A> ofCallable(Callable<A> callable) {
+  static <A> Try<A> ofCallable(Callable<? extends A> callable) {
     return of(callable::call);
   }
 
@@ -72,34 +72,36 @@ public sealed interface Try<A> permits Failure, Success {
     }
   }
 
-  default Try<A> orElse(Supplier<Try<A>> or) {
-    return isSuccess() ? this : or.get();
+  @SuppressWarnings("unchecked")
+  default Try<A> orElse(Supplier<? extends Try<? extends A>> or) {
+    return isSuccess() ? this : (Try<A>) or.get();
   }
 
   default boolean contains(A value) {
     return exists(a -> Objects.equals(a, value));
   }
 
-  default boolean exists(Predicate<A> f) {
+  default boolean exists(Predicate<? super A> f) {
     return (this instanceof Success(A value)) && f.test(value);
   }
 
   @SuppressWarnings("unchecked")
-  default <B> Try<B> map(Function<A, B> f) {
+  default <B> Try<B> map(Function<? super A, ? extends B> f) {
     return (this instanceof Success(A value)) ? Try.success(f.apply(value)) : (Failure<B>) this;
   }
 
   @SuppressWarnings("unchecked")
-  default <B> Try<B> mapTry(ThrowingFunction<A, B> f) {
+  default <B> Try<B> mapTry(ThrowingFunction<? super A, ? extends B> f) {
     return (this instanceof Success(A value)) ? Try.of(() -> f.apply(value)) : (Failure<B>) this;
   }
 
   @SuppressWarnings("unchecked")
-  default <B> Try<B> flatMap(Function<A, Try<B>> f) {
-    return (this instanceof Success(A value)) ? f.apply(value) : (Failure<B>) this;
+  default <B> Try<B> flatMap(Function<? super A, ? extends Try<? extends B>> f) {
+    return (Try<B>) ((this instanceof Success(A value)) ? f.apply(value) : this);
   }
 
-  default <B> B fold(Function<A, B> success, Function<Throwable, B> failure) {
+  default <B> B fold(
+      Function<? super A, ? extends B> success, Function<? super Throwable, ? extends B> failure) {
     switch (this) {
       case Success(A value) -> {
         return success.apply(value);
@@ -110,15 +112,16 @@ public sealed interface Try<A> permits Failure, Success {
     }
   }
 
-  default Try<A> recover(Function<Throwable, A> f) {
+  default Try<A> recover(Function<? super Throwable, ? extends A> f) {
     return (this instanceof Failure(Throwable t)) ? Try.success(f.apply(t)) : this;
   }
 
-  default Try<A> recoverWith(Function<Throwable, Try<A>> f) {
-    return (this instanceof Failure(Throwable t)) ? f.apply(t) : this;
+  @SuppressWarnings("unchecked")
+  default Try<A> recoverWith(Function<? super Throwable, ? extends Try<? extends A>> f) {
+    return (Try<A>) ((this instanceof Failure(Throwable t)) ? f.apply(t) : this);
   }
 
-  default Try<A> filter(Predicate<A> f) {
+  default Try<A> filter(Predicate<? super A> f) {
     switch (this) {
       case Success(A value) -> {
         return f.test(value)
@@ -131,25 +134,25 @@ public sealed interface Try<A> permits Failure, Success {
     }
   }
 
-  default Try<A> filterNot(Predicate<A> f) {
+  default Try<A> filterNot(Predicate<? super A> f) {
     return filter(f.negate());
   }
 
-  default Try<A> tap(Consumer<A> f) {
+  default Try<A> tap(Consumer<? super A> f) {
     if (this instanceof Success(A value)) {
       f.accept(value);
     }
     return this;
   }
 
-  default Try<A> tapFailure(Consumer<Throwable> f) {
+  default Try<A> tapFailure(Consumer<? super Throwable> f) {
     if (this instanceof Failure(Throwable t)) {
       f.accept(t);
     }
     return this;
   }
 
-  default Try<A> tapBoth(Consumer<A> fa, Consumer<Throwable> ft) {
+  default Try<A> tapBoth(Consumer<? super A> fa, Consumer<? super Throwable> ft) {
     return tap(fa).tapFailure(ft);
   }
 

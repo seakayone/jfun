@@ -1,5 +1,6 @@
 package org.kleinb.jfun;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
@@ -8,6 +9,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public sealed interface Validation<E, A> permits Invalid, Valid {
+
   static <E, A> Validation<E, A> valid(A value) {
     return new Valid<>(value);
   }
@@ -16,8 +18,8 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
     return new Invalid<>(List.of(error));
   }
 
-  static <E, A> Validation<E, A> invalid(List<E> errors) {
-    return new Invalid<>(errors);
+  static <E, A> Validation<E, A> invalid(Collection<E> errors) {
+    return new Invalid<>(List.copyOf(errors));
   }
 
   static <E, A> Validation<E, A> fromEither(Either<E, A> either) {
@@ -28,12 +30,14 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
     return t.fold(Validation::valid, Validation::invalid);
   }
 
-  static <E, A> Validation<E, A> fromPredicate(E error, Predicate<A> p, A a) {
+  static <E, A> Validation<E, A> fromPredicate(E error, Predicate<? super A> p, A a) {
     return p.test(a) ? valid(a) : invalid(error);
   }
 
   static <E, A1, A2, Z> Validation<E, Z> validateWith(
-      Validation<E, A1> v1, Validation<E, A2> v2, Function2<A1, A2, Z> f) {
+      Validation<E, A1> v1,
+      Validation<E, A2> v2,
+      Function2<? super A1, ? super A2, ? extends Z> f) {
     if (v1.isValid() && v2.isValid()) {
       return valid(f.apply(v1.get(), v2.get()));
     } else {
@@ -45,7 +49,7 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
       Validation<E, A1> v1,
       Validation<E, A2> v2,
       Validation<E, A3> v3,
-      Function3<A1, A2, A3, Z> f) {
+      Function3<? super A1, ? super A2, ? super A3, ? extends Z> f) {
     if (v1.isValid() && v2.isValid() && v3.isValid()) {
       return valid(f.apply(v1.get(), v2.get(), v3.get()));
     } else {
@@ -58,7 +62,7 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
       Validation<E, A2> v2,
       Validation<E, A3> v3,
       Validation<E, A4> v4,
-      Function4<A1, A2, A3, A4, Z> f) {
+      Function4<? super A1, ? super A2, ? super A3, ? super A4, ? extends Z> f) {
     if (v1.isValid() && v2.isValid() && v3.isValid() && v4.isValid()) {
       return valid(f.apply(v1.get(), v2.get(), v3.get(), v4.get()));
     } else {
@@ -72,7 +76,7 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
       Validation<E, A3> v3,
       Validation<E, A4> v4,
       Validation<E, A5> v5,
-      Function5<A1, A2, A3, A4, A5, Z> f) {
+      Function5<? super A1, ? super A2, ? super A3, ? super A4, ? super A5, ? extends Z> f) {
     if (v1.isValid() && v2.isValid() && v3.isValid() && v4.isValid() && v5.isValid()) {
       return valid(f.apply(v1.get(), v2.get(), v3.get(), v4.get(), v5.get()));
     } else {
@@ -87,7 +91,8 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
       Validation<E, A4> v4,
       Validation<E, A5> v5,
       Validation<E, A6> v6,
-      Function6<A1, A2, A3, A4, A5, A6, Z> f) {
+      Function6<? super A1, ? super A2, ? super A3, ? super A4, ? super A5, ? super A6, ? extends Z>
+          f) {
     if (v1.isValid()
         && v2.isValid()
         && v3.isValid()
@@ -108,7 +113,16 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
       Validation<E, A5> v5,
       Validation<E, A6> v6,
       Validation<E, A7> v7,
-      Function7<A1, A2, A3, A4, A5, A6, A7, Z> f) {
+      Function7<
+              ? super A1,
+              ? super A2,
+              ? super A3,
+              ? super A4,
+              ? super A5,
+              ? super A6,
+              ? super A7,
+              ? extends Z>
+          f) {
     if (v1.isValid()
         && v2.isValid()
         && v3.isValid()
@@ -131,7 +145,17 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
       Validation<E, A6> v6,
       Validation<E, A7> v7,
       Validation<E, A8> v8,
-      Function8<A1, A2, A3, A4, A5, A6, A7, A8, Z> f) {
+      Function8<
+              ? super A1,
+              ? super A2,
+              ? super A3,
+              ? super A4,
+              ? super A5,
+              ? super A6,
+              ? super A7,
+              ? super A8,
+              ? extends Z>
+          f) {
     if (v1.isValid()
         && v2.isValid()
         && v3.isValid()
@@ -188,7 +212,7 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
     return (this instanceof Valid(A value)) ? value : or;
   }
 
-  default A getOrElse(Supplier<A> or) {
+  default A getOrElse(Supplier<? extends A> or) {
     return (this instanceof Valid(A value)) ? value : or.get();
   }
 
@@ -196,8 +220,9 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
     return (this instanceof Valid<E, A>) ? this : or;
   }
 
-  default Validation<E, A> orElse(Supplier<Validation<E, A>> or) {
-    return (this instanceof Valid<E, A>) ? this : or.get();
+  @SuppressWarnings("unchecked")
+  default Validation<E, A> orElse(Supplier<? extends Validation<? extends E, ? extends A>> or) {
+    return (Validation<E, A>) ((this instanceof Valid<E, A>) ? this : or.get());
   }
 
   default Validation<A, List<E>> swap() {
@@ -212,23 +237,27 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
   }
 
   @SuppressWarnings("unchecked")
-  default <B> Validation<E, B> map(Function<A, B> f) {
+  default <B> Validation<E, B> map(Function<? super A, ? extends B> f) {
     return (this instanceof Valid(A value)) ? valid(f.apply(value)) : (Invalid<E, B>) this;
   }
 
   @SuppressWarnings("unchecked")
-  default <B> Validation<B, A> mapError(Function<E, B> f) {
-    return (this instanceof Invalid<E, A>(List<E> errs))
-        ? invalid(errs.stream().map(f).toList())
-        : (Valid<B, A>) this;
+  default <B> Validation<B, A> mapError(Function<? super E, ? extends B> f) {
+    return (Validation<B, A>)
+        ((this instanceof Invalid<E, A>(List<E> errs))
+            ? invalid(errs.stream().map(f).toList())
+            : this);
   }
 
   @SuppressWarnings("unchecked")
-  default <B> Validation<E, B> flatMap(Function<A, Validation<E, B>> f) {
-    return (this instanceof Valid(A value)) ? f.apply(value) : (Invalid<E, B>) this;
+  default <B> Validation<E, B> flatMap(
+      Function<? super A, ? extends Validation<? extends E, ? extends B>> f) {
+    return (Validation<E, B>) ((this instanceof Valid(A value)) ? f.apply(value) : this);
   }
 
-  default <B> B fold(Function<A, B> valid, Function<List<E>, B> invalid) {
+  default <B> B fold(
+      Function<? super A, ? extends B> valid,
+      Function<? super List<? super E>, ? extends B> invalid) {
     switch (this) {
       case Valid(A value) -> {
         return valid.apply(value);
@@ -239,33 +268,35 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
     }
   }
 
-  default Validation<E, A> tap(Consumer<A> f) {
+  default Validation<E, A> tap(Consumer<? super A> f) {
     if (this instanceof Valid(A value)) {
       f.accept(value);
     }
     return this;
   }
 
-  default Validation<E, A> tapError(Consumer<List<E>> f) {
+  default Validation<E, A> tapError(Consumer<? super List<? super E>> f) {
     if (this instanceof Invalid(List<E> error)) {
       f.accept(error);
     }
     return this;
   }
 
-  default Validation<E, A> tapBoth(Consumer<A> valid, Consumer<List<E>> invalid) {
+  default Validation<E, A> tapBoth(
+      Consumer<? super A> valid, Consumer<? super List<? super E>> invalid) {
     return tap(valid).tapError(invalid);
   }
 
+  @SuppressWarnings("unchecked")
   default Either<List<E>, A> toEither() {
-    return fold(Either::right, Either::left);
+    return fold(Either::right, errs -> Either.left((List<E>) errs));
   }
 
   default Option<A> toOption() {
     return fold(Option::some, _ -> Option.none());
   }
 
-  default Try<A> toTry(Function<List<E>, Throwable> e) {
+  default Try<A> toTry(Function<? super List<? super E>, ? extends Throwable> e) {
     return fold(Try::success, errs -> Try.failure(e.apply(errs)));
   }
 }

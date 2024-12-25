@@ -10,6 +10,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public sealed interface Either<A, B> permits Left, Right {
+
   static <A, B> Either<A, B> left(A value) {
     return new Left<>(value);
   }
@@ -41,11 +42,12 @@ public sealed interface Either<A, B> permits Left, Right {
     return exists(b -> Objects.equals(b, elem));
   }
 
-  default boolean exists(Predicate<B> f) {
+  default boolean exists(Predicate<? super B> f) {
     return this instanceof Right(B value) && f.test(value);
   }
 
-  default <C> C fold(Function<B, C> right, Function<A, C> left) {
+  default <C> C fold(
+      Function<? super B, ? extends C> right, Function<? super A, ? extends C> left) {
     switch (this) {
       case Left(A value) -> {
         return left.apply(value);
@@ -57,13 +59,14 @@ public sealed interface Either<A, B> permits Left, Right {
   }
 
   @SuppressWarnings("unchecked")
-  default <C> Either<A, C> map(Function<B, C> f) {
+  default <C> Either<A, C> map(Function<? super B, ? extends C> f) {
     return (this instanceof Right(B value)) ? Either.right(f.apply(value)) : (Left<A, C>) this;
   }
 
   @SuppressWarnings("unchecked")
-  default <C> Either<A, C> flatMap(Function<B, Either<A, C>> f) {
-    return (this instanceof Right(B value)) ? f.apply(value) : (Left<A, C>) this;
+  default <C> Either<A, C> flatMap(
+      Function<? super B, ? extends Either<? extends A, ? extends C>> f) {
+    return (this instanceof Right(B value)) ? (Either<A, C>) f.apply(value) : (Left<A, C>) this;
   }
 
   default B get() {
@@ -81,33 +84,34 @@ public sealed interface Either<A, B> permits Left, Right {
     return (this instanceof Right(B value)) ? value : or;
   }
 
-  default Either<A, B> orElse(Supplier<Either<A, B>> or) {
-    return (this instanceof Right(B value)) ? this : or.get();
+  @SuppressWarnings("unchecked")
+  default Either<A, B> orElse(Supplier<? extends Either<? extends A, ? extends B>> or) {
+    return isRight() ? this : (Either<A, B>) or.get();
   }
 
-  default Option<B> filterToOption(Predicate<B> p) {
+  default Option<B> filterToOption(Predicate<? super B> p) {
     return (this instanceof Right(B value) && p.test(value)) ? Option.some(value) : Option.none();
   }
 
-  default B filterOrElse(Predicate<B> p, B or) {
+  default B filterOrElse(Predicate<? super B> p, B or) {
     return (this instanceof Right(B value) && p.test(value)) ? value : or;
   }
 
-  default Either<A, B> tap(Consumer<B> f) {
+  default Either<A, B> tap(Consumer<? super B> f) {
     if (this instanceof Right(B value)) {
       f.accept(value);
     }
     return this;
   }
 
-  default Either<A, B> tapLeft(Consumer<A> f) {
+  default Either<A, B> tapLeft(Consumer<? super A> f) {
     if (this instanceof Left(A value)) {
       f.accept(value);
     }
     return this;
   }
 
-  default Either<A, B> tapBoth(Consumer<A> fa, Consumer<B> fb) {
+  default Either<A, B> tapBoth(Consumer<? super A> fa, Consumer<? super B> fb) {
     return tapLeft(fa).tap(fb);
   }
 
@@ -125,7 +129,7 @@ public sealed interface Either<A, B> permits Left, Right {
     return fold(List::of, _ -> List.of());
   }
 
-  default Try<B> toTry(Function<A, Throwable> e) {
+  default Try<B> toTry(Function<? super A, ? extends Throwable> e) {
     return fold(Try::success, a -> Try.failure(e.apply(a)));
   }
 

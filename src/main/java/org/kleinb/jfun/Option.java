@@ -15,9 +15,10 @@ public sealed interface Option<A> permits None, Some {
     return new Some<>(value);
   }
 
-  @SuppressWarnings("unchecked")
   static <A> Option<A> none() {
-    return (None<A>) None.INSTANCE;
+    @SuppressWarnings("unchecked")
+    final var none = (None<A>) None.INSTANCE;
+    return none;
   }
 
   static <A> Option<A> of(A value) {
@@ -25,8 +26,8 @@ public sealed interface Option<A> permits None, Some {
   }
 
   @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-  static <A> Option<A> ofOptional(Optional<A> optional) {
-    return optional.map(Option::some).orElseGet(Option::none);
+  static <A> Option<A> ofOptional(Optional<? extends A> optional) {
+    return optional.<Option<A>>map(Option::some).orElseGet(Option::none);
   }
 
   default boolean isSome() {
@@ -41,7 +42,7 @@ public sealed interface Option<A> permits None, Some {
     return exists(a -> Objects.equals(a, value));
   }
 
-  default boolean exists(Predicate<A> f) {
+  default boolean exists(Predicate<? super A> f) {
     return (this instanceof Some(A value)) && f.test(value);
   }
 
@@ -49,24 +50,26 @@ public sealed interface Option<A> permits None, Some {
     if (this instanceof Some(A value)) {
       return value;
     } else {
-      throw new NoSuchElementException("get called on None");
+      throw new NoSuchElementException("No value present");
     }
   }
 
-  default <B> Option<B> flatMap(Function<A, Option<B>> f) {
-    return (this instanceof Some(A value)) ? f.apply(value) : none();
+  @SuppressWarnings("unchecked")
+  default <B> Option<B> flatMap(Function<? super A, ? extends Option<? extends B>> f) {
+    return (this instanceof Some(A value)) ? (Option<B>) f.apply(value) : none();
   }
 
-  default <B> Option<B> map(Function<A, B> f) {
+  default <B> Option<B> map(Function<? super A, ? extends B> f) {
     return (this instanceof Some(A value)) ? some(f.apply(value)) : none();
   }
 
-  default <C> C fold(Function<A, C> some, Supplier<C> none) {
+  default <C> C fold(Function<? super A, ? extends C> some, Supplier<? extends C> none) {
     return (this instanceof Some(A value)) ? some.apply(value) : none.get();
   }
 
-  default Option<A> orElse(Supplier<Option<A>> or) {
-    return isSome() ? this : or.get();
+  @SuppressWarnings("unchecked")
+  default Option<A> orElse(Supplier<? extends Option<? extends A>> or) {
+    return isSome() ? this : (Option<A>) or.get();
   }
 
   default A getOrNull() {
@@ -77,15 +80,15 @@ public sealed interface Option<A> permits None, Some {
     return (this instanceof Some(A value)) ? value : a;
   }
 
-  default Option<A> filter(Predicate<A> f) {
+  default Option<A> filter(Predicate<? super A> f) {
     return (this instanceof Some(A value) && f.test(value)) ? this : none();
   }
 
-  default Option<A> filterNot(Predicate<A> f) {
+  default Option<A> filterNot(Predicate<? super A> f) {
     return filter(f.negate());
   }
 
-  default Option<A> tap(Consumer<A> f) {
+  default Option<A> tap(Consumer<? super A> f) {
     if (this instanceof Some(A value)) {
       f.accept(value);
     }
@@ -102,7 +105,7 @@ public sealed interface Option<A> permits None, Some {
     return fold(Optional::of, Optional::empty);
   }
 
-  default <B> Either<B, A> toRight(Supplier<B> left) {
+  default <B> Either<B, A> toRight(Supplier<? extends B> left) {
     return fold(Either::right, () -> Either.left(left.get()));
   }
 

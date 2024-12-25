@@ -20,6 +20,13 @@ class OptionTest {
   }
 
   @Test
+  void shouldCreateSomeWithNull() {
+    Option<Integer> actual = Option.some(null);
+    assertThat(actual.get()).isNull();
+    assertThat(actual).isInstanceOf(Some.class);
+  }
+
+  @Test
   void shouldCreateNone() {
     Option<Integer> actual = Option.none();
     assertThat(actual).isEqualTo(Option.none());
