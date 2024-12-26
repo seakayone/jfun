@@ -9,6 +9,10 @@ public interface Function4<A, B, C, D, Z> {
 
   Z apply(A a, B b, C c, D d);
 
+  default Function3<B, C, D, Z> apply(A a) {
+    return (b, c, d) -> apply(a, b, c, d);
+  }
+
   default Function4<D, C, B, A, Z> reversed() {
     return (d, c, b, a) -> apply(a, b, c, d);
   }
