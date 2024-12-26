@@ -10,6 +10,10 @@ public interface Function2<A, B, Z> extends java.util.function.BiFunction<A, B, 
   @Override
   Z apply(A a, B b);
 
+  default Function2<B, A, Z> reversed() {
+    return (b, a) -> apply(a, b);
+  }
+
   default Function1<A, Function1<B, Z>> curried() {
     return a -> b -> apply(a, b);
   }

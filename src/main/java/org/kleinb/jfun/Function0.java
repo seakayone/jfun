@@ -16,6 +16,10 @@ public interface Function0<Z> extends Supplier<Z> {
     return apply();
   }
 
+  default Function0<Z> reversed() {
+    return this;
+  }
+
   default Function0<Z> curried() {
     return this;
   }

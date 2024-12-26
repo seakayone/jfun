@@ -14,6 +14,10 @@ public interface Function1<A, Z> extends java.util.function.Function<A, Z> {
   @Override
   Z apply(A b);
 
+  default Function1<A, Z> reversed() {
+    return this;
+  }
+
   default Function1<A, Z> curried() {
     return this;
   }

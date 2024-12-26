@@ -9,6 +9,10 @@ public interface Function4<A, B, C, D, Z> {
 
   Z apply(A a, B b, C c, D d);
 
+  default Function4<D, C, B, A, Z> reversed() {
+    return (d, c, b, a) -> apply(a, b, c, d);
+  }
+
   default Function1<A, Function1<B, Function1<C, Function1<D, Z>>>> curried() {
     return a -> b -> c -> d -> apply(a, b, c, d);
   }
