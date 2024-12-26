@@ -19,6 +19,18 @@ class Function1Test {
   }
 
   @Test
+  void apply() {
+    Function1<String, String> f = a -> "foo";
+    assertThat(f.apply("bar")).isEqualTo("foo");
+  }
+
+  @Test
+  void reversed() {
+    Function1<String, String> f = a -> "foo";
+    assertThat(f.reversed().apply("bar")).isEqualTo("foo");
+  }
+
+  @Test
   void curried() {
     Function1<String, String> f = a -> "foo";
     assertThat(f.curried().apply("bar")).isEqualTo("foo");

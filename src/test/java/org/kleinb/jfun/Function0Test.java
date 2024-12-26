@@ -13,6 +13,18 @@ class Function0Test {
   }
 
   @Test
+  void apply() {
+    Function0<String> f = () -> "foo";
+    assertThat(f.apply()).isEqualTo("foo");
+  }
+
+  @Test
+  void reversed() {
+    Function0<String> f = () -> "foo";
+    assertThat(f.reversed().apply()).isEqualTo("foo");
+  }
+
+  @Test
   void curried() {
     Function0<String> f = () -> "foo";
     assertThat(f.curried().apply()).isEqualTo("foo");
