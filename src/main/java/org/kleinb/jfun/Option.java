@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public sealed interface Option<A> permits None, Some {
 
@@ -96,6 +97,10 @@ public sealed interface Option<A> permits None, Some {
   }
 
   // Conversion methods
+
+  default Stream<A> toStream() {
+    return fold(Stream::of, Stream::empty);
+  }
 
   default List<A> toList() {
     return fold(List::of, List::of);

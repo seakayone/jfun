@@ -1,7 +1,7 @@
 package org.kleinb.jfun;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -252,6 +252,19 @@ class OptionTest {
   }
 
   // conversion methods
+
+  // .toStream
+
+  @Test
+  void shouldConvertSomeToStream() {
+    assertThat(Option.some(42).toStream()).containsExactly(42);
+  }
+
+  @Test
+  void shouldConvertNoneToEmptyStream() {
+    assertThat(Option.none().toStream()).isEmpty();
+  }
+
   // .toList
   @Test
   void shouldConvertSomeToList() {

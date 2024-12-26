@@ -1,6 +1,7 @@
 package org.kleinb.jfun;
 
 public record Tuple0() implements Tuple {
+
   public static Tuple0 INSTANCE = new Tuple0();
 
   public static <T1> Tuple1<T1> append(T1 _1) {
