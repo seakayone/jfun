@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public sealed interface Validation<E, A> permits Invalid, Valid {
 
@@ -41,7 +42,7 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
     if (v1.isValid() && v2.isValid()) {
       return valid(f.apply(v1.get(), v2.get()));
     } else {
-      return invalid(errors(List.of(v1, v2)));
+      return invalid(errors(Stream.of(v1, v2)));
     }
   }
 
@@ -53,7 +54,7 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
     if (v1.isValid() && v2.isValid() && v3.isValid()) {
       return valid(f.apply(v1.get(), v2.get(), v3.get()));
     } else {
-      return invalid(errors(List.of(v1, v2, v3)));
+      return invalid(errors(Stream.of(v1, v2, v3)));
     }
   }
 
@@ -66,7 +67,7 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
     if (v1.isValid() && v2.isValid() && v3.isValid() && v4.isValid()) {
       return valid(f.apply(v1.get(), v2.get(), v3.get(), v4.get()));
     } else {
-      return invalid(errors(List.of(v1, v2, v3, v4)));
+      return invalid(errors(Stream.of(v1, v2, v3, v4)));
     }
   }
 
@@ -80,7 +81,7 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
     if (v1.isValid() && v2.isValid() && v3.isValid() && v4.isValid() && v5.isValid()) {
       return valid(f.apply(v1.get(), v2.get(), v3.get(), v4.get(), v5.get()));
     } else {
-      return invalid(errors(List.of(v1, v2, v3, v4, v5)));
+      return invalid(errors(Stream.of(v1, v2, v3, v4, v5)));
     }
   }
 
@@ -101,7 +102,7 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
         && v6.isValid()) {
       return valid(f.apply(v1.get(), v2.get(), v3.get(), v4.get(), v5.get(), v6.get()));
     } else {
-      return invalid(errors(List.of(v1, v2, v3, v4, v5, v6)));
+      return invalid(errors(Stream.of(v1, v2, v3, v4, v5, v6)));
     }
   }
 
@@ -132,7 +133,7 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
         && v7.isValid()) {
       return valid(f.apply(v1.get(), v2.get(), v3.get(), v4.get(), v5.get(), v6.get(), v7.get()));
     } else {
-      return invalid(errors(List.of(v1, v2, v3, v4, v5, v6, v7)));
+      return invalid(errors(Stream.of(v1, v2, v3, v4, v5, v6, v7)));
     }
   }
 
@@ -167,15 +168,16 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
       return valid(
           f.apply(v1.get(), v2.get(), v3.get(), v4.get(), v5.get(), v6.get(), v7.get(), v8.get()));
     } else {
-      return invalid(errors(List.of(v1, v2, v3, v4, v5, v6, v7, v8)));
+      return invalid(errors(Stream.of(v1, v2, v3, v4, v5, v6, v7, v8)));
     }
   }
 
   static <E> List<E> errors(List<Validation<E, ?>> validations) {
-    return validations.stream()
-        .filter(Validation::isInvalid)
-        .flatMap(v -> v.getError().stream())
-        .toList();
+    return errors(validations.stream());
+  }
+
+  static <E> List<E> errors(Stream<Validation<E, ?>> validations) {
+    return validations.filter(Validation::isInvalid).flatMap(v -> v.getError().stream()).toList();
   }
 
   default boolean isValid() {
