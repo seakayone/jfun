@@ -1,5 +1,7 @@
 package org.kleinb.jfun;
 
+import java.util.Objects;
+
 @FunctionalInterface
 public interface Function2<A, B, Z> extends java.util.function.BiFunction<A, B, Z> {
 
@@ -23,14 +25,19 @@ public interface Function2<A, B, Z> extends java.util.function.BiFunction<A, B, 
   }
 
   default Function1<Tuple2<A, B>, Z> tupled() {
-    return t -> apply(t._1(), t._2());
+    return t -> {
+      Objects.requireNonNull(t);
+      return apply(t._1(), t._2());
+    };
   }
 
   default <D> Function2<A, B, D> andThen(Function1<? super Z, ? extends D> after) {
+    Objects.requireNonNull(after);
     return (a, b) -> after.apply(apply(a, b));
   }
 
   default <D> Function2<D, B, Z> compose(Function1<? super D, ? extends A> before) {
+    Objects.requireNonNull(before);
     return (d, b) -> apply(before.apply(d), b);
   }
 }

@@ -1,5 +1,7 @@
 package org.kleinb.jfun;
 
+import java.util.Objects;
+
 @FunctionalInterface
 public interface Function4<A, B, C, D, Z> {
 
@@ -22,14 +24,19 @@ public interface Function4<A, B, C, D, Z> {
   }
 
   default Function1<Tuple4<A, B, C, D>, Z> tupled() {
-    return t -> apply(t._1(), t._2(), t._3(), t._4());
+    return t -> {
+      Objects.requireNonNull(t);
+      return apply(t._1(), t._2(), t._3(), t._4());
+    };
   }
 
   default <F> Function4<A, B, C, D, F> andThen(Function1<? super Z, ? extends F> after) {
+    Objects.requireNonNull(after);
     return (a, b, c, d) -> after.apply(apply(a, b, c, d));
   }
 
   default <F> Function4<F, B, C, D, Z> compose(Function1<? super F, ? extends A> before) {
+    Objects.requireNonNull(before);
     return (f, b, c, d) -> apply(before.apply(f), b, c, d);
   }
 }

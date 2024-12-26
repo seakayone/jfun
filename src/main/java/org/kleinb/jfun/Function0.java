@@ -1,5 +1,6 @@
 package org.kleinb.jfun;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 @FunctionalInterface
@@ -25,10 +26,14 @@ public interface Function0<Z> extends Supplier<Z> {
   }
 
   default Function1<Tuple0, Z> tupled() {
-    return _ -> apply();
+    return t -> {
+      Objects.requireNonNull(t);
+      return apply();
+    };
   }
 
   default <B> Function0<B> andThen(Function1<? super Z, ? extends B> after) {
+    Objects.requireNonNull(after);
     return () -> after.apply(apply());
   }
 }

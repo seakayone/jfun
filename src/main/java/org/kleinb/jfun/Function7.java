@@ -1,5 +1,7 @@
 package org.kleinb.jfun;
 
+import java.util.Objects;
+
 @FunctionalInterface
 public interface Function7<A, B, C, D, E, F, G, Z> {
 
@@ -24,14 +26,19 @@ public interface Function7<A, B, C, D, E, F, G, Z> {
   }
 
   default Function1<Tuple7<A, B, C, D, E, F, G>, Z> tupled() {
-    return t -> apply(t._1(), t._2(), t._3(), t._4(), t._5(), t._6(), t._7());
+    return t -> {
+      Objects.requireNonNull(t);
+      return apply(t._1(), t._2(), t._3(), t._4(), t._5(), t._6(), t._7());
+    };
   }
 
   default <I> Function7<A, B, C, D, E, F, G, I> andThen(Function1<? super Z, ? extends I> after) {
+    Objects.requireNonNull(after);
     return (a, b, c, d, e, f, g) -> after.apply(apply(a, b, c, d, e, f, g));
   }
 
   default <I> Function7<I, B, C, D, E, F, G, Z> compose(Function1<? super I, ? extends A> before) {
+    Objects.requireNonNull(before);
     return (i, b, c, d, e, f, g) -> apply(before.apply(i), b, c, d, e, f, g);
   }
 }
