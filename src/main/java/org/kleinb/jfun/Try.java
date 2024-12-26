@@ -123,13 +123,14 @@ public sealed interface Try<A> permits Failure, Success {
   }
 
   default <B> B fold(
-      Function<? super A, ? extends B> success, Function<? super Throwable, ? extends B> failure) {
+      Function<? super Throwable, ? extends B> ifFailure,
+      Function<? super A, ? extends B> ifSuccess) {
     switch (this) {
       case Success(A value) -> {
-        return success.apply(value);
+        return ifSuccess.apply(value);
       }
       case Failure(Throwable t) -> {
-        return failure.apply(t);
+        return ifFailure.apply(t);
       }
     }
   }
@@ -186,19 +187,19 @@ public sealed interface Try<A> permits Failure, Success {
   // conversion methods
 
   default Either<Throwable, A> toEither() {
-    return fold(Either::right, Either::left);
+    return fold(Either::left, Either::right);
   }
 
   default Option<A> toOption() {
-    return fold(Option::some, _ -> Option.none());
+    return fold(_ -> Option.none(), Option::some);
   }
 
   default Optional<A> toOptional() {
-    return fold(Optional::of, _ -> Optional.empty());
+    return fold(_ -> Optional.empty(), Optional::of);
   }
 
   default List<A> toList() {
-    return fold(List::of, _ -> List.of());
+    return fold(_ -> List.of(), List::of);
   }
 }
 

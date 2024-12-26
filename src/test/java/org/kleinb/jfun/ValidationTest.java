@@ -230,14 +230,14 @@ class ValidationTest {
   @Test
   void shouldFoldValid() {
     Validation<String, Integer> valid = Validation.valid(42);
-    Integer actual = valid.fold(i -> i, List::size);
+    Integer actual = valid.fold(List::size, i -> i);
     assertThat(actual).isEqualTo(42);
   }
 
   @Test
   void shouldFoldInvalid() {
     Validation<String, Integer> invalid = Validation.invalid("error");
-    Integer actual = invalid.fold(i -> i, List::size);
+    Integer actual = invalid.fold(List::size, i -> i);
     assertThat(actual).isEqualTo(1);
   }
 

@@ -47,13 +47,13 @@ public sealed interface Either<A, B> permits Left, Right {
   }
 
   default <C> C fold(
-      Function<? super B, ? extends C> right, Function<? super A, ? extends C> left) {
+      Function<? super A, ? extends C> ifLeft, Function<? super B, ? extends C> ifRight) {
     switch (this) {
       case Left(A value) -> {
-        return left.apply(value);
+        return ifLeft.apply(value);
       }
       case Right(B value) -> {
-        return right.apply(value);
+        return ifRight.apply(value);
       }
     }
   }
@@ -135,22 +135,22 @@ public sealed interface Either<A, B> permits Left, Right {
   // conversion methods
 
   default Option<B> toOption() {
-    return fold(Option::some, _ -> Option.none());
+    return fold(_ -> Option.none(), Option::some);
   }
 
   default Optional<B> toOptional() {
-    return fold(Optional::of, _ -> Optional.empty());
+    return fold(_ -> Optional.empty(), Optional::of);
   }
 
   default List<B> toList() {
-    return fold(List::of, _ -> List.of());
+    return fold(_ -> List.of(), List::of);
   }
 
   default Try<B> toTry(Function<? super A, ? extends Throwable> e) {
-    return fold(Try::success, a -> Try.failure(e.apply(a)));
+    return fold(a -> Try.failure(e.apply(a)), Try::success);
   }
 
   default Validation<A, B> toValidation() {
-    return fold(Validation::valid, Validation::invalid);
+    return fold(Validation::invalid, Validation::valid);
   }
 }

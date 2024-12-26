@@ -183,13 +183,13 @@ class EitherTest {
   @Test
   void shouldFoldRight() {
     Either<Integer, String> either = Either.right("42");
-    assertThat(either.fold(Integer::valueOf, Function.identity())).isEqualTo(42);
+    assertThat(either.fold(Function.identity(), Integer::valueOf)).isEqualTo(42);
   }
 
   @Test
   void shouldFoldLeft() {
     Either<Integer, String> either = Either.left(42);
-    assertThat(either.fold(Integer::valueOf, Function.identity())).isEqualTo(42);
+    assertThat(either.fold(Function.identity(), Integer::valueOf)).isEqualTo(42);
   }
 
   // filterToOption

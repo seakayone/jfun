@@ -77,8 +77,8 @@ public sealed interface Option<A> permits None, Some {
     return (this instanceof Some(A value)) ? some(f.apply(value)) : none();
   }
 
-  default <C> C fold(Function<? super A, ? extends C> some, Supplier<? extends C> none) {
-    return (this instanceof Some(A value)) ? some.apply(value) : none.get();
+  default <C> C fold(Supplier<? extends C> ifNone, Function<? super A, ? extends C> ifSome) {
+    return (this instanceof Some(A value)) ? ifSome.apply(value) : ifNone.get();
   }
 
   default Option<A> orElse(Supplier<? extends Option<? extends A>> or) {
@@ -117,7 +117,7 @@ public sealed interface Option<A> permits None, Some {
   // Conversion methods
 
   default Stream<A> toStream() {
-    return fold(Stream::of, Stream::empty);
+    return fold(Stream::empty, Stream::of);
   }
 
   default List<A> toList() {
@@ -125,14 +125,14 @@ public sealed interface Option<A> permits None, Some {
   }
 
   default Optional<A> toOptional() {
-    return fold(Optional::of, Optional::empty);
+    return fold(Optional::empty, Optional::of);
   }
 
   default <B> Either<B, A> toRight(Supplier<? extends B> left) {
-    return fold(Either::right, () -> Either.left(left.get()));
+    return fold(() -> Either.left(left.get()), Either::right);
   }
 
   default Try<A> toTry() {
-    return fold(Try::success, () -> Try.failure(new NoSuchElementException()));
+    return fold(() -> Try.failure(new NoSuchElementException()), Try::success);
   }
 }

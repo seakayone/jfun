@@ -134,12 +134,12 @@ class OptionTest {
 
   @Test
   void shouldFoldSomeIntegerToString() {
-    assertThat(Option.some(42).fold(Object::toString, () -> "none")).isEqualTo("42");
+    assertThat(Option.some(42).fold(() -> "none", Object::toString)).isEqualTo("42");
   }
 
   @Test
   void shouldFoldNone() {
-    assertThat(Option.none().fold(Object::toString, () -> "none")).isEqualTo("none");
+    assertThat(Option.none().fold(() -> "none", Object::toString)).isEqualTo("none");
   }
 
   // .orNull

@@ -24,11 +24,11 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
   }
 
   static <E, A> Validation<E, A> fromEither(Either<E, A> either) {
-    return either.fold(Validation::valid, Validation::invalid);
+    return either.fold(Validation::invalid, Validation::valid);
   }
 
   static <A> Validation<Throwable, A> fromTry(Try<A> t) {
-    return t.fold(Validation::valid, Validation::invalid);
+    return t.fold(Validation::invalid, Validation::valid);
   }
 
   static <E, A> Validation<E, A> fromPredicate(E error, Predicate<? super A> p, A a) {
@@ -279,14 +279,14 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
   }
 
   default <B> B fold(
-      Function<? super A, ? extends B> valid,
-      Function<? super List<? super E>, ? extends B> invalid) {
+      Function<? super List<? super E>, ? extends B> ifInvalid,
+      Function<? super A, ? extends B> ifValid) {
     switch (this) {
       case Valid(A value) -> {
-        return valid.apply(value);
+        return ifValid.apply(value);
       }
       case Invalid(List<E> error) -> {
-        return invalid.apply(error);
+        return ifInvalid.apply(error);
       }
     }
   }
@@ -312,19 +312,19 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
 
   default Either<List<E>, A> toEither() {
     return fold(
-        Either::right,
         (List<? super E> errs) -> {
           @SuppressWarnings("unchecked")
           Either<List<E>, A> left = Either.left((List<E>) errs);
           return left;
-        });
+        },
+        Either::right);
   }
 
   default Option<A> toOption() {
-    return fold(Option::some, _ -> Option.none());
+    return fold(_ -> Option.none(), Option::some);
   }
 
   default Try<A> toTry(Function<? super List<? super E>, ? extends Throwable> e) {
-    return fold(Try::success, errs -> Try.failure(e.apply(errs)));
+    return fold(errs -> Try.failure(e.apply(errs)), Try::success);
   }
 }
