@@ -28,9 +28,9 @@ public sealed interface Option<A> permits None, Some {
     return optional.<Option<A>>map(Option::some).orElseGet(Option::none);
   }
 
-  static <A> Option<List<A>> sequence(Iterable<Option<A>> options) {
+  static <A> Option<List<A>> sequence(Iterable<? extends Option<? extends A>> options) {
     var result = new ArrayList<A>();
-    for (Option<A> option : options) {
+    for (Option<? extends A> option : options) {
       if (option instanceof None) {
         return none();
       }
