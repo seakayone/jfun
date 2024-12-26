@@ -41,6 +41,6 @@ class Function1Test {
   void andThen() {
     Function1<String, String> f = a -> "f" + a;
     Function1<String, String> g = a -> "g" + a;
-    assertThat(f.andThen(g).apply("h")).isEqualTo("ghf");
+    assertThat(f.andThen(g).apply("h")).isEqualTo("gfh");
   }
 }

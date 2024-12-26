@@ -58,15 +58,27 @@ public sealed interface Either<A, B> permits Left, Right {
     }
   }
 
-  @SuppressWarnings("unchecked")
   default <C> Either<A, C> map(Function<? super B, ? extends C> f) {
-    return (this instanceof Right(B value)) ? Either.right(f.apply(value)) : (Left<A, C>) this;
+    if (this instanceof Right(B value)) {
+      return Either.right(f.apply(value));
+    } else {
+      @SuppressWarnings("unchecked")
+      Left<A, C> left = (Left<A, C>) this;
+      return left;
+    }
   }
 
-  @SuppressWarnings("unchecked")
   default <C> Either<A, C> flatMap(
       Function<? super B, ? extends Either<? extends A, ? extends C>> f) {
-    return (this instanceof Right(B value)) ? (Either<A, C>) f.apply(value) : (Left<A, C>) this;
+    if (this instanceof Right(B value)) {
+      @SuppressWarnings("unchecked")
+      Either<A, C> either = (Either<A, C>) f.apply(value);
+      return either;
+    } else {
+      @SuppressWarnings("unchecked")
+      Left<A, C> left = (Left<A, C>) this;
+      return left;
+    }
   }
 
   default B get() {
@@ -84,9 +96,14 @@ public sealed interface Either<A, B> permits Left, Right {
     return (this instanceof Right(B value)) ? value : or;
   }
 
-  @SuppressWarnings("unchecked")
   default Either<A, B> orElse(Supplier<? extends Either<? extends A, ? extends B>> or) {
-    return isRight() ? this : (Either<A, B>) or.get();
+    if (isRight()) {
+      return this;
+    } else {
+      @SuppressWarnings("unchecked")
+      Either<A, B> either = (Either<A, B>) or.get();
+      return either;
+    }
   }
 
   default Option<B> filterToOption(Predicate<? super B> p) {

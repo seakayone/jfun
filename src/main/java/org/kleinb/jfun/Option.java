@@ -55,9 +55,14 @@ public sealed interface Option<A> permits None, Some {
     }
   }
 
-  @SuppressWarnings("unchecked")
   default <B> Option<B> flatMap(Function<? super A, ? extends Option<? extends B>> f) {
-    return (this instanceof Some(A value)) ? (Option<B>) f.apply(value) : none();
+    if (this instanceof Some(A value)) {
+      @SuppressWarnings("unchecked")
+      Option<B> option = (Option<B>) f.apply(value);
+      return option;
+    } else {
+      return none();
+    }
   }
 
   default <B> Option<B> map(Function<? super A, ? extends B> f) {
@@ -68,9 +73,14 @@ public sealed interface Option<A> permits None, Some {
     return (this instanceof Some(A value)) ? some.apply(value) : none.get();
   }
 
-  @SuppressWarnings("unchecked")
   default Option<A> orElse(Supplier<? extends Option<? extends A>> or) {
-    return isSome() ? this : (Option<A>) or.get();
+    if (this instanceof Some<A> some) {
+      return some;
+    } else {
+      @SuppressWarnings("unchecked")
+      Option<A> option = (Option<A>) or.get();
+      return option;
+    }
   }
 
   default A getOrNull() {

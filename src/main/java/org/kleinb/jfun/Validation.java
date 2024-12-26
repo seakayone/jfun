@@ -220,9 +220,14 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
     return (this instanceof Valid<E, A>) ? this : or;
   }
 
-  @SuppressWarnings("unchecked")
   default Validation<E, A> orElse(Supplier<? extends Validation<? extends E, ? extends A>> or) {
-    return (Validation<E, A>) ((this instanceof Valid<E, A>) ? this : or.get());
+    if (this instanceof Valid<E, A>) {
+      return this;
+    } else {
+      @SuppressWarnings("unchecked")
+      Validation<E, A> validation = (Validation<E, A>) or.get();
+      return validation;
+    }
   }
 
   default Validation<A, List<E>> swap() {
@@ -236,23 +241,39 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
     }
   }
 
-  @SuppressWarnings("unchecked")
   default <B> Validation<E, B> map(Function<? super A, ? extends B> f) {
-    return (this instanceof Valid(A value)) ? valid(f.apply(value)) : (Invalid<E, B>) this;
+    if (this instanceof Valid(A value)) {
+      return valid(f.apply(value));
+    } else {
+      @SuppressWarnings("unchecked")
+      Invalid<E, B> invalid = (Invalid<E, B>) this;
+      return invalid;
+    }
   }
 
-  @SuppressWarnings("unchecked")
   default <B> Validation<B, A> mapError(Function<? super E, ? extends B> f) {
-    return (Validation<B, A>)
-        ((this instanceof Invalid<E, A>(List<E> errs))
-            ? invalid(errs.stream().map(f).toList())
-            : this);
+    if (this instanceof Invalid<E, A>(List<E> errs)) {
+      @SuppressWarnings("unchecked")
+      Validation<B, A> validation = (Validation<B, A>) invalid(errs.stream().map(f).toList());
+      return validation;
+    } else {
+      @SuppressWarnings("unchecked")
+      Validation<B, A> validation = (Validation<B, A>) this;
+      return validation;
+    }
   }
 
-  @SuppressWarnings("unchecked")
   default <B> Validation<E, B> flatMap(
       Function<? super A, ? extends Validation<? extends E, ? extends B>> f) {
-    return (Validation<E, B>) ((this instanceof Valid(A value)) ? f.apply(value) : this);
+    if (this instanceof Valid(A value)) {
+      @SuppressWarnings("unchecked")
+      Validation<E, B> validation = (Validation<E, B>) f.apply(value);
+      return validation;
+    } else {
+      @SuppressWarnings("unchecked")
+      Validation<E, B> validation = (Validation<E, B>) this;
+      return validation;
+    }
   }
 
   default <B> B fold(
@@ -287,9 +308,14 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
     return tap(valid).tapError(invalid);
   }
 
-  @SuppressWarnings("unchecked")
   default Either<List<E>, A> toEither() {
-    return fold(Either::right, errs -> Either.left((List<E>) errs));
+    return fold(
+        Either::right,
+        (List<? super E> errs) -> {
+          @SuppressWarnings("unchecked")
+          Either<List<E>, A> left = Either.left((List<E>) errs);
+          return left;
+        });
   }
 
   default Option<A> toOption() {

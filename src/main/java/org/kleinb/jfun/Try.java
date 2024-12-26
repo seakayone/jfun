@@ -72,9 +72,14 @@ public sealed interface Try<A> permits Failure, Success {
     }
   }
 
-  @SuppressWarnings("unchecked")
   default Try<A> orElse(Supplier<? extends Try<? extends A>> or) {
-    return isSuccess() ? this : (Try<A>) or.get();
+    if (this instanceof Success<A> success) {
+      return success;
+    } else {
+      @SuppressWarnings("unchecked")
+      Try<A> aTry = (Try<A>) or.get();
+      return aTry;
+    }
   }
 
   default boolean contains(A value) {
@@ -85,19 +90,36 @@ public sealed interface Try<A> permits Failure, Success {
     return (this instanceof Success(A value)) && f.test(value);
   }
 
-  @SuppressWarnings("unchecked")
   default <B> Try<B> map(Function<? super A, ? extends B> f) {
-    return (this instanceof Success(A value)) ? Try.success(f.apply(value)) : (Failure<B>) this;
+    if (this instanceof Success(A value)) {
+      return Try.success(f.apply(value));
+    } else {
+      @SuppressWarnings("unchecked")
+      Failure<B> aFailure = (Failure<B>) this;
+      return aFailure;
+    }
   }
 
-  @SuppressWarnings("unchecked")
   default <B> Try<B> mapTry(ThrowingFunction<? super A, ? extends B> f) {
-    return (this instanceof Success(A value)) ? Try.of(() -> f.apply(value)) : (Failure<B>) this;
+    if (this instanceof Success(A value)) {
+      return Try.of(() -> f.apply(value));
+    } else {
+      @SuppressWarnings("unchecked")
+      Failure<B> failure = (Failure<B>) this;
+      return failure;
+    }
   }
 
-  @SuppressWarnings("unchecked")
   default <B> Try<B> flatMap(Function<? super A, ? extends Try<? extends B>> f) {
-    return (Try<B>) ((this instanceof Success(A value)) ? f.apply(value) : this);
+    if (this instanceof Success(A value)) {
+      @SuppressWarnings("unchecked")
+      Try<B> aTry = (Try<B>) f.apply(value);
+      return aTry;
+    } else {
+      @SuppressWarnings("unchecked")
+      Try<B> aTry = (Try<B>) this;
+      return aTry;
+    }
   }
 
   default <B> B fold(
@@ -116,9 +138,14 @@ public sealed interface Try<A> permits Failure, Success {
     return (this instanceof Failure(Throwable t)) ? Try.success(f.apply(t)) : this;
   }
 
-  @SuppressWarnings("unchecked")
   default Try<A> recoverWith(Function<? super Throwable, ? extends Try<? extends A>> f) {
-    return (Try<A>) ((this instanceof Failure(Throwable t)) ? f.apply(t) : this);
+    if (this instanceof Failure(Throwable t)) {
+      @SuppressWarnings("unchecked")
+      Try<A> recovered = (Try<A>) f.apply(t);
+      return recovered;
+    } else {
+      return this;
+    }
   }
 
   default Try<A> filter(Predicate<? super A> f) {
@@ -176,8 +203,9 @@ public sealed interface Try<A> permits Failure, Success {
 }
 
 interface TryOps {
-  @SuppressWarnings("unchecked")
   static <T extends Throwable, R> R sneakyThrow(Throwable t) throws T {
-    throw (T) t;
+    @SuppressWarnings("unchecked")
+    T t1 = (T) t;
+    throw t1;
   }
 }
