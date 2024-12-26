@@ -3,6 +3,7 @@ package org.kleinb.jfun;
 import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -24,14 +25,17 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
   }
 
   static <E, A> Validation<E, A> fromEither(Either<E, A> either) {
+    Objects.requireNonNull(either);
     return either.fold(Validation::invalid, Validation::valid);
   }
 
   static <A> Validation<Throwable, A> fromTry(Try<A> t) {
+    Objects.requireNonNull(t);
     return t.fold(Validation::invalid, Validation::valid);
   }
 
   static <E, A> Validation<E, A> fromPredicate(E error, Predicate<? super A> p, A a) {
+    Objects.requireNonNull(p);
     return p.test(a) ? valid(a) : invalid(error);
   }
 
@@ -39,6 +43,9 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
       Validation<E, A1> v1,
       Validation<E, A2> v2,
       Function2<? super A1, ? super A2, ? extends Z> f) {
+    Objects.requireNonNull(v1);
+    Objects.requireNonNull(v2);
+    Objects.requireNonNull(f);
     if (v1.isValid() && v2.isValid()) {
       return valid(f.apply(v1.get(), v2.get()));
     } else {
@@ -51,6 +58,10 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
       Validation<E, A2> v2,
       Validation<E, A3> v3,
       Function3<? super A1, ? super A2, ? super A3, ? extends Z> f) {
+    Objects.requireNonNull(v1);
+    Objects.requireNonNull(v2);
+    Objects.requireNonNull(v3);
+    Objects.requireNonNull(f);
     if (v1.isValid() && v2.isValid() && v3.isValid()) {
       return valid(f.apply(v1.get(), v2.get(), v3.get()));
     } else {
@@ -64,6 +75,11 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
       Validation<E, A3> v3,
       Validation<E, A4> v4,
       Function4<? super A1, ? super A2, ? super A3, ? super A4, ? extends Z> f) {
+    Objects.requireNonNull(v1);
+    Objects.requireNonNull(v2);
+    Objects.requireNonNull(v3);
+    Objects.requireNonNull(v4);
+    Objects.requireNonNull(f);
     if (v1.isValid() && v2.isValid() && v3.isValid() && v4.isValid()) {
       return valid(f.apply(v1.get(), v2.get(), v3.get(), v4.get()));
     } else {
@@ -78,6 +94,12 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
       Validation<E, A4> v4,
       Validation<E, A5> v5,
       Function5<? super A1, ? super A2, ? super A3, ? super A4, ? super A5, ? extends Z> f) {
+    Objects.requireNonNull(v1);
+    Objects.requireNonNull(v2);
+    Objects.requireNonNull(v3);
+    Objects.requireNonNull(v4);
+    Objects.requireNonNull(v5);
+    Objects.requireNonNull(f);
     if (v1.isValid() && v2.isValid() && v3.isValid() && v4.isValid() && v5.isValid()) {
       return valid(f.apply(v1.get(), v2.get(), v3.get(), v4.get(), v5.get()));
     } else {
@@ -94,6 +116,13 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
       Validation<E, A6> v6,
       Function6<? super A1, ? super A2, ? super A3, ? super A4, ? super A5, ? super A6, ? extends Z>
           f) {
+    Objects.requireNonNull(v1);
+    Objects.requireNonNull(v2);
+    Objects.requireNonNull(v3);
+    Objects.requireNonNull(v4);
+    Objects.requireNonNull(v5);
+    Objects.requireNonNull(v6);
+    Objects.requireNonNull(f);
     if (v1.isValid()
         && v2.isValid()
         && v3.isValid()
@@ -124,6 +153,14 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
               ? super A7,
               ? extends Z>
           f) {
+    Objects.requireNonNull(v1);
+    Objects.requireNonNull(v2);
+    Objects.requireNonNull(v3);
+    Objects.requireNonNull(v4);
+    Objects.requireNonNull(v5);
+    Objects.requireNonNull(v6);
+    Objects.requireNonNull(v7);
+    Objects.requireNonNull(f);
     if (v1.isValid()
         && v2.isValid()
         && v3.isValid()
@@ -157,6 +194,15 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
               ? super A8,
               ? extends Z>
           f) {
+    Objects.requireNonNull(v1);
+    Objects.requireNonNull(v2);
+    Objects.requireNonNull(v3);
+    Objects.requireNonNull(v4);
+    Objects.requireNonNull(v5);
+    Objects.requireNonNull(v6);
+    Objects.requireNonNull(v7);
+    Objects.requireNonNull(v8);
+    Objects.requireNonNull(f);
     if (v1.isValid()
         && v2.isValid()
         && v3.isValid()
@@ -173,10 +219,12 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
   }
 
   static <E> List<E> errors(List<Validation<E, ?>> validations) {
+    Objects.requireNonNull(validations);
     return errors(validations.stream());
   }
 
   static <E> List<E> errors(Stream<Validation<E, ?>> validations) {
+    Objects.requireNonNull(validations);
     return validations.filter(Validation::isInvalid).flatMap(v -> v.getError().stream()).toList();
   }
 
@@ -215,19 +263,23 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
   }
 
   default A getOrElse(Supplier<? extends A> or) {
+    Objects.requireNonNull(or);
     return (this instanceof Valid(A value)) ? value : or.get();
   }
 
   default Validation<E, A> orElse(Validation<E, A> or) {
+    Objects.requireNonNull(or);
     return (this instanceof Valid<E, A>) ? this : or;
   }
 
   default Validation<E, A> orElse(Supplier<? extends Validation<? extends E, ? extends A>> or) {
+    Objects.requireNonNull(or);
     if (this instanceof Valid<E, A>) {
       return this;
     } else {
       @SuppressWarnings("unchecked")
       Validation<E, A> validation = (Validation<E, A>) or.get();
+      Objects.requireNonNull(validation);
       return validation;
     }
   }
@@ -244,6 +296,7 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
   }
 
   default <B> Validation<E, B> map(Function<? super A, ? extends B> f) {
+    Objects.requireNonNull(f);
     if (this instanceof Valid(A value)) {
       return valid(f.apply(value));
     } else {
@@ -254,6 +307,7 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
   }
 
   default <B> Validation<B, A> mapError(Function<? super E, ? extends B> f) {
+    Objects.requireNonNull(f);
     if (this instanceof Invalid<E, A>(List<E> errs)) {
       @SuppressWarnings("unchecked")
       Validation<B, A> validation = (Validation<B, A>) invalid(errs.stream().map(f).toList());
@@ -267,9 +321,11 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
 
   default <B> Validation<E, B> flatMap(
       Function<? super A, ? extends Validation<? extends E, ? extends B>> f) {
+    Objects.requireNonNull(f);
     if (this instanceof Valid(A value)) {
       @SuppressWarnings("unchecked")
       Validation<E, B> validation = (Validation<E, B>) f.apply(value);
+      Objects.requireNonNull(validation);
       return validation;
     } else {
       @SuppressWarnings("unchecked")
@@ -281,6 +337,8 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
   default <B> B fold(
       Function<? super List<? super E>, ? extends B> ifInvalid,
       Function<? super A, ? extends B> ifValid) {
+    Objects.requireNonNull(ifInvalid);
+    Objects.requireNonNull(ifValid);
     switch (this) {
       case Valid(A value) -> {
         return ifValid.apply(value);
@@ -292,6 +350,7 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
   }
 
   default Validation<E, A> tap(Consumer<? super A> f) {
+    Objects.requireNonNull(f);
     if (this instanceof Valid(A value)) {
       f.accept(value);
     }
@@ -299,6 +358,7 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
   }
 
   default Validation<E, A> tapError(Consumer<? super List<? super E>> f) {
+    Objects.requireNonNull(f);
     if (this instanceof Invalid(List<E> error)) {
       f.accept(error);
     }
@@ -307,6 +367,8 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
 
   default Validation<E, A> tapBoth(
       Consumer<? super A> valid, Consumer<? super List<? super E>> invalid) {
+    Objects.requireNonNull(valid);
+    Objects.requireNonNull(invalid);
     return tap(valid).tapError(invalid);
   }
 
@@ -325,6 +387,7 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
   }
 
   default Try<A> toTry(Function<? super List<? super E>, ? extends Throwable> e) {
+    Objects.requireNonNull(e);
     return fold(errs -> Try.failure(e.apply(errs)), Try::success);
   }
 }

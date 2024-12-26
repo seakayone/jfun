@@ -25,10 +25,12 @@ public sealed interface Option<A> permits None, Some {
 
   @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
   static <A> Option<A> ofOptional(Optional<? extends A> optional) {
+    Objects.requireNonNull(optional);
     return optional.<Option<A>>map(Option::some).orElseGet(Option::none);
   }
 
   static <A> Option<List<A>> sequence(Iterable<? extends Option<? extends A>> options) {
+    Objects.requireNonNull(options);
     var result = new ArrayList<A>();
     for (Option<? extends A> option : options) {
       if (option instanceof None) {
@@ -51,8 +53,9 @@ public sealed interface Option<A> permits None, Some {
     return exists(a -> Objects.equals(a, value));
   }
 
-  default boolean exists(Predicate<? super A> f) {
-    return (this instanceof Some(A value)) && f.test(value);
+  default boolean exists(Predicate<? super A> p) {
+    Objects.requireNonNull(p);
+    return (this instanceof Some(A value)) && p.test(value);
   }
 
   default A get() {
@@ -64,9 +67,11 @@ public sealed interface Option<A> permits None, Some {
   }
 
   default <B> Option<B> flatMap(Function<? super A, ? extends Option<? extends B>> f) {
+    Objects.requireNonNull(f);
     if (this instanceof Some(A value)) {
       @SuppressWarnings("unchecked")
       Option<B> option = (Option<B>) f.apply(value);
+      Objects.requireNonNull(option);
       return option;
     } else {
       return none();
@@ -74,19 +79,24 @@ public sealed interface Option<A> permits None, Some {
   }
 
   default <B> Option<B> map(Function<? super A, ? extends B> f) {
+    Objects.requireNonNull(f);
     return (this instanceof Some(A value)) ? some(f.apply(value)) : none();
   }
 
   default <C> C fold(Supplier<? extends C> ifNone, Function<? super A, ? extends C> ifSome) {
+    Objects.requireNonNull(ifNone);
+    Objects.requireNonNull(ifSome);
     return (this instanceof Some(A value)) ? ifSome.apply(value) : ifNone.get();
   }
 
   default Option<A> orElse(Supplier<? extends Option<? extends A>> or) {
+    Objects.requireNonNull(or);
     if (this instanceof Some<A> some) {
       return some;
     } else {
       @SuppressWarnings("unchecked")
       Option<A> option = (Option<A>) or.get();
+      Objects.requireNonNull(option);
       return option;
     }
   }
@@ -100,14 +110,17 @@ public sealed interface Option<A> permits None, Some {
   }
 
   default Option<A> filter(Predicate<? super A> f) {
+    Objects.requireNonNull(f);
     return (this instanceof Some(A value) && f.test(value)) ? this : none();
   }
 
   default Option<A> filterNot(Predicate<? super A> f) {
+    Objects.requireNonNull(f);
     return filter(f.negate());
   }
 
   default Option<A> tap(Consumer<? super A> f) {
+    Objects.requireNonNull(f);
     if (this instanceof Some(A value)) {
       f.accept(value);
     }
@@ -129,6 +142,7 @@ public sealed interface Option<A> permits None, Some {
   }
 
   default <B> Either<B, A> toRight(Supplier<? extends B> left) {
+    Objects.requireNonNull(left);
     return fold(() -> Either.left(left.get()), Either::right);
   }
 

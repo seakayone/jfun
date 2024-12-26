@@ -42,12 +42,15 @@ public sealed interface Either<A, B> permits Left, Right {
     return exists(b -> Objects.equals(b, elem));
   }
 
-  default boolean exists(Predicate<? super B> f) {
-    return this instanceof Right(B value) && f.test(value);
+  default boolean exists(Predicate<? super B> p) {
+    Objects.requireNonNull(p);
+    return this instanceof Right(B value) && p.test(value);
   }
 
   default <C> C fold(
       Function<? super A, ? extends C> ifLeft, Function<? super B, ? extends C> ifRight) {
+    Objects.requireNonNull(ifLeft);
+    Objects.requireNonNull(ifRight);
     switch (this) {
       case Left(A value) -> {
         return ifLeft.apply(value);
@@ -59,6 +62,7 @@ public sealed interface Either<A, B> permits Left, Right {
   }
 
   default <C> Either<A, C> map(Function<? super B, ? extends C> f) {
+    Objects.requireNonNull(f);
     if (this instanceof Right(B value)) {
       return Either.right(f.apply(value));
     } else {
@@ -70,9 +74,11 @@ public sealed interface Either<A, B> permits Left, Right {
 
   default <C> Either<A, C> flatMap(
       Function<? super B, ? extends Either<? extends A, ? extends C>> f) {
+    Objects.requireNonNull(f);
     if (this instanceof Right(B value)) {
       @SuppressWarnings("unchecked")
       Either<A, C> either = (Either<A, C>) f.apply(value);
+      Objects.requireNonNull(either);
       return either;
     } else {
       @SuppressWarnings("unchecked")
@@ -97,24 +103,29 @@ public sealed interface Either<A, B> permits Left, Right {
   }
 
   default Either<A, B> orElse(Supplier<? extends Either<? extends A, ? extends B>> or) {
+    Objects.requireNonNull(or);
     if (isRight()) {
       return this;
     } else {
       @SuppressWarnings("unchecked")
       Either<A, B> either = (Either<A, B>) or.get();
+      Objects.requireNonNull(either);
       return either;
     }
   }
 
   default Option<B> filterToOption(Predicate<? super B> p) {
+    Objects.requireNonNull(p);
     return (this instanceof Right(B value) && p.test(value)) ? Option.some(value) : Option.none();
   }
 
   default B filterOrElse(Predicate<? super B> p, B or) {
+    Objects.requireNonNull(p);
     return (this instanceof Right(B value) && p.test(value)) ? value : or;
   }
 
   default Either<A, B> tap(Consumer<? super B> f) {
+    Objects.requireNonNull(f);
     if (this instanceof Right(B value)) {
       f.accept(value);
     }
@@ -122,6 +133,7 @@ public sealed interface Either<A, B> permits Left, Right {
   }
 
   default Either<A, B> tapLeft(Consumer<? super A> f) {
+    Objects.requireNonNull(f);
     if (this instanceof Left(A value)) {
       f.accept(value);
     }
@@ -129,6 +141,8 @@ public sealed interface Either<A, B> permits Left, Right {
   }
 
   default Either<A, B> tapBoth(Consumer<? super A> fa, Consumer<? super B> fb) {
+    Objects.requireNonNull(fa);
+    Objects.requireNonNull(fb);
     return tapLeft(fa).tap(fb);
   }
 
@@ -147,6 +161,7 @@ public sealed interface Either<A, B> permits Left, Right {
   }
 
   default Try<B> toTry(Function<? super A, ? extends Throwable> e) {
+    Objects.requireNonNull(e);
     return fold(a -> Try.failure(e.apply(a)), Try::success);
   }
 

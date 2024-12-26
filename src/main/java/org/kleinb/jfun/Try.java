@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 public sealed interface Try<A> permits Failure, Success {
 
   static <A> Try<A> of(ThrowingSupplier<? extends A> supplier) {
+    Objects.requireNonNull(supplier);
     try {
       return success(supplier.get());
     } catch (Throwable t) {
@@ -20,15 +21,18 @@ public sealed interface Try<A> permits Failure, Success {
     }
   }
 
-  static <A> Try<A> ofSupplier(Supplier<? extends A> callable) {
-    return of(callable::get);
+  static <A> Try<A> ofSupplier(Supplier<? extends A> supplier) {
+    Objects.requireNonNull(supplier);
+    return of(supplier::get);
   }
 
   static <A> Try<A> ofCallable(Callable<? extends A> callable) {
+    Objects.requireNonNull(callable);
     return of(callable::call);
   }
 
   static Try<Void> ofRunnable(Runnable runnable) {
+    Objects.requireNonNull(runnable);
     return of(
         () -> {
           runnable.run();
@@ -41,6 +45,7 @@ public sealed interface Try<A> permits Failure, Success {
   }
 
   static <A> Try<A> failure(Throwable t) {
+    Objects.requireNonNull(t);
     return new Failure<>(t);
   }
 
@@ -73,11 +78,13 @@ public sealed interface Try<A> permits Failure, Success {
   }
 
   default Try<A> orElse(Supplier<? extends Try<? extends A>> or) {
+    Objects.requireNonNull(or);
     if (this instanceof Success<A> success) {
       return success;
     } else {
       @SuppressWarnings("unchecked")
       Try<A> aTry = (Try<A>) or.get();
+      Objects.requireNonNull(aTry);
       return aTry;
     }
   }
@@ -86,11 +93,13 @@ public sealed interface Try<A> permits Failure, Success {
     return exists(a -> Objects.equals(a, value));
   }
 
-  default boolean exists(Predicate<? super A> f) {
-    return (this instanceof Success(A value)) && f.test(value);
+  default boolean exists(Predicate<? super A> p) {
+    Objects.requireNonNull(p);
+    return (this instanceof Success(A value)) && p.test(value);
   }
 
   default <B> Try<B> map(Function<? super A, ? extends B> f) {
+    Objects.requireNonNull(f);
     if (this instanceof Success(A value)) {
       return Try.success(f.apply(value));
     } else {
@@ -101,6 +110,7 @@ public sealed interface Try<A> permits Failure, Success {
   }
 
   default <B> Try<B> mapTry(ThrowingFunction<? super A, ? extends B> f) {
+    Objects.requireNonNull(f);
     if (this instanceof Success(A value)) {
       return Try.of(() -> f.apply(value));
     } else {
@@ -111,9 +121,11 @@ public sealed interface Try<A> permits Failure, Success {
   }
 
   default <B> Try<B> flatMap(Function<? super A, ? extends Try<? extends B>> f) {
+    Objects.requireNonNull(f);
     if (this instanceof Success(A value)) {
       @SuppressWarnings("unchecked")
       Try<B> aTry = (Try<B>) f.apply(value);
+      Objects.requireNonNull(aTry);
       return aTry;
     } else {
       @SuppressWarnings("unchecked")
@@ -125,6 +137,8 @@ public sealed interface Try<A> permits Failure, Success {
   default <B> B fold(
       Function<? super Throwable, ? extends B> ifFailure,
       Function<? super A, ? extends B> ifSuccess) {
+    Objects.requireNonNull(ifSuccess);
+    Objects.requireNonNull(ifFailure);
     switch (this) {
       case Success(A value) -> {
         return ifSuccess.apply(value);
@@ -136,23 +150,27 @@ public sealed interface Try<A> permits Failure, Success {
   }
 
   default Try<A> recover(Function<? super Throwable, ? extends A> f) {
+    Objects.requireNonNull(f);
     return (this instanceof Failure(Throwable t)) ? Try.success(f.apply(t)) : this;
   }
 
   default Try<A> recoverWith(Function<? super Throwable, ? extends Try<? extends A>> f) {
+    Objects.requireNonNull(f);
     if (this instanceof Failure(Throwable t)) {
       @SuppressWarnings("unchecked")
       Try<A> recovered = (Try<A>) f.apply(t);
+      Objects.requireNonNull(recovered);
       return recovered;
     } else {
       return this;
     }
   }
 
-  default Try<A> filter(Predicate<? super A> f) {
+  default Try<A> filter(Predicate<? super A> p) {
+    Objects.requireNonNull(p);
     switch (this) {
       case Success(A value) -> {
-        return f.test(value)
+        return p.test(value)
             ? this
             : Try.failure(new NoSuchElementException("Predicate does not hold for " + value));
       }
@@ -162,11 +180,13 @@ public sealed interface Try<A> permits Failure, Success {
     }
   }
 
-  default Try<A> filterNot(Predicate<? super A> f) {
-    return filter(f.negate());
+  default Try<A> filterNot(Predicate<? super A> p) {
+    Objects.requireNonNull(p);
+    return filter(p.negate());
   }
 
   default Try<A> tap(Consumer<? super A> f) {
+    Objects.requireNonNull(f);
     if (this instanceof Success(A value)) {
       f.accept(value);
     }
@@ -174,6 +194,7 @@ public sealed interface Try<A> permits Failure, Success {
   }
 
   default Try<A> tapFailure(Consumer<? super Throwable> f) {
+    Objects.requireNonNull(f);
     if (this instanceof Failure(Throwable t)) {
       f.accept(t);
     }
@@ -181,6 +202,8 @@ public sealed interface Try<A> permits Failure, Success {
   }
 
   default Try<A> tapBoth(Consumer<? super A> fa, Consumer<? super Throwable> ft) {
+    Objects.requireNonNull(fa);
+    Objects.requireNonNull(ft);
     return tap(fa).tapFailure(ft);
   }
 
