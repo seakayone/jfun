@@ -1,9 +1,6 @@
 package org.kleinb.jfun;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -29,6 +26,17 @@ public sealed interface Option<A> permits None, Some {
   @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
   static <A> Option<A> ofOptional(Optional<? extends A> optional) {
     return optional.<Option<A>>map(Option::some).orElseGet(Option::none);
+  }
+
+  static <A> Option<List<A>> sequence(Iterable<Option<A>> options) {
+    var result = new ArrayList<A>();
+    for (Option<A> option : options) {
+      if (option instanceof None) {
+        return none();
+      }
+      result.add(option.get());
+    }
+    return some(Collections.unmodifiableList(result));
   }
 
   default boolean isSome() {

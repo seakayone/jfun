@@ -54,6 +54,19 @@ class OptionTest {
     assertThat(Option.ofOptional(Optional.empty())).isEqualTo(Option.none());
   }
 
+  // .sequence
+
+  @Test
+  void shouldSequenceSome() {
+    assertThat(Option.sequence(List.of(Option.some(42), Option.some(43))))
+        .isEqualTo(Option.some(List.of(42, 43)));
+  }
+
+  @Test
+  void shouldSequenceNone() {
+    assertThat(Option.sequence(List.of(Option.some(42), Option.none()))).isEqualTo(Option.none());
+  }
+
   // .get
 
   @Test
