@@ -2,6 +2,7 @@ package org.kleinb.jfun;
 
 sealed interface Tuple
     permits Tuple0, Tuple1, Tuple2, Tuple3, Tuple4, Tuple5, Tuple6, Tuple7, Tuple8 {
+
   static Tuple0 empty() {
     return Tuple0.INSTANCE;
   }
