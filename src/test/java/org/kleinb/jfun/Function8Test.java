@@ -23,6 +23,15 @@ class Function8Test {
   }
 
   @Test
+  void applyA() {
+    Function8<String, String, String, String, String, String, String, String, String> f =
+        (a, b, c, d, e, g, h, i) -> a + b + c + d + e + g + h + i;
+    Function7<String, String, String, String, String, String, String, String> g = f.apply("foo");
+    assertThat(g.apply("bar", "baz", "qux", "quux", "quuz", "quuux", "quuuux"))
+        .isEqualTo("foobarbazquxquuxquuzquuuxquuuux");
+  }
+
+  @Test
   void curried() {
     Function8<String, String, String, String, String, String, String, String, String> f =
         (a, b, c, d, e, g, h, i) -> "foo";
@@ -55,5 +64,27 @@ class Function8Test {
             f.tupled()
                 .apply(Tuple.of("bar", "baz", "qux", "quux", "quuz", "quuux", "quuuux", "quuuuux")))
         .isEqualTo("barbazquxquuxquuzquuuxquuuuxquuuuux");
+  }
+
+  @Test
+  void compose() {
+    Function8<String, String, String, String, String, String, String, String, String> f =
+        (a, b, c, d, e, g, h, i) -> a + b + c + d + e + g + h + i;
+    Function1<String, String> before = s -> s + "foo";
+    assertThat(
+            f.compose(before)
+                .apply("bar", "baz", "qux", "quux", "quuz", "quuux", "quuuux", "quuuuux"))
+        .isEqualTo("barfoobazquxquuxquuzquuuxquuuuxquuuuux");
+  }
+
+  @Test
+  void andThen() {
+    Function8<String, String, String, String, String, String, String, String, String> f =
+        (a, b, c, d, e, g, h, i) -> a + b + c + d + e + g + h + i;
+    Function1<String, String> after = s -> s + "foo";
+    assertThat(
+            f.andThen(after)
+                .apply("bar", "baz", "qux", "quux", "quuz", "quuux", "quuuux", "quuuuux"))
+        .isEqualTo("barbazquxquuxquuzquuuxquuuuxquuuuuxfoo");
   }
 }

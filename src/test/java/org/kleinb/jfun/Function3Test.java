@@ -19,6 +19,19 @@ class Function3Test {
   }
 
   @Test
+  void applyA() {
+    Function3<String, String, String, String> f = (a, b, c) -> a + b + c;
+    Function2<String, String, String> g = f.apply("foo");
+    assertThat(g.apply("bar", "baz")).isEqualTo("foobarbaz");
+  }
+
+  @Test
+  void reversed() {
+    Function3<String, String, String, String> f = (a, b, c) -> a + b + c;
+    assertThat(f.reversed().apply("foo", "bar", "baz")).isEqualTo("bazbarfoo");
+  }
+
+  @Test
   void curried() {
     Function3<String, String, String, String> f = (a, b, c) -> "foo";
     assertThat(f.curried().apply("bar").apply("baz").apply("qux")).isEqualTo("foo");

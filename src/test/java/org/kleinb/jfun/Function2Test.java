@@ -19,6 +19,13 @@ class Function2Test {
   }
 
   @Test
+  void applyA() {
+    Function2<String, String, String> f = (a, b) -> a + b;
+    Function1<String, String> g = f.apply("foo");
+    assertThat(g.apply("bar")).isEqualTo("foobar");
+  }
+
+  @Test
   void curried() {
     Function2<String, String, String> f = (a, b) -> "foo";
     assertThat(f.curried().apply("bar").apply("baz")).isEqualTo("foo");

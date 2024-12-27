@@ -59,4 +59,10 @@ class Tuple2Test {
         .isEqualTo(
             Tuple.of(42, "foo", true, 3.14, 42L, (short) 42, List.of(1, 2, 3), Map.of("foo", 42)));
   }
+
+  @Test
+  void toEntry() {
+    Tuple2<Integer, String> t = Tuple.of(42, "foo");
+    assertThat(t.toEntry()).isEqualTo(Map.entry(42, "foo"));
+  }
 }

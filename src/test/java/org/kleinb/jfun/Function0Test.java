@@ -2,9 +2,16 @@ package org.kleinb.jfun;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 
 class Function0Test {
+
+  @Test
+  void supplier() {
+    Function0<String> f = () -> "foo";
+    assertThat(((Supplier<String>) f).get()).isEqualTo("foo");
+  }
 
   @Test
   void constant() {

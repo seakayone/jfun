@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 class ValidationTest {
@@ -103,6 +104,26 @@ class ValidationTest {
   void shouldThrowOnGetErrorValid() {
     Validation<?, Integer> valid = Validation.valid(42);
     assertThatThrownBy(valid::getError).isInstanceOf(NoSuchElementException.class);
+  }
+
+  // .errors
+
+  @Test
+  void errors() {
+    Validation<String, Integer> invalid1 = Validation.invalid("error1");
+    Validation<String, Double> invalid2 = Validation.invalid("error2");
+    Validation<String, String> valid = Validation.valid("valid");
+    assertThat(Validation.errors(List.of(invalid1, invalid2, valid)))
+        .isEqualTo(List.of("error1", "error2"));
+  }
+
+  @Test
+  void errorsStream() {
+    Validation<String, Integer> invalid1 = Validation.invalid("error1");
+    Validation<String, Double> invalid2 = Validation.invalid("error2");
+    Validation<String, String> valid = Validation.valid("valid");
+    assertThat(Validation.errors(Stream.of(invalid1, invalid2, valid)))
+        .isEqualTo(List.of("error1", "error2"));
   }
 
   // .getOrElse

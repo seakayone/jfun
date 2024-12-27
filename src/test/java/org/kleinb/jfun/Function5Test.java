@@ -20,6 +20,14 @@ class Function5Test {
   }
 
   @Test
+  void applyA() {
+    Function5<String, String, String, String, String, String> f =
+        (a, b, c, d, e) -> a + b + c + d + e;
+    Function4<String, String, String, String, String> g = f.apply("foo");
+    assertThat(g.apply("bar", "baz", "qux", "quux")).isEqualTo("foobarbazquxquux");
+  }
+
+  @Test
   void curried() {
     Function5<String, String, String, String, String, String> f = (a, b, c, d, e) -> "foo";
     assertThat(f.curried().apply("bar").apply("baz").apply("qux").apply("quux").apply("quuz"))
