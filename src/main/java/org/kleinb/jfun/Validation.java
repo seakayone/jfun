@@ -385,13 +385,12 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
   }
 
   default Either<List<E>, A> toEither() {
-    return fold(
-        (List<? super E> errs) -> {
+    return toEitherWith(
+        errs -> {
           @SuppressWarnings("unchecked")
-          Either<List<E>, A> left = Either.left((List<E>) errs);
-          return left;
-        },
-        Either::right);
+          List<E> cast = (List<E>) errs;
+          return cast;
+        });
   }
 
   default <B> Either<B, A> toEitherWith(Function<? super List<? super E>, ? extends B> f) {
