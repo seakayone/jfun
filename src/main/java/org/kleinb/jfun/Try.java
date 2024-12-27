@@ -201,10 +201,10 @@ public sealed interface Try<A> permits Failure, Success {
     return this;
   }
 
-  default Try<A> tapBoth(Consumer<? super A> fa, Consumer<? super Throwable> ft) {
-    Objects.requireNonNull(fa);
-    Objects.requireNonNull(ft);
-    return tap(fa).tapFailure(ft);
+  default Try<A> tapBoth(Consumer<? super Throwable> ifFailure, Consumer<? super A> ifSuccess) {
+    Objects.requireNonNull(ifSuccess);
+    Objects.requireNonNull(ifFailure);
+    return tap(ifSuccess).tapFailure(ifFailure);
   }
 
   // conversion methods

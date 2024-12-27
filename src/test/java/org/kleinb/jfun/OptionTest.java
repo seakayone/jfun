@@ -264,6 +264,42 @@ class OptionTest {
     assertThat(actual).isEqualTo(Option.none());
   }
 
+  // .tapNone
+
+  @Test
+  void shouldTapNone() {
+    StringBuilder sb = new StringBuilder();
+    Option<Integer> actual = Option.<Integer>none().tapNone(() -> sb.append("none"));
+    assertThat(sb.toString()).isEqualTo("none");
+    assertThat(actual).isEqualTo(Option.none());
+  }
+
+  @Test
+  void shouldNotTapSome() {
+    StringBuilder sb = new StringBuilder();
+    Option<Integer> actual = Option.some(42).tapNone(() -> sb.append("none"));
+    assertThat(sb.toString()).isEmpty();
+    assertThat(actual).isEqualTo(Option.some(42));
+  }
+
+  // .tapBoth
+
+  @Test
+  void shouldTapBothSome() {
+    StringBuilder sb = new StringBuilder();
+    Option<Integer> actual = Option.some(42).tapBoth(() -> sb.append("none"), sb::append);
+    assertThat(sb.toString()).isEqualTo("42");
+    assertThat(actual).isEqualTo(Option.some(42));
+  }
+
+  @Test
+  void shouldTapBothNone() {
+    StringBuilder sb = new StringBuilder();
+    Option<Integer> actual = Option.<Integer>none().tapBoth(() -> sb.append("none"), sb::append);
+    assertThat(sb.toString()).isEqualTo("none");
+    assertThat(actual).isEqualTo(Option.none());
+  }
+
   // conversion methods
 
   // .toStream

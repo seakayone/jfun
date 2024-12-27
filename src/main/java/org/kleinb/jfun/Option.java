@@ -127,6 +127,25 @@ public sealed interface Option<A> permits None, Some {
     return this;
   }
 
+  default Option<A> tapNone(Runnable f) {
+    Objects.requireNonNull(f);
+    if (this instanceof None) {
+      f.run();
+    }
+    return this;
+  }
+
+  default Option<A> tapBoth(Runnable ifNone, Consumer<? super A> ifSome) {
+    Objects.requireNonNull(ifNone);
+    Objects.requireNonNull(ifSome);
+    if (this instanceof Some(A value)) {
+      ifSome.accept(value);
+    } else {
+      ifNone.run();
+    }
+    return this;
+  }
+
   // Conversion methods
 
   default Stream<A> toStream() {

@@ -140,10 +140,10 @@ public sealed interface Either<A, B> permits Left, Right {
     return this;
   }
 
-  default Either<A, B> tapBoth(Consumer<? super A> fa, Consumer<? super B> fb) {
-    Objects.requireNonNull(fa);
-    Objects.requireNonNull(fb);
-    return tapLeft(fa).tap(fb);
+  default Either<A, B> tapBoth(Consumer<? super A> ifLeft, Consumer<? super B> ifRight) {
+    Objects.requireNonNull(ifLeft);
+    Objects.requireNonNull(ifRight);
+    return tapLeft(ifLeft).tap(ifRight);
   }
 
   // conversion methods

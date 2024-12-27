@@ -375,7 +375,7 @@ class TryTest {
   @Test
   void shouldTapBothSuccess() {
     StringBuilder sb = new StringBuilder();
-    Try<Integer> actual = Try.success(42).tapBoth(sb::append, e -> sb.append(e.getMessage()));
+    Try<Integer> actual = Try.success(42).tapBoth(e -> sb.append(e.getMessage()), sb::append);
     assertThat(sb.toString()).isEqualTo("42");
     assertThat(actual).isEqualTo(Try.success(42));
   }
@@ -385,7 +385,7 @@ class TryTest {
     StringBuilder sb = new StringBuilder();
     Exception exception = new Exception("Boom");
     Try<Integer> actual =
-        Try.<Integer>failure(exception).tapBoth(sb::append, e -> sb.append(e.getMessage()));
+        Try.<Integer>failure(exception).tapBoth(e -> sb.append(e.getMessage()), sb::append);
     assertThat(sb.toString()).isEqualTo("Boom");
     assertThat(actual).isEqualTo(Try.failure(exception));
   }

@@ -285,24 +285,24 @@ class ValidationTest {
   // .tapError
 
   @Test
-  void shouldTapErrorValid() {
+  void shouldTapInvalidValid() {
     Validation<String, Integer> valid = Validation.valid(42);
     StringBuilder sb = new StringBuilder();
-    var actual = valid.tapError(sb::append);
+    var actual = valid.tapInvalid(sb::append);
     assertThat(sb.toString()).isEmpty();
     assertThat(actual).isEqualTo(valid);
   }
 
   @Test
-  void shouldTapErrorInvalid() {
+  void shouldTapInvalidInvalid() {
     Validation<String, Integer> invalid = Validation.invalid("error");
     StringBuilder sb = new StringBuilder();
-    var actual = invalid.tapError(it -> sb.append(it.size()));
+    var actual = invalid.tapInvalid(it -> sb.append(it.size()));
     assertThat(sb.toString()).isEqualTo("1");
     assertThat(actual).isEqualTo(invalid);
   }
 
-  // .tapBoth
+  // .
 
   @Test
   void shouldTapBothValid() {
@@ -317,7 +317,7 @@ class ValidationTest {
   void shouldTapBothInvalid() {
     Validation<String, Integer> invalid = Validation.invalid("error");
     StringBuilder sb = new StringBuilder();
-    var actual = invalid.tapBoth(sb::append, it -> sb.append(it.size()));
+    var actual = invalid.tapBoth(it -> sb.append(it.size()), sb::append);
     assertThat(sb.toString()).isEqualTo("1");
     assertThat(actual).isEqualTo(invalid);
   }
@@ -591,13 +591,13 @@ class ValidationTest {
   @Test
   void shouldConvertValidToSuccess() {
     Validation<String, Integer> valid = Validation.valid(42);
-    assertThat(valid.toTry(_ -> new RuntimeException())).isEqualTo(Try.success(42));
+    assertThat(valid.toTryWith(_ -> new RuntimeException())).isEqualTo(Try.success(42));
   }
 
   @Test
   void shouldConvertInvalidToFailure() {
     var exception = new RuntimeException("error");
     Validation<String, Integer> invalid = Validation.invalid("error");
-    assertThat(invalid.toTry(_ -> exception)).isEqualTo(Try.failure(exception));
+    assertThat(invalid.toTryWith(_ -> exception)).isEqualTo(Try.failure(exception));
   }
 }
