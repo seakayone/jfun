@@ -4,10 +4,6 @@ import java.util.Objects;
 
 public record Tuple4<T1, T2, T3, T4>(T1 _1, T2 _2, T3 _3, T4 _4) implements Tuple {
 
-  public static <T1, T2, T3, T4> Tuple4<T1, T2, T3, T4> of(T1 _1, T2 _2, T3 _3, T4 _4) {
-    return new Tuple4<>(_1, _2, _3, _4);
-  }
-
   public <T5> Tuple5<T1, T2, T3, T4, T5> append(T5 _5) {
     return new Tuple5<>(_1, _2, _3, _4, _5);
   }
