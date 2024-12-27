@@ -247,6 +247,18 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
     }
   }
 
+  default <B> Validation<E, Tuple2<A, B>> zip(Validation<E, B> other) {
+    Objects.requireNonNull(other);
+    return zipWith(other, Tuple::of);
+  }
+
+  default <B, C> Validation<E, C> zipWith(
+      Validation<E, B> other, Function2<? super A, ? super B, ? extends C> f) {
+    Objects.requireNonNull(other);
+    Objects.requireNonNull(f);
+    return Validation.validateWith(this, other, f);
+  }
+
   default List<E> getError() {
     switch (this) {
       case Invalid(List<E> error) -> {
@@ -357,7 +369,7 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
     return this;
   }
 
-  default Validation<E, A> tapError(Consumer<? super List<? super E>> f) {
+  default Validation<E, A> tapInvalid(Consumer<? super List<? super E>> f) {
     Objects.requireNonNull(f);
     if (this instanceof Invalid(List<E> error)) {
       f.accept(error);
@@ -366,10 +378,10 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
   }
 
   default Validation<E, A> tapBoth(
-      Consumer<? super A> valid, Consumer<? super List<? super E>> invalid) {
-    Objects.requireNonNull(valid);
-    Objects.requireNonNull(invalid);
-    return tap(valid).tapError(invalid);
+      Consumer<? super List<? super E>> ifInvalid, Consumer<? super A> ifValid) {
+    Objects.requireNonNull(ifValid);
+    Objects.requireNonNull(ifInvalid);
+    return tap(ifValid).tapInvalid(ifInvalid);
   }
 
   default Either<List<E>, A> toEither() {
@@ -382,11 +394,16 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
         Either::right);
   }
 
+  default <B> Either<B, A> toEitherWith(Function<? super List<? super E>, ? extends B> f) {
+    Objects.requireNonNull(f);
+    return fold(errs -> Either.left(f.apply(errs)), Either::right);
+  }
+
   default Option<A> toOption() {
     return fold(_ -> Option.none(), Option::some);
   }
 
-  default Try<A> toTry(Function<? super List<? super E>, ? extends Throwable> e) {
+  default Try<A> toTryWith(Function<? super List<? super E>, ? extends Throwable> e) {
     Objects.requireNonNull(e);
     return fold(errs -> Try.failure(e.apply(errs)), Try::success);
   }

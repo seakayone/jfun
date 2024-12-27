@@ -66,6 +66,17 @@ public sealed interface Option<A> permits None, Some {
     }
   }
 
+  default <B> Option<Tuple2<A, B>> zip(Option<B> that) {
+    Objects.requireNonNull(that);
+    return zipWith(that, Tuple::of);
+  }
+
+  default <B, C> Option<C> zipWith(Option<B> that, Function2<A, B, C> f) {
+    Objects.requireNonNull(that);
+    Objects.requireNonNull(f);
+    return flatMap(a -> that.map(b -> f.apply(a, b)));
+  }
+
   default <B> Option<B> flatMap(Function<? super A, ? extends Option<? extends B>> f) {
     Objects.requireNonNull(f);
     if (this instanceof Some(A value)) {

@@ -79,6 +79,18 @@ class OptionTest {
     assertThatThrownBy(Option.<Integer>none()::get).isInstanceOf(NoSuchElementException.class);
   }
 
+  // .zip
+
+  @Test
+  void shouldZipSome() {
+    assertThat(Option.some(42).zip(Option.some("foo"))).isEqualTo(Option.some(Tuple.of(42, "foo")));
+  }
+
+  @Test
+  void shouldZipNone() {
+    assertThat(Option.none().zip(Option.some("foo"))).isEqualTo(Option.none());
+  }
+
   // .isSome , isNone
 
   @Test

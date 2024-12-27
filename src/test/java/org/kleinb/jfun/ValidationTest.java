@@ -92,6 +92,30 @@ class ValidationTest {
     assertThatThrownBy(invalid::get).isInstanceOf(NoSuchElementException.class);
   }
 
+  // .zip
+
+  @Test
+  void shouldZipValid() {
+    Validation<String, Integer> valid = Validation.valid(42);
+    Validation<String, String> other = Validation.valid("foo");
+    assertThat(valid.zip(other)).isEqualTo(Validation.valid(Tuple.of(42, "foo")));
+  }
+
+  @Test
+  void shouldZipInvalid() {
+    Validation<String, Integer> invalid = Validation.invalid("error");
+    Validation<String, String> other = Validation.valid("foo");
+    assertThat(invalid.zip(other)).isEqualTo(Validation.invalid("error"));
+    assertThat(other.zip(invalid)).isEqualTo(Validation.invalid("error"));
+  }
+
+  @Test
+  void shouldZipInvalidInvalid() {
+    Validation<String, Integer> invalid = Validation.invalid("error");
+    Validation<String, String> other = Validation.invalid("error2");
+    assertThat(invalid.zip(other)).isEqualTo(Validation.invalid(List.of("error", "error2")));
+  }
+
   // .getError
 
   @Test
