@@ -9,6 +9,10 @@ public interface Function2<A, B, Z> extends java.util.function.BiFunction<A, B, 
     return (_, _) -> value;
   }
 
+  static <A, B, Z> Function2<A, B, Z> of(Function2<A, B, Z> methodReference) {
+    return methodReference;
+  }
+
   @Override
   Z apply(A a, B b);
 

@@ -13,6 +13,10 @@ public interface Function1<A, Z> extends java.util.function.Function<A, Z> {
     return _ -> c;
   }
 
+  static <A, Z> Function1<A, Z> of(Function1<A, Z> methodReference) {
+    return methodReference;
+  }
+
   @Override
   Z apply(A b);
 
