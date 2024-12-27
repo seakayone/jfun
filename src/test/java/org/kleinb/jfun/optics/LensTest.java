@@ -1,4 +1,4 @@
-package org.kleinb.jfun;
+package org.kleinb.jfun.optics;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -6,17 +6,7 @@ import org.junit.jupiter.api.Test;
 
 class LensTest {
 
-  record City(String cityName) {
-    public City {
-      if (cityName.isBlank()) {
-        throw new IllegalArgumentException("City name must not be blank");
-      }
-    }
-
-    public static Try<City> of(String cityName) {
-      return Try.of(() -> new City(cityName));
-    }
-  }
+  record City(String cityName) {}
 
   record Address(City city, String street) {}
 
@@ -35,6 +25,23 @@ class LensTest {
 
   final Lens<Person, String> personCityLens = addressLens.andThen(cityLens).andThen(cityNameLens);
 
+  interface LensLaws {
+    static <S, A> boolean getReplace(Lens<S, A> l, S s) {
+      return l.replace(s, l.get(s)).equals(s);
+    }
+
+    static <S, A> boolean replaceGet(Lens<S, A> l, S s, A a) {
+      return l.get(l.replace(s, a)).equals(a);
+    }
+  }
+
+  @Test
+  void shouldSatisfyLensLaws() {
+    final Person person = new Person("Sherlock", new Address(new City("London"), "Baker Street"));
+    assertThat(LensLaws.getReplace(nameLens, person)).isTrue();
+    assertThat(LensLaws.replaceGet(nameLens, person, "Holmes")).isTrue();
+  }
+
   @Test
   void shouldGet() {
     final Person person = new Person("Sherlock", new Address(new City("London"), "Baker Street"));
@@ -42,11 +49,11 @@ class LensTest {
   }
 
   @Test
-  void shouldSet() {
+  void shouldReplace() {
     final Address address = new Address(new City("London"), "Baker Street");
     final Person person = new Person("Sherlock", address);
 
-    final Person actual = nameLens.set(person, "Holmes");
+    final Person actual = nameLens.replace(person, "Holmes");
 
     assertThat(actual.name()).isEqualTo("Holmes");
     assertThat(actual.address()).isEqualTo(address);
@@ -59,11 +66,11 @@ class LensTest {
   }
 
   @Test
-  void shouldComposeSet() {
+  void shouldComposeReplace() {
     final Address address = new Address(new City("London"), "Baker Street");
     final Person person = new Person("Sherlock", address);
 
-    final Person actual = personCityLens.set(person, "Paris");
+    final Person actual = personCityLens.replace(person, "Paris");
 
     assertThat(actual.name()).isEqualTo("Sherlock");
     assertThat(actual.address()).isEqualTo(new Address(new City("Paris"), "Baker Street"));
