@@ -1,5 +1,6 @@
 package org.kleinb.jfun;
 
+import java.util.Map;
 import java.util.Objects;
 
 public record Tuple2<T1, T2>(T1 _1, T2 _2) implements Tuple {
@@ -43,5 +44,9 @@ public record Tuple2<T1, T2>(T1 _1, T2 _2) implements Tuple {
     Objects.requireNonNull(other);
     return new Tuple8<>(
         _1, _2, other._1(), other._2(), other._3(), other._4(), other._5(), other._6());
+  }
+
+  public Map.Entry<T1, T2> toEntry() {
+    return Map.entry(_1, _2);
   }
 }
