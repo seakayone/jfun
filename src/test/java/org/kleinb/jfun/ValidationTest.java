@@ -63,6 +63,18 @@ class ValidationTest {
     assertThat(actual).isEqualTo(Validation.invalid("Not greater than zero"));
   }
 
+  @Test
+  void shouldCreatNonNullValidation() {
+    Validation<String, Integer> actual = Validation.nonNull("Must not be null", 42);
+    assertThat(actual).isEqualTo(Validation.valid(42));
+  }
+
+  @Test
+  void shouldCreatNonNullValidationInvalid() {
+    Validation<String, Integer> actual = Validation.nonNull("Must not be null", null);
+    assertThat(actual).isEqualTo(Validation.invalid("Must not be null"));
+  }
+
   // .isValid , .isInvalid
   @Test
   void shouldCheckValid() {

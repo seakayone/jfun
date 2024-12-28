@@ -26,18 +26,20 @@ public interface Prism<WHOLE, PART> {
 
   WHOLE reverseGet(PART part);
 
-  default WHOLE replace(WHOLE whole, PART part) {
-    return switch (getOption(whole)) {
-      case Some<PART> _ -> reverseGet(part);
-      case None<PART> _ -> whole;
-    };
+  default Function1<WHOLE, WHOLE> replace(PART part) {
+    return whole ->
+        switch (getOption(whole)) {
+          case Some<PART> _ -> reverseGet(part);
+          case None<PART> _ -> whole;
+        };
   }
 
-  default WHOLE modify(Function1<PART, PART> f, WHOLE whole) {
-    return switch (getOption(whole)) {
-      case Some(PART value) -> replace(whole, f.apply(value));
-      case None<PART> _ -> whole;
-    };
+  default Function1<WHOLE, WHOLE> modify(Function1<PART, PART> f) {
+    return whole ->
+        switch (getOption(whole)) {
+          case Some(PART value) -> replace(f.apply(value)).apply(whole);
+          case None<PART> _ -> whole;
+        };
   }
 
   default <NEW_PART> Prism<WHOLE, NEW_PART> andThen(Prism<PART, NEW_PART> other) {

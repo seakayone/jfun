@@ -241,13 +241,10 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
   }
 
   default A get() {
-    switch (this) {
-      case Valid(A value) -> {
-        return value;
-      }
-      case Invalid<E, A> _ -> {
-        throw new NoSuchElementException("get called on Invalid");
-      }
+    if (this instanceof Valid(A value)) {
+      return value;
+    } else {
+      throw new NoSuchElementException("get called on Invalid");
     }
   }
 
@@ -273,13 +270,10 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
   }
 
   default List<E> getError() {
-    switch (this) {
-      case Invalid(List<E> error) -> {
-        return error;
-      }
-      case Valid<E, A> _ -> {
-        throw new NoSuchElementException("getError called on Valid");
-      }
+    if (this instanceof Invalid(List<E> error)) {
+      return error;
+    } else {
+      throw new NoSuchElementException("getError called on Valid");
     }
   }
 
