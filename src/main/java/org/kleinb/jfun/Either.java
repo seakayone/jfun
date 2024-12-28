@@ -72,6 +72,17 @@ public sealed interface Either<A, B> permits Left, Right {
     }
   }
 
+  default <C> Either<C, B> mapLeft(Function<? super A, ? extends C> f) {
+    Objects.requireNonNull(f);
+    if (this instanceof Left(A value)) {
+      return Either.left(f.apply(value));
+    } else {
+      @SuppressWarnings("unchecked")
+      Right<C, B> right = (Right<C, B>) this;
+      return right;
+    }
+  }
+
   default <C> Either<A, C> flatMap(
       Function<? super B, ? extends Either<? extends A, ? extends C>> f) {
     Objects.requireNonNull(f);

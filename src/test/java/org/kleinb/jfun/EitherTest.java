@@ -117,6 +117,20 @@ class EitherTest {
     assertThat(either.map(Integer::parseInt)).isEqualTo(Either.left(42));
   }
 
+  // .mapLeft
+
+  @Test
+  void shouldMapLeftRight() {
+    Either<Integer, String> either = Either.right("42");
+    assertThat(either.mapLeft(_ -> "not mapped")).isEqualTo(Either.right("42"));
+  }
+
+  @Test
+  void shouldMapLeftLeft() {
+    Either<Integer, String> either = Either.left(42);
+    assertThat(either.mapLeft(i -> i + 1)).isEqualTo(Either.left(43));
+  }
+
   // .flatMap
   @Test
   void shouldFlatMapRight() {
