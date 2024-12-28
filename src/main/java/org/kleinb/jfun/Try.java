@@ -217,6 +217,10 @@ public sealed interface Try<A> permits Failure, Success {
     return fold(_ -> Option.none(), Option::some);
   }
 
+  default Validation<Throwable, A> toValidation() {
+    return fold(Validation::invalid, Validation::valid);
+  }
+
   default Optional<A> toOptional() {
     return fold(_ -> Optional.empty(), Optional::of);
   }

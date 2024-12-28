@@ -422,6 +422,21 @@ class TryTest {
     assertThat(actual.toEither()).isEqualTo(Either.left(exception));
   }
 
+  // .toValidation
+
+  @Test
+  void shouldConvertSuccessToValid() {
+    Try<Integer> actual = Try.success(42);
+    assertThat(actual.toValidation()).isEqualTo(Validation.valid(42));
+  }
+
+  @Test
+  void shouldConvertFailureToInvalid() {
+    var exception = new Exception("Boom");
+    Try<Integer> actual = Try.failure(exception);
+    assertThat(actual.toValidation()).isEqualTo(Validation.invalid(exception));
+  }
+
   // .toOptional
 
   @Test
