@@ -26,7 +26,7 @@ public interface Prism<WHOLE, PART> {
 
   WHOLE reverseGet(PART part);
 
-  default WHOLE replace(PART part, WHOLE whole) {
+  default WHOLE replace(WHOLE whole, PART part) {
     return switch (getOption(whole)) {
       case Some<PART> _ -> reverseGet(part);
       case None<PART> _ -> whole;
@@ -35,7 +35,7 @@ public interface Prism<WHOLE, PART> {
 
   default WHOLE modify(Function1<PART, PART> f, WHOLE whole) {
     return switch (getOption(whole)) {
-      case Some(PART value) -> replace(f.apply(value), whole);
+      case Some(PART value) -> replace(whole, f.apply(value));
       case None<PART> _ -> whole;
     };
   }

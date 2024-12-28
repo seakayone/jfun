@@ -46,13 +46,13 @@ class PrismTest {
   @Test
   void testPrismReplace() {
     Json json = new Json.JStr("hello");
-    assertThat(Json.jStrPrism().replace("world", json)).isEqualTo(new Json.JStr("world"));
+    assertThat(Json.jStrPrism().replace(json, "world")).isEqualTo(new Json.JStr("world"));
   }
 
   @Test
   void testPrismReplaceDoesNotMatch() {
     Json json = new Json.JNum(42);
-    assertThat(Json.jStrPrism().replace("world", json)).isEqualTo(json);
+    assertThat(Json.jStrPrism().replace(json, "world")).isEqualTo(json);
   }
 
   // .modify
@@ -83,7 +83,7 @@ class PrismTest {
     final Prism<Json, Integer> foo = Json.jNumPrism().andThen(DoubleToIntegerPrism.get());
     Json json = new Json.JNum(42.0);
     assertThat(foo.getOption(json)).isEqualTo(Option.some(42));
-    assertThat(foo.replace(5, json)).isEqualTo(new Json.JNum(5));
+    assertThat(foo.replace(json, 5)).isEqualTo(new Json.JNum(5));
     assertThat(foo.modify(i -> i + 1, json)).isEqualTo(new Json.JNum(43));
     assertThat(foo.reverseGet(42)).isEqualTo(json);
   }
