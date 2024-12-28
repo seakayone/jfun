@@ -3,6 +3,8 @@ package org.kleinb.jfun.optics;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
+import org.kleinb.jfun.Either;
+import org.kleinb.jfun.Option;
 
 class LensTest {
 
@@ -38,6 +40,8 @@ class LensTest {
     assertThat(nameLens.get(person)).isEqualTo("Sherlock");
   }
 
+  // .replace
+
   @Test
   void shouldReplace() {
     final Address address = new Address(new City("London"), "Baker Street");
@@ -48,6 +52,8 @@ class LensTest {
     assertThat(actual.name()).isEqualTo("Holmes");
     assertThat(actual.address()).isEqualTo(address);
   }
+
+  // .andThen, compose
 
   @Test
   void shouldComposeGet() {
@@ -67,6 +73,15 @@ class LensTest {
   }
 
   @Test
+  void shouldSatisfyLensLawsComposed() {
+    final Person person = new Person("Sherlock", new Address(new City("London"), "Baker Street"));
+    assertThat(LensLaws.getReplace(personCityLens, person)).isTrue();
+    assertThat(LensLaws.replaceGet(personCityLens, person, "London")).isTrue();
+  }
+
+  // .modify
+
+  @Test
   void shouldModify() {
     final Address address = new Address(new City("London"), "Baker Street");
     final Person person = new Person("Sherlock", address);
@@ -75,5 +90,50 @@ class LensTest {
 
     assertThat(actual)
         .isEqualTo(new Person("Sherlock", new Address(new City("LONDON"), "Baker Street")));
+  }
+
+  // .getOrModify
+
+  @Test
+  void shouldGetOrModify() {
+    final Person person = new Person("Sherlock", new Address(new City("London"), "Baker Street"));
+    assertThat(personCityLens.getOrModify(person)).isEqualTo(Either.right("London"));
+  }
+
+  // .getOption
+
+  @Test
+  void shouldGetOption() {
+    final Person person = new Person("Sherlock", new Address(new City("London"), "Baker Street"));
+    assertThat(personCityLens.getOption(person)).isEqualTo(Option.some("London"));
+  }
+
+  // .find
+
+  @Test
+  void shouldFind() {
+    final Person person = new Person("Sherlock", new Address(new City("London"), "Baker Street"));
+    assertThat(personCityLens.find("London"::equals).apply(person))
+        .isEqualTo(Option.some("London"));
+  }
+
+  @Test
+  void shouldFindNoMatch() {
+    final Person person = new Person("Sherlock", new Address(new City("London"), "Baker Street"));
+    assertThat(personCityLens.find("Paris"::equals).apply(person)).isEqualTo(Option.none());
+  }
+
+  // exists
+
+  @Test
+  void shouldExist() {
+    final Person person = new Person("Sherlock", new Address(new City("London"), "Baker Street"));
+    assertThat(personCityLens.exists("London"::equals).test(person)).isTrue();
+  }
+
+  @Test
+  void shouldNotExist() {
+    final Person person = new Person("Sherlock", new Address(new City("London"), "Baker Street"));
+    assertThat(personCityLens.exists("Paris"::equals).test(person)).isFalse();
   }
 }

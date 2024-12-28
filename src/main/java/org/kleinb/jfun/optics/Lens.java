@@ -40,7 +40,7 @@ public interface Lens<WHOLE, PART> {
   }
 
   default Function1<WHOLE, Option<PART>> find(Predicate<PART> p) {
-    return whole -> Option.some(get((whole))).filter(p);
+    return whole -> Option.some(get(whole)).filter(p);
   }
 
   default Predicate<WHOLE> exists(Predicate<PART> p) {
