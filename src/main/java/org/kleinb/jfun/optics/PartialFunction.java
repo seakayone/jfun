@@ -6,6 +6,10 @@ import org.kleinb.jfun.Option;
 
 public interface PartialFunction<A, B> {
 
+  default PartialFunction<A, B> of(Function1<? super A, ? extends B> f) {
+    return PartialFunction.of(f, _ -> true);
+  }
+
   static <A1 extends A, A, B> PartialFunction<A, B> caseOf(
       Class<? super A1> clazz, Function1<? super A1, ? extends B> f) {
     @SuppressWarnings("unchecked")

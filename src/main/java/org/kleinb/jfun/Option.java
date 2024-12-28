@@ -13,6 +13,10 @@ public sealed interface Option<A> permits None, Some {
     return new Some<>(value);
   }
 
+  static <A> Option<A> none(Void ignored) {
+    return none();
+  }
+
   static <A> Option<A> none() {
     @SuppressWarnings("unchecked")
     final var none = (None<A>) None.INSTANCE;
