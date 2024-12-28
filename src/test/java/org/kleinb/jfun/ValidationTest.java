@@ -116,6 +116,26 @@ class ValidationTest {
     assertThat(invalid.zip(other)).isEqualTo(Validation.invalid(List.of("error", "error2")));
   }
 
+  // .contains
+
+  @Test
+  void shouldContainValid() {
+    Validation<String, Integer> valid = Validation.valid(42);
+    assertThat(valid.contains(42)).isTrue();
+  }
+
+  @Test
+  void shouldNotContainValid() {
+    Validation<String, Integer> valid = Validation.valid(42);
+    assertThat(valid.contains(43)).isFalse();
+  }
+
+  @Test
+  void shouldNotContainInvalid() {
+    Validation<String, String> invalid = Validation.invalid("error");
+    assertThat(invalid.contains("error")).isFalse();
+  }
+
   // .getError
 
   @Test

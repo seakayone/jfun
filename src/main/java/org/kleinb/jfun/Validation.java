@@ -39,6 +39,10 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
     return p.test(a) ? valid(a) : invalid(error);
   }
 
+  static <E, A> Validation<E, A> nonNull(E error, A a) {
+    return fromPredicate(error, Objects::nonNull, a);
+  }
+
   static <E, A1, A2, Z> Validation<E, Z> validateWith(
       Validation<E, A1> v1,
       Validation<E, A2> v2,
@@ -257,6 +261,15 @@ public sealed interface Validation<E, A> permits Invalid, Valid {
     Objects.requireNonNull(other);
     Objects.requireNonNull(f);
     return Validation.validateWith(this, other, f);
+  }
+
+  default boolean contains(A value) {
+    return exists(a -> Objects.equals(a, value));
+  }
+
+  default boolean exists(Predicate<? super A> p) {
+    Objects.requireNonNull(p);
+    return (this instanceof Valid(A value)) && p.test(value);
   }
 
   default List<E> getError() {
