@@ -42,6 +42,14 @@ public interface Prism<WHOLE, PART> {
         };
   }
 
+  default Function1<WHOLE, Option<WHOLE>> modifyOption(Function1<PART, PART> f) {
+    return whole -> getOption(whole).map(p -> replace(f.apply(p)).apply(whole));
+  }
+
+  default Function1<WHOLE, Option<WHOLE>> replaceOption(PART part) {
+    return modifyOption(_ -> part);
+  }
+
   default <NEW_PART> Prism<WHOLE, NEW_PART> andThen(Prism<PART, NEW_PART> other) {
     var self = this;
     return new Prism<>() {
