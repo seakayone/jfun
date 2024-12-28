@@ -25,16 +25,6 @@ class LensTest {
 
   final Lens<Person, String> personCityLens = addressLens.andThen(cityLens).andThen(cityNameLens);
 
-  interface LensLaws {
-    static <S, A> boolean getReplace(Lens<S, A> l, S s) {
-      return l.replace(s, l.get(s)).equals(s);
-    }
-
-    static <S, A> boolean replaceGet(Lens<S, A> l, S s, A a) {
-      return l.get(l.replace(s, a)).equals(a);
-    }
-  }
-
   @Test
   void shouldSatisfyLensLaws() {
     final Person person = new Person("Sherlock", new Address(new City("London"), "Baker Street"));

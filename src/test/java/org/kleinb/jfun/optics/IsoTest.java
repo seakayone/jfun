@@ -8,16 +8,6 @@ import org.kleinb.jfun.Tuple2;
 
 class IsoTest {
 
-  interface IsoLaws {
-    static <A, B> boolean roundTripOneWay(Iso<A, B> i, A a) {
-      return i.reverseGet(i.get(a)).equals(a);
-    }
-
-    static <A, B> boolean roundTripOtherWay(Iso<A, B> i, B b) {
-      return i.get(i.reverseGet(b)).equals(b);
-    }
-  }
-
   record Person(String name, Integer age) {}
 
   @Test
