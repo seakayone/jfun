@@ -126,20 +126,19 @@ class RecordsExampleTest {
 
   @Test
   void testWith() {
-    final Person person = new Person(new Person.Name("Bob"), new Person.Age(42), Option.none());
+    final Person p = new Person(new Person.Name("Bob"), new Person.Age(42), Option.none());
     final Address newAddress = new Address("4 Privet Drive, Little Whinging, Surrey");
 
-    assertThat(person.withName(new Person.Name("Bob")))
-        .isEqualTo(new Person(new Person.Name("Bob"), new Person.Age(42), Option.none()));
+    assertThat(p.withName(new Person.Name("Bob")))
+        .isEqualTo(new Person(new Person.Name("Bob"), p.age, p.address));
 
-    assertThat(person.withAge(new Person.Age(43)))
-        .isEqualTo(new Person(new Person.Name("Alice"), new Person.Age(43), Option.none()));
+    assertThat(p.withAge(new Person.Age(43)))
+        .isEqualTo(new Person(p.name, new Person.Age(43), p.address));
 
-    assertThat(person.withAddress(newAddress))
-        .isEqualTo(new Person(new Person.Name("Alice"), new Person.Age(42), Option.of(newAddress)));
-    assertThat(person.withNoAddress())
-        .isEqualTo(new Person(new Person.Name("Alice"), new Person.Age(42), Option.none()));
-    assertThat(person.withAddress(Option.of(newAddress)))
-        .isEqualTo(new Person(new Person.Name("Alice"), new Person.Age(42), Option.of(newAddress)));
+    assertThat(p.withAddress(newAddress))
+        .isEqualTo(new Person(p.name, p.age, Option.of(newAddress)));
+    assertThat(p.withNoAddress()).isEqualTo(new Person(p.name, p.age, Option.none()));
+    assertThat(p.withAddress(Option.of(newAddress)))
+        .isEqualTo(new Person(p.name, p.age, Option.of(newAddress)));
   }
 }
