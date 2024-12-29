@@ -109,6 +109,17 @@ public sealed interface Either<A, B> permits Left, Right {
     }
   }
 
+  default A getLeft() {
+    switch (this) {
+      case Left(A value) -> {
+        return value;
+      }
+      case Right(B _) -> {
+        throw new NoSuchElementException("getLeft called on Right");
+      }
+    }
+  }
+
   default B getOrElse(B or) {
     return (this instanceof Right(B value)) ? value : or;
   }
