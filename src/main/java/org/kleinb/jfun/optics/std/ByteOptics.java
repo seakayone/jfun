@@ -3,7 +3,7 @@ package org.kleinb.jfun.optics.std;
 import org.kleinb.jfun.Option;
 import org.kleinb.jfun.optics.Prism;
 
-public class ByteOptics {
+public final class ByteOptics {
   private ByteOptics() {}
 
   public static Prism<Byte, Boolean> byteToBoolean() {

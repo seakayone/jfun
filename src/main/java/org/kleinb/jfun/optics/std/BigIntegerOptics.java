@@ -6,7 +6,7 @@ import org.kleinb.jfun.Option;
 import org.kleinb.jfun.Try;
 import org.kleinb.jfun.optics.Prism;
 
-public class BigIntegerOptics {
+public final class BigIntegerOptics {
   private BigIntegerOptics() {}
 
   public static Prism<BigInteger, Long> bigIntegerToLong() {

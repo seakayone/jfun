@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import org.kleinb.jfun.Try;
 import org.kleinb.jfun.optics.Prism;
 
-public class BigDecimalOptics {
+public final class BigDecimalOptics {
   private BigDecimalOptics() {}
 
   public static Prism<BigDecimal, Long> bigDecimalToLong() {

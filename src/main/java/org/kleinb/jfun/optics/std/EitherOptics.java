@@ -5,7 +5,6 @@ import org.kleinb.jfun.optics.PartialFunction;
 import org.kleinb.jfun.optics.Prism;
 
 public final class EitherOptics {
-
   private EitherOptics() {}
 
   static <A, B> Prism<Either<A, B>, A> left() {
