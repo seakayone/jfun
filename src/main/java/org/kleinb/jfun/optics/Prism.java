@@ -5,63 +5,57 @@ import org.kleinb.jfun.None;
 import org.kleinb.jfun.Option;
 import org.kleinb.jfun.Some;
 
-public interface Prism<WHOLE, PART> extends Optional<WHOLE, PART> {
+public interface Prism<S, A> extends Optional<S, A> {
 
-  static <WHOLE, PART> Prism<WHOLE, PART> of(
-      PartialFunction<WHOLE, PART> getOption, Function1<PART, WHOLE> reverseGet) {
+  static <S, A> Prism<S, A> of(PartialFunction<S, A> getOption, Function1<A, S> reverseGet) {
     return Prism.of(getOption.lift(), reverseGet);
   }
 
-  static <WHOLE, PART> Prism<WHOLE, PART> of(
-      Function1<WHOLE, Option<PART>> getOption, Function1<PART, WHOLE> reverseGet) {
+  static <S, A> Prism<S, A> of(Function1<S, Option<A>> getOption, Function1<A, S> reverseGet) {
     return new Prism<>() {
       @Override
-      public Option<PART> getOption(WHOLE whole) {
-        return getOption.apply(whole);
+      public Option<A> getOption(S s) {
+        return getOption.apply(s);
       }
 
       @Override
-      public WHOLE reverseGet(PART part) {
-        return reverseGet.apply(part);
+      public S reverseGet(A a) {
+        return reverseGet.apply(a);
       }
     };
   }
 
-  Option<PART> getOption(WHOLE whole);
+  Option<A> getOption(S s);
 
-  WHOLE reverseGet(PART part);
+  S reverseGet(A a);
 
-  default Function1<WHOLE, WHOLE> replace(PART part) {
-    return whole ->
-        switch (getOption(whole)) {
-          case Some<PART> _ -> reverseGet(part);
-          case None<PART> _ -> whole;
+  default Function1<S, S> replace(A a) {
+    return s ->
+        switch (getOption(s)) {
+          case Some<A> _ -> reverseGet(a);
+          case None<A> _ -> s;
         };
   }
 
-  default Function1<WHOLE, WHOLE> modify(Function1<PART, PART> f) {
-    return whole ->
-        switch (getOption(whole)) {
-          case Some(PART value) -> replace(f.apply(value)).apply(whole);
-          case None<PART> _ -> whole;
+  default Function1<S, S> modify(Function1<A, A> f) {
+    return s ->
+        switch (getOption(s)) {
+          case Some(A value) -> replace(f.apply(value)).apply(s);
+          case None<A> _ -> s;
         };
   }
 
-  default Function1<WHOLE, Option<WHOLE>> replaceOption(PART part) {
-    return modifyOption(_ -> part);
-  }
-
-  default <NEW_PART> Prism<WHOLE, NEW_PART> andThen(Prism<PART, NEW_PART> other) {
+  default <B> Prism<S, B> andThen(Prism<A, B> other) {
     var self = this;
     return new Prism<>() {
       @Override
-      public Option<NEW_PART> getOption(WHOLE whole) {
-        return self.getOption(whole).flatMap(other::getOption);
+      public Option<B> getOption(S s) {
+        return self.getOption(s).flatMap(other::getOption);
       }
 
       @Override
-      public WHOLE reverseGet(NEW_PART newPart) {
-        return self.reverseGet(other.reverseGet(newPart));
+      public S reverseGet(B b) {
+        return self.reverseGet(other.reverseGet(b));
       }
     };
   }

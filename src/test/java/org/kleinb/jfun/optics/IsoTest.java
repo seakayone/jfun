@@ -69,7 +69,8 @@ class IsoTest {
 
   @Test
   void andThen() {
-    Iso<Tuple2<String, Integer>, Tuple2<Integer, String>> swapped = Iso.of(Tuple2::swap, Tuple2::swap);
+    Iso<Tuple2<String, Integer>, Tuple2<Integer, String>> swapped =
+        Iso.of(Tuple2::swap, Tuple2::swap);
     Iso<Person, Tuple2<Integer, String>> personTuple2IsoSwapped = personTuple2Iso.andThen(swapped);
     Person person = new Person("Alice", 42);
     assertThat(personTuple2IsoSwapped.get(person)).isEqualTo(Tuple.of(42, "Alice"));
