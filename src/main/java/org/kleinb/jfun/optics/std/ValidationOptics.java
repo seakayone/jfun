@@ -2,7 +2,7 @@ package org.kleinb.jfun.optics.std;
 
 import java.util.List;
 import org.kleinb.jfun.Validation;
-import org.kleinb.jfun.optics.PartialFunction;
+import org.kleinb.jfun.PartialFunction;
 import org.kleinb.jfun.optics.Prism;
 
 public final class ValidationOptics {

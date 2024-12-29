@@ -1,8 +1,6 @@
-package org.kleinb.jfun.optics;
+package org.kleinb.jfun;
 
 import java.util.function.Predicate;
-import org.kleinb.jfun.Function1;
-import org.kleinb.jfun.Option;
 
 public interface PartialFunction<A, B> {
 

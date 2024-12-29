@@ -3,7 +3,7 @@ package org.kleinb.jfun.optics.std;
 import java.util.Objects;
 import org.kleinb.jfun.Option;
 import org.kleinb.jfun.optics.Iso;
-import org.kleinb.jfun.optics.PartialFunction;
+import org.kleinb.jfun.PartialFunction;
 import org.kleinb.jfun.optics.Prism;
 
 public final class OptionOptics {

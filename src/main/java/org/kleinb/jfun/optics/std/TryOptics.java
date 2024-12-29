@@ -1,7 +1,7 @@
 package org.kleinb.jfun.optics.std;
 
 import org.kleinb.jfun.Try;
-import org.kleinb.jfun.optics.PartialFunction;
+import org.kleinb.jfun.PartialFunction;
 import org.kleinb.jfun.optics.Prism;
 
 public final class TryOptics {

@@ -1,9 +1,6 @@
 package org.kleinb.jfun.optics;
 
-import org.kleinb.jfun.Function1;
-import org.kleinb.jfun.None;
-import org.kleinb.jfun.Option;
-import org.kleinb.jfun.Some;
+import org.kleinb.jfun.*;
 
 public interface Prism<S, A> extends Optional<S, A> {
 
