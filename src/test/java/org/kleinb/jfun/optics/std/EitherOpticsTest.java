@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 import org.kleinb.jfun.Either;
-import org.kleinb.jfun.optics.PrismLaws;
+import org.kleinb.jfun.optics.law.PrismLaws;
 
 class EitherOpticsTest {
 

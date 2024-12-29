@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.kleinb.jfun.Try;
 import org.kleinb.jfun.optics.Prism;
-import org.kleinb.jfun.optics.PrismLaws;
+import org.kleinb.jfun.optics.law.PrismLaws;
 
 class TryOpticsTest {
   @Test

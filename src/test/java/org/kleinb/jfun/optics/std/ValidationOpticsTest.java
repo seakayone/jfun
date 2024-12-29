@@ -6,7 +6,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.kleinb.jfun.Validation;
 import org.kleinb.jfun.optics.Prism;
-import org.kleinb.jfun.optics.PrismLaws;
+import org.kleinb.jfun.optics.law.PrismLaws;
 
 class ValidationOpticsTest {
   @Test

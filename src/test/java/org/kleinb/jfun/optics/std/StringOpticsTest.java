@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.kleinb.jfun.optics.Iso;
-import org.kleinb.jfun.optics.IsoLaws;
 import org.kleinb.jfun.optics.Prism;
-import org.kleinb.jfun.optics.PrismLaws;
+import org.kleinb.jfun.optics.law.IsoLaws;
+import org.kleinb.jfun.optics.law.PrismLaws;
 
 class StringOpticsTest {
 

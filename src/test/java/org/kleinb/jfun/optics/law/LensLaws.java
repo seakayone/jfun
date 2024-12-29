@@ -1,4 +1,6 @@
-package org.kleinb.jfun.optics;
+package org.kleinb.jfun.optics.law;
+
+import org.kleinb.jfun.optics.Lens;
 
 public interface LensLaws {
   static <S, A> boolean getReplace(Lens<S, A> l, S s) {

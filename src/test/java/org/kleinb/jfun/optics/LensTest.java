@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.kleinb.jfun.Either;
 import org.kleinb.jfun.Option;
+import org.kleinb.jfun.optics.law.LensLaws;
 
 class LensTest {
 
@@ -128,12 +129,12 @@ class LensTest {
   @Test
   void shouldExist() {
     final Person person = new Person("Sherlock", new Address(new City("London"), "Baker Street"));
-    assertThat(personCityLens.exists("London"::equals).test(person)).isTrue();
+    assertThat(personCityLens.exist("London"::equals).test(person)).isTrue();
   }
 
   @Test
   void shouldNotExist() {
     final Person person = new Person("Sherlock", new Address(new City("London"), "Baker Street"));
-    assertThat(personCityLens.exists("Paris"::equals).test(person)).isFalse();
+    assertThat(personCityLens.exist("Paris"::equals).test(person)).isFalse();
   }
 }

@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigInteger;
 import org.junit.jupiter.api.Test;
-import org.kleinb.jfun.optics.PrismLaws;
+import org.kleinb.jfun.optics.law.PrismLaws;
 
 class BigIntegerOpticsTest {
 
@@ -74,6 +74,7 @@ class BigIntegerOpticsTest {
 
     assertThat(PrismLaws.partialRoundTripOneWay(prism, BigInteger.ONE)).isTrue();
     assertThat(PrismLaws.partialRoundTripOneWay(prism, BigInteger.ZERO)).isTrue();
+    assertThat(PrismLaws.partialRoundTripOneWay(prism, BigInteger.valueOf(2L))).isTrue();
 
     assertThat(PrismLaws.partialRoundTripOtherWay(prism, true)).isTrue();
     assertThat(PrismLaws.partialRoundTripOtherWay(prism, false)).isTrue();

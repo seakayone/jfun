@@ -131,6 +131,20 @@ class EitherTest {
     assertThat(either.mapLeft(i -> i + 1)).isEqualTo(Either.left(43));
   }
 
+  // .biMap
+
+  @Test
+  void shouldBiMapRight() {
+    Either<Integer, String> either = Either.right("42");
+    assertThat(either.biMap(Function.identity(), Integer::parseInt)).isEqualTo(Either.right(42));
+  }
+
+  @Test
+  void shouldBiMapLeft() {
+    Either<Integer, String> either = Either.left(42);
+    assertThat(either.biMap(Function.identity(), Integer::parseInt)).isEqualTo(Either.left(42));
+  }
+
   // .flatMap
   @Test
   void shouldFlatMapRight() {
@@ -156,6 +170,18 @@ class EitherTest {
   void shouldGetRight() {
     Either<Integer, String> either = Either.right("42");
     assertThat(either.get()).isEqualTo("42");
+  }
+
+  @Test
+  void shouldGetLeftOnRightThrows() {
+    Either<Integer, String> either = Either.right("42");
+    assertThatThrownBy(either::getLeft).isInstanceOf(NoSuchElementException.class);
+  }
+
+  @Test
+  void shouldGetOnLeftThrows() {
+    Either<Integer, String> either = Either.left(42);
+    assertThatThrownBy(either::get).isInstanceOf(NoSuchElementException.class);
   }
 
   @Test

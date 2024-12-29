@@ -25,6 +25,12 @@ class Function1Test {
   }
 
   @Test
+  void methodReference() {
+    Function1<String, String> f = Function1.of(String::toUpperCase);
+    assertThat(f.apply("bar")).isEqualTo("BAR");
+  }
+
+  @Test
   void reversed() {
     Function1<String, String> f = a -> "foo";
     assertThat(f.reversed().apply("bar")).isEqualTo("foo");

@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.kleinb.jfun.optics.Iso;
-import org.kleinb.jfun.optics.IsoLaws;
+import org.kleinb.jfun.optics.law.IsoLaws;
 
 class MapOpticsTest {
 

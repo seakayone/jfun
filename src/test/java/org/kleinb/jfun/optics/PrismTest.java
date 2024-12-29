@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.kleinb.jfun.Option;
+import org.kleinb.jfun.optics.law.PrismLaws;
 import org.kleinb.jfun.optics.std.DoubleOptics;
 
 class PrismTest {

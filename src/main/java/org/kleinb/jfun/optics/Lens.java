@@ -1,12 +1,10 @@
 package org.kleinb.jfun.optics;
 
-import java.util.function.Predicate;
-import org.kleinb.jfun.Either;
 import org.kleinb.jfun.Function1;
 import org.kleinb.jfun.Function2;
 import org.kleinb.jfun.Option;
 
-public interface Lens<WHOLE, PART> {
+public interface Lens<WHOLE, PART> extends Optional<WHOLE, PART> {
 
   static <WHOLE, PART> Lens<WHOLE, PART> of(
       Function1<WHOLE, PART> get, Function2<PART, WHOLE, WHOLE> replace) {
@@ -25,26 +23,9 @@ public interface Lens<WHOLE, PART> {
 
   PART get(WHOLE whole);
 
-  Function1<WHOLE, WHOLE> replace(PART b);
-
-  default Function1<WHOLE, WHOLE> modify(Function1<PART, PART> f) {
-    return whole -> replace(f.apply(get(whole))).apply(whole);
-  }
-
-  default Either<WHOLE, PART> getOrModify(WHOLE whole) {
-    return Either.right(get(whole));
-  }
-
+  @Override
   default Option<PART> getOption(WHOLE whole) {
     return Option.some(get(whole));
-  }
-
-  default Function1<WHOLE, Option<PART>> find(Predicate<PART> p) {
-    return whole -> Option.some(get(whole)).filter(p);
-  }
-
-  default Predicate<WHOLE> exists(Predicate<PART> p) {
-    return (Function1.of(this::get)).andThen(Function1.of(p::test))::apply;
   }
 
   default <PART2> Lens<WHOLE, PART2> andThen(Lens<PART, PART2> other) {

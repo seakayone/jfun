@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
 import org.kleinb.jfun.optics.Prism;
-import org.kleinb.jfun.optics.PrismLaws;
+import org.kleinb.jfun.optics.law.PrismLaws;
 
 class BigDecimalOpticsTest {
 

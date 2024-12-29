@@ -83,6 +83,13 @@ public sealed interface Either<A, B> permits Left, Right {
     }
   }
 
+  default <C, D> Either<C, D> biMap(
+      Function<? super A, ? extends C> f, Function<? super B, ? extends D> g) {
+    Objects.requireNonNull(f);
+    Objects.requireNonNull(g);
+    return fold(a -> Either.left(f.apply(a)), b -> Either.right(g.apply(b)));
+  }
+
   default <C> Either<A, C> flatMap(
       Function<? super B, ? extends Either<? extends A, ? extends C>> f) {
     Objects.requireNonNull(f);

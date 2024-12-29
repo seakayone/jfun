@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.kleinb.jfun.Tuple;
 import org.kleinb.jfun.Tuple2;
+import org.kleinb.jfun.optics.law.IsoLaws;
 
 class IsoTest {
 

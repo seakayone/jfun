@@ -26,6 +26,23 @@ class Function2Test {
   }
 
   @Test
+  void uncurried() {
+    Function1<String, Function1<String, String>> f = a -> b -> a + b;
+    Function2<String, String, String> g = Function2.of(f);
+    assertThat(g.apply("foo", "bar")).isEqualTo("foobar");
+  }
+
+  @Test
+  void ofMethodReference() {
+    Function2<String, String, String> g = Function2.of(Function2Test::add);
+    assertThat(g.apply("foo", "bar")).isEqualTo("foobar");
+  }
+
+  private static String add(String a, String b) {
+    return a + b;
+  }
+
+  @Test
   void curried() {
     Function2<String, String, String> f = (a, b) -> "foo";
     assertThat(f.curried().apply("bar").apply("baz")).isEqualTo("foo");

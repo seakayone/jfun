@@ -5,9 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.kleinb.jfun.Option;
 import org.kleinb.jfun.optics.Iso;
-import org.kleinb.jfun.optics.IsoLaws;
 import org.kleinb.jfun.optics.Prism;
-import org.kleinb.jfun.optics.PrismLaws;
+import org.kleinb.jfun.optics.law.IsoLaws;
+import org.kleinb.jfun.optics.law.PrismLaws;
 
 class OptionOpticsTest {
 
