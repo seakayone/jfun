@@ -9,10 +9,15 @@ public interface Prism<WHOLE, PART> {
 
   static <WHOLE, PART> Prism<WHOLE, PART> of(
       PartialFunction<WHOLE, PART> getOption, Function1<PART, WHOLE> reverseGet) {
+    return Prism.of(getOption.lift(), reverseGet);
+  }
+
+  static <WHOLE, PART> Prism<WHOLE, PART> of(
+      Function1<WHOLE, Option<PART>> getOption, Function1<PART, WHOLE> reverseGet) {
     return new Prism<>() {
       @Override
       public Option<PART> getOption(WHOLE whole) {
-        return getOption.lift().apply(whole);
+        return getOption.apply(whole);
       }
 
       @Override

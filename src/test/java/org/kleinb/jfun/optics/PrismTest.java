@@ -112,7 +112,7 @@ class PrismTest {
 
   @Test
   void testPrismAndThen() {
-    final Prism<Json, Integer> foo = Json.jNumPrism().andThen(DoubleOptics.get());
+    final Prism<Json, Integer> foo = Json.jNumPrism().andThen(DoubleOptics.doubleIntegerPrism());
     Json json = new Json.JNum(42.0);
     assertThat(foo.getOption(json)).isEqualTo(Option.some(42));
     assertThat(foo.replace(5).apply(json)).isEqualTo(new Json.JNum(5));
