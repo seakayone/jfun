@@ -5,7 +5,7 @@ import org.kleinb.jfun.None;
 import org.kleinb.jfun.Option;
 import org.kleinb.jfun.Some;
 
-public interface Prism<WHOLE, PART> {
+public interface Prism<WHOLE, PART> extends Optional<WHOLE, PART> {
 
   static <WHOLE, PART> Prism<WHOLE, PART> of(
       PartialFunction<WHOLE, PART> getOption, Function1<PART, WHOLE> reverseGet) {
@@ -45,10 +45,6 @@ public interface Prism<WHOLE, PART> {
           case Some(PART value) -> replace(f.apply(value)).apply(whole);
           case None<PART> _ -> whole;
         };
-  }
-
-  default Function1<WHOLE, Option<WHOLE>> modifyOption(Function1<PART, PART> f) {
-    return whole -> getOption(whole).map(p -> replace(f.apply(p)).apply(whole));
   }
 
   default Function1<WHOLE, Option<WHOLE>> replaceOption(PART part) {
