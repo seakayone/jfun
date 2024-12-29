@@ -8,11 +8,11 @@ public interface PartialFunction<A, B> {
       Class<? super A1> clazz, Function1<? super A1, ? extends B> f) {
     @SuppressWarnings("unchecked")
     Function1<A, B> f1 = (Function1<A, B>) f;
-    return of(f1, clazz::isInstance);
+    return of(clazz::isInstance, f1);
   }
 
   static <A, B> PartialFunction<A, B> of(
-      Function1<? super A, ? extends B> f, Predicate<? super A> isDefinedAt) {
+      Predicate<? super A> isDefinedAt, Function1<? super A, ? extends B> f) {
     return new PartialFunction<>() {
       @Override
       public B apply(A a) {

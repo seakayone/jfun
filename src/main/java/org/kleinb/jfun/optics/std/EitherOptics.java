@@ -8,10 +8,10 @@ public final class EitherOptics {
   private EitherOptics() {}
 
   static <A, B> Prism<Either<A, B>, A> left() {
-    return Prism.of(PartialFunction.of(Either::getLeft, Either::isLeft), Either::left);
+    return Prism.of(PartialFunction.of(Either::isLeft, Either::getLeft), Either::left);
   }
 
   static <A, B> Prism<Either<A, B>, B> right() {
-    return Prism.of(PartialFunction.of(Either::get, Either::isRight), Either::right);
+    return Prism.of(PartialFunction.of(Either::isRight, Either::get), Either::right);
   }
 }
