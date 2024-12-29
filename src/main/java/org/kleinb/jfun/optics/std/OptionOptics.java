@@ -6,7 +6,8 @@ import org.kleinb.jfun.optics.Iso;
 import org.kleinb.jfun.optics.PartialFunction;
 import org.kleinb.jfun.optics.Prism;
 
-public interface OptionOptics {
+public final class OptionOptics {
+  private OptionOptics() {}
 
   static <A> Prism<Option<A>, A> some() {
     return Prism.of(PartialFunction.of(Option::get, Option::isSome), Option::some);

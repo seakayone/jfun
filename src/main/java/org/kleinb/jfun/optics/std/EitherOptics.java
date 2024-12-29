@@ -4,7 +4,7 @@ import org.kleinb.jfun.Either;
 import org.kleinb.jfun.optics.PartialFunction;
 import org.kleinb.jfun.optics.Prism;
 
-public class EitherOptics {
+public final class EitherOptics {
 
   private EitherOptics() {}
 

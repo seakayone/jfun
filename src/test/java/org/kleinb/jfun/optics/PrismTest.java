@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.kleinb.jfun.Option;
-import org.kleinb.jfun.optics.std.DoubleToIntegerPrism;
+import org.kleinb.jfun.optics.std.DoubleOptics;
 
 class PrismTest {
 
@@ -112,7 +112,7 @@ class PrismTest {
 
   @Test
   void testPrismAndThen() {
-    final Prism<Json, Integer> foo = Json.jNumPrism().andThen(DoubleToIntegerPrism.get());
+    final Prism<Json, Integer> foo = Json.jNumPrism().andThen(DoubleOptics.get());
     Json json = new Json.JNum(42.0);
     assertThat(foo.getOption(json)).isEqualTo(Option.some(42));
     assertThat(foo.replace(5).apply(json)).isEqualTo(new Json.JNum(5));
