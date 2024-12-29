@@ -3,7 +3,7 @@ package org.kleinb.jfun.optics;
 import org.kleinb.jfun.Function0;
 import org.kleinb.jfun.Function1;
 
-public interface Iso<A, B> extends Lens<A, B> {
+public interface Iso<A, B> extends Lens<A, B>, Optional<A, B> {
 
   static <A> Iso<A, A> identity() {
     return of(Function1.identity(), Function1.identity());
