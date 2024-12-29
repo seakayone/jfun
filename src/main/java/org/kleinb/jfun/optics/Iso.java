@@ -31,7 +31,7 @@ public interface Iso<S, A> extends Lens<S, A>, Optional<S, A> {
 
   S reverseGet(A a);
 
-  default Iso<A, S> flip() {
+  default Iso<A, S> reverse() {
     return of(this::reverseGet, this::get);
   }
 

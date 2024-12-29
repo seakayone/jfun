@@ -55,11 +55,11 @@ class IsoTest {
     assertThat(iso.reverseGet(person)).isSameAs(person);
   }
 
-  // .flip
+  // .reverse
 
   @Test
-  void flip() {
-    Iso<Tuple2<String, Integer>, Person> iso = personTuple2Iso.flip();
+  void reverse() {
+    Iso<Tuple2<String, Integer>, Person> iso = personTuple2Iso.reverse();
     Tuple2<String, Integer> tuple = Tuple.of("Alice", 42);
     assertThat(iso.get(tuple)).isEqualTo(new Person("Alice", 42));
     assertThat(iso.reverseGet(new Person("Alice", 42))).isEqualTo(tuple);
