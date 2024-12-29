@@ -58,10 +58,10 @@ public interface Optional<S, A> {
     return s -> getOption(s).filter(p).isSome();
   }
 
-  default <C> Optional<S, C> andThen(Optional<A, C> other) {
+  default <B> Optional<S, B> andThen(Optional<A, B> other) {
     final var self = this;
     return Optional.of(
         s -> self.getOption(s).flatMap(other::getOption),
-        Function2.of(c -> self.modify(other.replace(c))));
+        Function2.of(b -> self.modify(other.replace(b))));
   }
 }

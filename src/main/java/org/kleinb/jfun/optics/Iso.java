@@ -3,40 +3,49 @@ package org.kleinb.jfun.optics;
 import org.kleinb.jfun.Function0;
 import org.kleinb.jfun.Function1;
 
-public interface Iso<A, B> extends Lens<A, B>, Optional<A, B> {
+public interface Iso<S, A> extends Lens<S, A>, Optional<S, A> {
 
-  static <A> Iso<A, A> identity() {
+  static <S> Iso<S, S> identity() {
     return of(Function1.identity(), Function1.identity());
   }
 
-  static <A> Iso<A, Void> unit(Function0<A> f) {
+  static <S> Iso<S, Void> unit(Function0<S> f) {
     return of(_ -> null, _ -> f.get());
   }
 
-  static <A, B> Iso<A, B> of(Function1<A, B> get, Function1<B, A> reverseGet) {
+  static <S, A> Iso<S, A> of(Function1<S, A> get, Function1<A, S> reverseGet) {
     return new Iso<>() {
       @Override
-      public B get(A a) {
-        return get.apply(a);
+      public A get(S s) {
+        return get.apply(s);
       }
 
       @Override
-      public A reverseGet(B b) {
-        return reverseGet.apply(b);
+      public S reverseGet(A a) {
+        return reverseGet.apply(a);
       }
     };
   }
 
-  B get(A a);
+  A get(S s);
 
-  A reverseGet(B b);
+  S reverseGet(A a);
 
-  @Override
-  default Function1<A, A> replace(B b) {
-    return _ -> reverseGet(b);
+  default Iso<A, S> flip() {
+    return of(this::reverseGet, this::get);
   }
 
-  default Lens<A, B> asLens() {
+  @Override
+  default Function1<S, S> replace(A a) {
+    return _ -> reverseGet(a);
+  }
+
+  default Lens<S, A> asLens() {
     return this;
+  }
+
+  default <B> Iso<S, B> andThen(Iso<A, B> other) {
+    var self = this;
+    return Iso.of(s -> other.get(self.get(s)), b -> self.reverseGet(other.reverseGet(b)));
   }
 }

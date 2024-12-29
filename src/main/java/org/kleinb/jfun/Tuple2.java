@@ -5,6 +5,10 @@ import java.util.Objects;
 
 public record Tuple2<T1, T2>(T1 _1, T2 _2) implements Tuple {
 
+  public Tuple2<T2, T1> swap() {
+    return new Tuple2<>(_2, _1);
+  }
+
   public <T3> Tuple3<T1, T2, T3> append(T3 _3) {
     return new Tuple3<>(_1, _2, _3);
   }

@@ -54,4 +54,25 @@ class IsoTest {
     assertThat(iso.get(person)).isSameAs(person);
     assertThat(iso.reverseGet(person)).isSameAs(person);
   }
+
+  // .flip
+
+  @Test
+  void flip() {
+    Iso<Tuple2<String, Integer>, Person> iso = personTuple2Iso.flip();
+    Tuple2<String, Integer> tuple = Tuple.of("Alice", 42);
+    assertThat(iso.get(tuple)).isEqualTo(new Person("Alice", 42));
+    assertThat(iso.reverseGet(new Person("Alice", 42))).isEqualTo(tuple);
+  }
+
+  // .andThen
+
+  @Test
+  void andThen() {
+    Iso<Tuple2<String, Integer>, Tuple2<Integer, String>> swapped = Iso.of(Tuple2::swap, Tuple2::swap);
+    Iso<Person, Tuple2<Integer, String>> personTuple2IsoSwapped = personTuple2Iso.andThen(swapped);
+    Person person = new Person("Alice", 42);
+    assertThat(personTuple2IsoSwapped.get(person)).isEqualTo(Tuple.of(42, "Alice"));
+    assertThat(personTuple2IsoSwapped.reverseGet(Tuple.of(42, "Alice"))).isEqualTo(person);
+  }
 }
