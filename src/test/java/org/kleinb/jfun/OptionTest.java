@@ -195,6 +195,17 @@ class OptionTest {
     assertThat(Option.none().getOrElse(42)).isEqualTo(42);
   }
 
+  // .getOrElse(Supplier)
+  @Test
+  void shouldGetOrElseSomeValueSupplier() {
+    assertThat(Option.some(42).getOrElse(() -> 0)).isEqualTo(42);
+  }
+
+  @Test
+  void shouldGetOrElseNoneValueSupplier() {
+    assertThat(Option.none().getOrElse(() -> 42)).isEqualTo(42);
+  }
+
   // .contains
   @Test
   void shouldContainValue() {

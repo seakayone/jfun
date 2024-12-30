@@ -71,7 +71,7 @@ public sealed interface Option<A> permits Option.None, Option.Some {
     if (this instanceof Some(A value)) {
       return value;
     } else {
-      throw new NoSuchElementException("No value present");
+      throw new NoSuchElementException("No element present");
     }
   }
 
@@ -127,6 +127,11 @@ public sealed interface Option<A> permits Option.None, Option.Some {
 
   default A getOrElse(A a) {
     return (this instanceof Some(A value)) ? value : a;
+  }
+
+  default A getOrElse(Supplier<A> a) {
+    Objects.requireNonNull(a);
+    return (this instanceof Some(A value)) ? value : a.get();
   }
 
   default Option<A> filter(Predicate<? super A> f) {
