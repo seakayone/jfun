@@ -13,6 +13,7 @@ import org.kleinb.jfun.Either.Right;
 class EitherTest {
 
   // factory methods, construction
+
   @Test
   void shouldCreateLeft() {
     Either<Integer, String> actual = Either.left(42);
