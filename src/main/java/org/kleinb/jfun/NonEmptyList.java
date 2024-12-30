@@ -198,7 +198,7 @@ public sealed interface NonEmptyList<A> extends Iterable<A> {
 
   default <B> NonEmptyList<B> map(Function<? super A, ? extends B> f) {
     Objects.requireNonNull(f);
-    NonEmptyList<B> result = new Single<B>(f.apply(head()), 1);
+    NonEmptyList<B> result = new Single<>(f.apply(head()), 1);
     switch (this.tailOption()) {
       case Option.None() -> {
         return result;

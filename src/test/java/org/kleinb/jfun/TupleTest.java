@@ -10,7 +10,7 @@ class TupleTest {
 
   @Test
   void empty() {
-    Tuple0<?> t = Tuple.empty();
+    Tuple0 t = Tuple.empty();
     assertThat(t).isSameAs(Tuple0.INSTANCE);
   }
 

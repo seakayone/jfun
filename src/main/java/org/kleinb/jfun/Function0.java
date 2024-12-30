@@ -25,7 +25,7 @@ public interface Function0<Z> extends Supplier<Z> {
     return this;
   }
 
-  default <A> Function1<Tuple0<A>, Z> tupled() {
+  default <A> Function1<Tuple0, Z> tupled() {
     return t -> {
       Objects.requireNonNull(t);
       return apply();

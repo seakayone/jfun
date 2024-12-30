@@ -1,8 +1,8 @@
 package org.kleinb.jfun;
 
-public record Tuple0<A>() implements Tuple {
+public record Tuple0() implements Tuple {
 
-  public static Tuple0<?> INSTANCE = new Tuple0<>();
+  public static Tuple0 INSTANCE = new Tuple0();
 
   public <T1> Tuple1<T1> append(T1 _1) {
     return new Tuple1<>(_1);
