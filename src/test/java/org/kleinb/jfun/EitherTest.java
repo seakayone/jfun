@@ -7,6 +7,8 @@ import java.util.NoSuchElementException;
 import java.util.function.Function;
 import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.Test;
+import org.kleinb.jfun.Either.Left;
+import org.kleinb.jfun.Either.Right;
 
 class EitherTest {
 

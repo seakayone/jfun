@@ -7,6 +7,8 @@ import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.kleinb.jfun.Validation.Invalid;
+import org.kleinb.jfun.Validation.Valid;
 
 class ValidationTest {
 

@@ -7,7 +7,12 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public sealed interface Option<A> permits None, Some {
+public sealed interface Option<A> permits Option.None, Option.Some {
+  record Some<A>(A value) implements Option<A> {}
+
+  record None<A>() implements Option<A> {
+    static final None<?> INSTANCE = new None<>();
+  }
 
   static <A> Option<A> some(A value) {
     return new Some<>(value);

@@ -10,7 +10,10 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public sealed interface Validation<E, A> permits Invalid, Valid {
+public sealed interface Validation<E, A> permits Validation.Invalid, Validation.Valid {
+  record Valid<E, A>(A value) implements Validation<E, A> {}
+
+  record Invalid<E, A>(List<E> error) implements Validation<E, A> {}
 
   static <E, A> Validation<E, A> valid(A value) {
     return new Valid<>(value);

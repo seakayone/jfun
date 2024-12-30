@@ -8,6 +8,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.Test;
+import org.kleinb.jfun.Option.*;
 
 class OptionTest {
 

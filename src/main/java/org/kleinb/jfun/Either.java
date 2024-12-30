@@ -9,7 +9,10 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public sealed interface Either<A, B> permits Left, Right {
+public sealed interface Either<A, B> permits Either.Left, Either.Right {
+  record Right<A, B>(B value) implements Either<A, B> {}
+
+  record Left<A, B>(A value) implements Either<A, B> {}
 
   static <A, B> Either<A, B> left(A value) {
     return new Left<>(value);

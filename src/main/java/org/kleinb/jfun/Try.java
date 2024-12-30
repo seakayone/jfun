@@ -10,7 +10,10 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public sealed interface Try<A> permits Failure, Success {
+public sealed interface Try<A> permits Try.Failure, Try.Success {
+  record Success<A>(A value) implements Try<A> {}
+
+  record Failure<A>(Throwable error) implements Try<A> {}
 
   static <A> Try<A> of(ThrowingSupplier<? extends A> supplier) {
     Objects.requireNonNull(supplier);
