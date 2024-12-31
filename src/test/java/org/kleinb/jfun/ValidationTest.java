@@ -282,6 +282,20 @@ class ValidationTest {
     assertThat(invalid.mapError(String::length)).isEqualTo(Validation.invalid(5));
   }
 
+  // .biMap
+
+  @Test
+  void shouldBiMapErrorValid() {
+    Validation<String, Integer> valid = Validation.valid(42);
+    assertThat(valid.biMap(String::length, Function1.identity())).isEqualTo(Validation.valid(42));
+  }
+
+  @Test
+  void shouldBiMapErrorInvalid() {
+    Validation<String, Integer> invalid = Validation.invalid("error");
+    assertThat(invalid.biMap(String::length, Function1.identity())).isEqualTo(Validation.invalid(5));
+  }
+
   // .flatMap
 
   @Test

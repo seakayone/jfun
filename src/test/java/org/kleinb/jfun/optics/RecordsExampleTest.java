@@ -19,9 +19,8 @@ class RecordsExampleTest {
 
     public static Validation<String, Id> of(String value) {
       return Try.of(() -> UUID.fromString(value))
-          .map(Id::new)
           .toValidation()
-          .mapError(Throwable::getMessage);
+          .biMap(Throwable::getMessage, Id::new);
     }
 
     public static Id makeNew() {

@@ -345,6 +345,17 @@ public sealed interface Validation<E, A> permits Validation.Invalid, Validation.
     }
   }
 
+  @SuppressWarnings("unchecked")
+  default <F, B> Validation<F, B> biMap(
+      Function<? super E, ? extends F> fe, Function<? super A, ? extends B> fa) {
+    Objects.requireNonNull(fe);
+    Objects.requireNonNull(fa);
+    return switch (this) {
+      case Valid<E, A> v -> (Validation<F, B>) v.map(fa);
+      case Invalid<E, A> iv -> (Validation<F, B>) iv.mapError(fe);
+    };
+  }
+
   default <B> Validation<E, B> flatMap(
       Function<? super A, ? extends Validation<? extends E, ? extends B>> f) {
     Objects.requireNonNull(f);
