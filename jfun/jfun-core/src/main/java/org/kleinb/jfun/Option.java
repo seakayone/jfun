@@ -7,7 +7,8 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public sealed interface Option<A> permits Option.None, Option.Some {
+public sealed interface Option<A> extends Iterable<A> permits Option.None, Option.Some {
+
   record Some<A>(A value) implements Option<A> {}
 
   record None<A>() implements Option<A> {
@@ -192,5 +193,28 @@ public sealed interface Option<A> permits Option.None, Option.Some {
 
   default Try<A> toTry() {
     return fold(() -> Try.failure(new NoSuchElementException()), Try::success);
+  }
+
+  @Override
+  default Iterator<A> iterator() {
+    var self = this;
+    return new Iterator<>() {
+      private Option<A> current = self;
+
+      @Override
+      public boolean hasNext() {
+        return current != null;
+      }
+
+      @Override
+      public A next() {
+        if (current instanceof Some(A value)) {
+          current = null;
+          return value;
+        } else {
+          throw new NoSuchElementException();
+        }
+      }
+    };
   }
 }

@@ -386,4 +386,18 @@ class OptionTest {
                 t -> t.getFailure() instanceof NoSuchElementException,
                 "is NoSuchElementException"));
   }
+
+  // .iterator
+  @Test
+  void shouldIterateSome() {
+    var iter = Option.some(42).iterator();
+    assertThat(iter.next()).isEqualTo(42);
+    assertThatThrownBy(iter::next).isInstanceOf(NoSuchElementException.class);
+  }
+
+  @Test
+  void shouldIterateNone() {
+    var iter = Option.none().iterator();
+    assertThatThrownBy(iter::next).isInstanceOf(NoSuchElementException.class);
+  }
 }
