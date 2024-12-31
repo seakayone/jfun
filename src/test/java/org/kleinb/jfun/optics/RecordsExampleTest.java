@@ -28,7 +28,7 @@ class RecordsExampleTest {
     static Validation<String, Option<Address>> ofNullable(String address) {
       return Option.of(address)
           .map(str -> Address.of(str).map(Option::some))
-          .getOrElse(Validation.valid(Option.none()));
+          .getOrElse(Validation::none);
     }
   }
 

@@ -19,6 +19,10 @@ public sealed interface Validation<E, A> permits Validation.Invalid, Validation.
     return new Valid<>(value);
   }
 
+  static <E, A> Validation<E, Option<A>> none() {
+    return valid(Option.none());
+  }
+
   static <E, A> Validation<E, A> invalid(E error) {
     return new Invalid<>(List.of(error));
   }
