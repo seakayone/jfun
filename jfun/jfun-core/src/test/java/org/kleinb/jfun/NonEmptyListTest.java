@@ -479,7 +479,7 @@ class NonEmptyListTest {
   @Test
   void collectFromNullElementStreamParallel() {
     var actual = integerStream().parallel().collect(NonEmptyList.collector()).get();
-    assertThat(actual).containsExactlyInAnyOrder(integerStream().toArray(Integer[]::new));
+    assertThat(actual).containsExactlyInAnyOrderElementsOf(integerStream().toList());
   }
 
   private Stream<Integer> integerStream() {

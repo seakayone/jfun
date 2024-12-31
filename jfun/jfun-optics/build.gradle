@@ -1,0 +1,22 @@
+plugins {
+    id 'java-library'
+    id("com.diffplug.spotless") version "7.0.0.BETA4"
+}
+
+apply from: rootProject.file('buildSrc/shared.gradle')
+
+dependencies {
+    implementation project(':jfun-core')
+}
+
+spotless {
+    format 'misc', {
+        target '*.gradle', '.gitattributes', '.gitignore'
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    java {
+        googleJavaFormat()
+        formatAnnotations()
+    }
+}

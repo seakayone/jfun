@@ -1,1 +1,6 @@
 rootProject.name = 'jfun'
+
+include ':jfun-core'
+project(':jfun-core').projectDir = new File(rootProject.projectDir, 'jfun/jfun-core')
+include ':jfun-optics'
+project(':jfun-optics').projectDir = new File(rootProject.projectDir, 'jfun/jfun-optics')
