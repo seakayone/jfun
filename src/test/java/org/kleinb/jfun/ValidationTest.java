@@ -282,18 +282,18 @@ class ValidationTest {
     assertThat(invalid.mapError(String::length)).isEqualTo(Validation.invalid(5));
   }
 
-  // .biMap
+  // .bimap
 
   @Test
-  void shouldBiMapErrorValid() {
+  void shouldBimapErrorValid() {
     Validation<String, Integer> valid = Validation.valid(42);
-    assertThat(valid.biMap(String::length, Function1.identity())).isEqualTo(Validation.valid(42));
+    assertThat(valid.bimap(String::length, Function1.identity())).isEqualTo(Validation.valid(42));
   }
 
   @Test
-  void shouldBiMapErrorInvalid() {
+  void shouldBimapErrorInvalid() {
     Validation<String, Integer> invalid = Validation.invalid("error");
-    assertThat(invalid.biMap(String::length, Function1.identity()))
+    assertThat(invalid.bimap(String::length, Function1.identity()))
         .isEqualTo(Validation.invalid(5));
   }
 

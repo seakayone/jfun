@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
@@ -452,5 +453,37 @@ class NonEmptyListTest {
   void consToString() {
     var nel = NonEmptyList.of(1, 2, 3);
     assertThat(nel.toString()).isEqualTo("NonEmptyList(1, 2, 3)");
+  }
+
+  // collect from Stream
+
+  @Test
+  void collectFromEmptyStream() {
+    var empty = Stream.<Integer>empty();
+    assertThat(empty.collect(NonEmptyList.collector())).isEqualTo(Option.none());
+  }
+
+  @Test
+  void collectFromSingleElementStream() {
+    var single = Stream.of(1);
+    assertThat(single.collect(NonEmptyList.collector())).isEqualTo(Option.some(NonEmptyList.of(1)));
+  }
+
+  @Test
+  void collectFromMultiElementStream() {
+    var multi = Stream.of(1, 2, 3, null);
+    assertThat(multi.collect(NonEmptyList.collector()))
+        .isEqualTo(Option.some(NonEmptyList.of(1, 2, 3, null)));
+  }
+
+  @Test
+  void collectFromNullElementStreamParallel() {
+    var actual = integerStream().parallel().collect(NonEmptyList.collector()).get();
+    assertThat(actual).containsExactlyInAnyOrder(integerStream().toArray(Integer[]::new));
+  }
+
+  private Stream<Integer> integerStream() {
+    var atomicInt = new AtomicInteger();
+    return Stream.generate(atomicInt::getAndIncrement).takeWhile(i -> i < 10_000);
   }
 }

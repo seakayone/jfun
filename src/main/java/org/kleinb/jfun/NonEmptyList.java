@@ -1,12 +1,21 @@
 package org.kleinb.jfun;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.*;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 import org.kleinb.jfun.Option.Some;
 
 public sealed interface NonEmptyList<A> extends Iterable<A> {
+
+  static <A, R> Collector<? super A, ArrayList<A>, Option<NonEmptyList<A>>> collector() {
+    final BinaryOperator<ArrayList<A>> combiner =
+        (as1, as2) -> {
+          as1.addAll(as2);
+          return as1;
+        };
+    return Collector.of(ArrayList::new, ArrayList::add, combiner, NonEmptyList::of);
+  }
 
   record Single<A>(A elem, int size) implements NonEmptyList<A> {
     public Single {

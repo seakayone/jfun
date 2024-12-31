@@ -86,7 +86,7 @@ public sealed interface Either<A, B> permits Either.Left, Either.Right {
     }
   }
 
-  default <C, D> Either<C, D> biMap(
+  default <C, D> Either<C, D> bimap(
       Function<? super A, ? extends C> f, Function<? super B, ? extends D> g) {
     Objects.requireNonNull(f);
     Objects.requireNonNull(g);

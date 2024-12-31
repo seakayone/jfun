@@ -346,7 +346,7 @@ public sealed interface Validation<E, A> permits Validation.Invalid, Validation.
   }
 
   @SuppressWarnings("unchecked")
-  default <F, B> Validation<F, B> biMap(
+  default <F, B> Validation<F, B> bimap(
       Function<? super E, ? extends F> fe, Function<? super A, ? extends B> fa) {
     Objects.requireNonNull(fe);
     Objects.requireNonNull(fa);

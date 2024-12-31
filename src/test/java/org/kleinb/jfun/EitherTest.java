@@ -134,18 +134,18 @@ class EitherTest {
     assertThat(either.mapLeft(i -> i + 1)).isEqualTo(Either.left(43));
   }
 
-  // .biMap
+  // .bimap
 
   @Test
-  void shouldBiMapRight() {
+  void shouldBimapRight() {
     Either<Integer, String> either = Either.right("42");
-    assertThat(either.biMap(Function.identity(), Integer::parseInt)).isEqualTo(Either.right(42));
+    assertThat(either.bimap(Function.identity(), Integer::parseInt)).isEqualTo(Either.right(42));
   }
 
   @Test
-  void shouldBiMapLeft() {
+  void shouldBimapLeft() {
     Either<Integer, String> either = Either.left(42);
-    assertThat(either.biMap(Function.identity(), Integer::parseInt)).isEqualTo(Either.left(42));
+    assertThat(either.bimap(Function.identity(), Integer::parseInt)).isEqualTo(Either.left(42));
   }
 
   // .flatMap
