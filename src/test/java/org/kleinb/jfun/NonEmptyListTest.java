@@ -16,7 +16,7 @@ class NonEmptyListTest {
   @Test
   void singleConstructor() {
     var nel = new NonEmptyList.Single<>(1, 1);
-    assertThat(nel.head()).isEqualTo(1);
+    assertThat(nel).containsExactly(1);
   }
 
   @Test
@@ -60,7 +60,7 @@ class NonEmptyListTest {
   @Test
   void ofValue() {
     var nel = NonEmptyList.of(1);
-    assertThat(nel.head()).isEqualTo(1);
+    assertThat(nel).containsExactly(1);
   }
 
   @Test
@@ -111,6 +111,22 @@ class NonEmptyListTest {
   @Test
   void ofStreamEmpty() {
     assertThat(NonEmptyList.of(Stream.empty())).isEqualTo(Option.none());
+  }
+
+  // .head .headOption
+
+  @Test
+  void headSingle() {
+    var nel = NonEmptyList.of(1);
+    assertThat(nel.head()).isEqualTo(1);
+    assertThat(nel.headOption()).isEqualTo(Option.some(1));
+  }
+
+  @Test
+  void headCons() {
+    var nel = NonEmptyList.of(1, 2, 3);
+    assertThat(nel.head()).isEqualTo(1);
+    assertThat(nel.headOption()).isEqualTo(Option.some(1));
   }
 
   // .concat

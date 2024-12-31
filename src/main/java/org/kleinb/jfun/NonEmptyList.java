@@ -140,6 +140,10 @@ public sealed interface NonEmptyList<A> extends Iterable<A> {
 
   A head();
 
+  default Option<A> headOption() {
+    return Option.some(head());
+  }
+
   Option<NonEmptyList<A>> tailOption();
 
   int size();
