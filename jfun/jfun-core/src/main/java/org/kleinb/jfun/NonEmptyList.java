@@ -1,7 +1,9 @@
 package org.kleinb.jfun;
 
 import java.util.*;
-import java.util.function.*;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 import org.kleinb.jfun.Option.Some;
