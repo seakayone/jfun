@@ -18,9 +18,9 @@ class RecordsExampleTest {
     }
 
     public static Validation<String, Id> of(String value) {
-      return Try.of(() -> UUID.fromString(value))
+      return Try.of(() -> new Id(UUID.fromString(value)))
           .toValidation()
-          .biMap(Throwable::getMessage, Id::new);
+          .mapError(Throwable::getMessage);
     }
 
     public static Id makeNew() {
@@ -71,9 +71,7 @@ class RecordsExampleTest {
     }
 
     static Validation<String, Option<Address>> ofNullable(String address) {
-      return Option.of(address)
-          .map(str -> Address.of(str).map(Option::some))
-          .getOrElse(Validation.none());
+      return Option.of(address).fold(Validation::none, str -> Address.of(str).map(Option::some));
     }
   }
 

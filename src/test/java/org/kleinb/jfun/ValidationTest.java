@@ -293,7 +293,8 @@ class ValidationTest {
   @Test
   void shouldBiMapErrorInvalid() {
     Validation<String, Integer> invalid = Validation.invalid("error");
-    assertThat(invalid.biMap(String::length, Function1.identity())).isEqualTo(Validation.invalid(5));
+    assertThat(invalid.biMap(String::length, Function1.identity()))
+        .isEqualTo(Validation.invalid(5));
   }
 
   // .flatMap
