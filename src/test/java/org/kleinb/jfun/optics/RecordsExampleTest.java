@@ -1,9 +1,10 @@
 package org.kleinb.jfun.optics;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.kleinb.jfun.Validation.valid;
 
 import java.util.Objects;
-import java.util.function.Predicate;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.kleinb.jfun.Option;
 import org.kleinb.jfun.Try;
@@ -11,12 +12,57 @@ import org.kleinb.jfun.Validation;
 
 class RecordsExampleTest {
 
-  public record Address(String address) {
-    private static final Predicate<String> addressCondition = Predicate.not(String::isBlank);
+  public record Id(UUID value) {
+    public Id {
+      Objects.requireNonNull(value, "Id must not be null");
+    }
 
+    public static Validation<String, Id> of(String value) {
+      return Try.of(() -> UUID.fromString(value))
+          .map(Id::new)
+          .toValidation()
+          .mapError(Throwable::getMessage);
+    }
+
+    public static Id makeNew() {
+      return new Id(UUID.randomUUID());
+    }
+
+    @Override
+    public String toString() {
+      return value.toString();
+    }
+  }
+
+  public record Age(int age) {
+    public Age {
+      if (age < 0) {
+        throw new IllegalArgumentException("Age must be positive");
+      }
+    }
+
+    public static Validation<String, Age> of(int age) {
+      return Try.of(() -> new Age(age)).toValidation().mapError(Throwable::getMessage);
+    }
+  }
+
+  public record Name(String name) {
+    public Name {
+      Objects.requireNonNull(name, "Name must not be null");
+      if (name.isBlank()) {
+        throw new IllegalArgumentException("Name must not be blank");
+      }
+    }
+
+    public static Validation<String, Name> of(String name) {
+      return Try.of(() -> new Name(name)).toValidation().mapError(Throwable::getMessage);
+    }
+  }
+
+  public record Address(String address) {
     public Address {
       Objects.requireNonNull(address, "Address must not be null");
-      if (addressCondition.negate().test(address)) {
+      if (address.isBlank()) {
         throw new IllegalArgumentException("Address must not be blank");
       }
     }
@@ -28,117 +74,89 @@ class RecordsExampleTest {
     static Validation<String, Option<Address>> ofNullable(String address) {
       return Option.of(address)
           .map(str -> Address.of(str).map(Option::some))
-          .getOrElse(Validation::none);
+          .getOrElse(Validation.none());
     }
   }
 
-  public record Person(Name name, Age age, Option<Address> address) {
-
-    public record Age(int age) {
-      private static final Predicate<Integer> ageCondition = i -> i > 0;
-
-      public Age {
-        if (ageCondition.negate().test(age)) {
-          throw new IllegalArgumentException("Age must be positive");
-        }
-      }
-
-      public static Validation<String, Age> of(int age) {
-        return Try.of(() -> new Age(age)).toValidation().mapError(Throwable::getMessage);
-      }
-    }
-
-    public record Name(String name) {
-      private static final Predicate<String> nameCondition = Predicate.not(String::isBlank);
-
-      public Name {
-        Objects.requireNonNull(name, "Name must not be null");
-        if (nameCondition.negate().test(name)) {
-          throw new IllegalArgumentException("Name must not be blank");
-        }
-      }
-
-      public static Validation<String, Name> of(String name) {
-        return Try.of(() -> new Name(name)).toValidation().mapError(Throwable::getMessage);
-      }
-    }
-
+  public record Person(Id id, Name name, Age age, Option<Address> address) {
     public Person {
       Objects.requireNonNull(name, "Name must not be null");
       Objects.requireNonNull(age, "Age must not be null");
       Objects.requireNonNull(address, "Address must not be null");
     }
 
-    public static Validation<String, Person> of(String name, int age) {
+    public static Validation<String, Person> of(String id, String name, int age) {
       return Validation.validateWith(
-          Name.of(name), Age.of(age), Validation.valid(Option.none()), Person::new);
+          Id.of(id), Name.of(name), Age.of(age), Validation.none(), Person::new);
     }
 
-    public static Validation<String, Person> of(String name, int age, String address) {
+    public static Validation<String, Person> of(String id, String name, int age, String address) {
       return Validation.validateWith(
-          Name.of(name), Age.of(age), Address.ofNullable(address), Person::new);
+          Id.of(id), Name.of(name), Age.of(age), Address.ofNullable(address), Person::new);
     }
+
+    static Lens<Person, Name> nameLens =
+        Lens.of(p -> p.name, (name, p) -> new Person(p.id, name, p.age, p.address));
+
+    static Lens<Person, Age> ageLens =
+        Lens.of(p -> p.age, (age, p) -> new Person(p.id, p.name, age, p.address));
+
+    static Lens<Person, Option<Address>> addressLens =
+        Lens.of(p -> p.address, (address, p) -> new Person(p.id, p.name, p.age, address));
 
     public Person withName(Name name) {
-      return new Person(name, this.age, Option.none());
+      Objects.requireNonNull(name, "Name must not be null");
+      return Person.nameLens.replace(name).apply(this);
     }
 
     public Person withAge(Age age) {
-      return new Person(this.name, age, Option.none());
+      return Person.ageLens.replace(age).apply(this);
     }
 
     public Person withAddress(Option<Address> address) {
       Objects.requireNonNull(address, "Address option must not be null");
-      return new Person(this.name, this.age, address);
-    }
-
-    public Person withAddress(Address address) {
-      Objects.requireNonNull(address, "Address must not be null");
-      return withAddress(Option.of(address));
-    }
-
-    public Person withNoAddress() {
-      return withAddress(Option.none());
+      return Person.addressLens.replace(address).apply(this);
     }
   }
 
   @Test
   void testValid() {
-    assertThat(Person.of("Alice", 42, null).get())
-        .isEqualTo(new Person(new Person.Name("Alice"), new Person.Age(42), Option.none()));
-    assertThat(Person.of("Harry Potter", 11, "4 Privet Drive, Little Whinging, Surrey").get())
+    final var id = Id.makeNew();
+    assertThat(Person.of(id.toString(), "Alice", 42, null))
+        .isEqualTo(valid(new Person(id, new Name("Alice"), new Age(42), Option.none())));
+    assertThat(
+            Person.of(id.toString(), "Harry Potter", 11, "4 Privet Drive, Little Whinging, Surrey"))
         .isEqualTo(
-            new Person(
-                new Person.Name("Harry Potter"),
-                new Person.Age(11),
-                Option.of(new Address("4 Privet Drive, Little Whinging, Surrey"))));
+            valid(
+                new Person(
+                    id,
+                    new Name("Harry Potter"),
+                    new Age(11),
+                    Option.of(new Address("4 Privet Drive, Little Whinging, Surrey")))));
   }
 
   @Test
   void testInvalid() {
-    assertThat(Person.of("Alice", -42).getError()).containsExactly("Age must be positive");
-    assertThat(Person.of("", 42).getError()).containsExactly("Name must not be blank");
-    assertThat(Person.of("Alice", 42, "").getError()).containsExactly("Address must not be blank");
-    assertThat(Person.of("", -42, "").getError())
+    final var id = Id.makeNew().toString();
+    assertThat(Person.of(id, "Alice", -42).getError()).containsExactly("Age must be positive");
+    assertThat(Person.of(id, "", 42).getError()).containsExactly("Name must not be blank");
+    assertThat(Person.of(id, "Alice", 42, "").getError())
+        .containsExactly("Address must not be blank");
+    assertThat(Person.of(id, "", -42, "").getError())
         .containsExactly(
             "Name must not be blank", "Age must be positive", "Address must not be blank");
   }
 
   @Test
   void testWith() {
-    final Person p = new Person(new Person.Name("Bob"), new Person.Age(42), Option.none());
+    final var id = Id.makeNew();
+    final Person p = new Person(id, new Name("Bob"), new Age(42), Option.none());
     final Address newAddress = new Address("4 Privet Drive, Little Whinging, Surrey");
 
-    assertThat(p.withName(new Person.Name("Bob")))
-        .isEqualTo(new Person(new Person.Name("Bob"), p.age, p.address));
-
-    assertThat(p.withAge(new Person.Age(43)))
-        .isEqualTo(new Person(p.name, new Person.Age(43), p.address));
-
-    assertThat(p.withAddress(newAddress))
-        .isEqualTo(new Person(p.name, p.age, Option.of(newAddress)));
-    assertThat(p.withNoAddress()).isEqualTo(new Person(p.name, p.age, Option.none()));
+    assertThat(p.withAge(new Age(43))).isEqualTo(new Person(id, p.name, new Age(43), p.address));
+    assertThat(p.withName(new Name("Bob")))
+        .isEqualTo(new Person(id, new Name("Bob"), p.age, p.address));
     assertThat(p.withAddress(Option.of(newAddress)))
-        .isEqualTo(new Person(p.name, p.age, Option.of(newAddress)));
+        .isEqualTo(new Person(id, p.name, p.age, Option.of(newAddress)));
   }
 }
