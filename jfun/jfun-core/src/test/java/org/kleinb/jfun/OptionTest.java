@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.Test;
 import org.kleinb.jfun.Option.*;
 
@@ -379,15 +378,13 @@ class OptionTest {
 
   @Test
   void shouldConvertNoneToFailure() {
-    assertThat(Option.none().toTry())
-        .has(new Condition<>(Try::isFailure, "is failure"))
-        .has(
-            new Condition<>(
-                t -> t.getFailure() instanceof NoSuchElementException,
-                "is NoSuchElementException"));
+    Try<Object> actual = Option.none().toTry();
+    assertThat(actual.isFailure()).isTrue();
+    assertThat(actual.getFailure()).isInstanceOf(NoSuchElementException.class);
   }
 
   // .iterator
+
   @Test
   void shouldIterateSome() {
     var iter = Option.some(42).iterator();

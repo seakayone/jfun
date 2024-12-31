@@ -111,7 +111,7 @@ public sealed interface NonEmptyList<A> extends Iterable<A> {
     return of(as.iterator());
   }
 
-  static <A> Option<NonEmptyList<A>> of(Iterator<? extends A> iterator) {
+  static <A> Option<NonEmptyList<A>> of(java.util.Iterator<? extends A> iterator) {
     Objects.requireNonNull(iterator);
     if (!iterator.hasNext()) {
       return Option.none();

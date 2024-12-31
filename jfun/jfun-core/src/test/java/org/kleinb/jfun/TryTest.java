@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.Test;
 
 class TryTest {
@@ -297,12 +296,8 @@ class TryTest {
   @Test
   void shouldFilterSuccessPredicateFalse() {
     Try<Integer> actual = Try.success(42).filter(i -> i != 42);
-    assertThat(actual)
-        .has(new Condition<>(Try::isFailure, "is failure"))
-        .has(
-            new Condition<>(
-                t -> t.getFailure() instanceof NoSuchElementException,
-                "is NoSuchElementException"));
+    assertThat(actual.isFailure()).isTrue();
+    assertThat(actual.getFailure()).isInstanceOf(NoSuchElementException.class);
   }
 
   // .filterNot
@@ -310,12 +305,8 @@ class TryTest {
   @Test
   void shouldFilterNotSuccess() {
     Try<Integer> actual = Try.success(42).filterNot(i -> i == 42);
-    assertThat(actual)
-        .has(new Condition<>(Try::isFailure, "is failure"))
-        .has(
-            new Condition<>(
-                t -> t.getFailure() instanceof NoSuchElementException,
-                "is NoSuchElementException"));
+    assertThat(actual.isFailure()).isTrue();
+    assertThat(actual.getFailure()).isInstanceOf(NoSuchElementException.class);
   }
 
   @Test

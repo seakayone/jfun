@@ -9,7 +9,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public sealed interface Either<A, B> permits Either.Left, Either.Right {
+public sealed interface Either<A, B> extends Iterable<B> permits Either.Left, Either.Right {
   record Right<A, B>(B value) implements Either<A, B> {}
 
   record Left<A, B>(A value) implements Either<A, B> {}
@@ -199,5 +199,10 @@ public sealed interface Either<A, B> permits Either.Left, Either.Right {
 
   default Validation<A, B> toValidation() {
     return fold(Validation::invalid, Validation::valid);
+  }
+
+  @Override
+  default Iterator<B> iterator() {
+    return fold(_ -> Iterator.empty(), Iterator::of);
   }
 }

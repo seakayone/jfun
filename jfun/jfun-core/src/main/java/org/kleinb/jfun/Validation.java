@@ -10,7 +10,8 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public sealed interface Validation<E, A> permits Validation.Invalid, Validation.Valid {
+public sealed interface Validation<E, A> extends Iterable<A>
+    permits Validation.Invalid, Validation.Valid {
   record Valid<E, A>(A value) implements Validation<E, A> {}
 
   record Invalid<E, A>(List<E> error) implements Validation<E, A> {}
@@ -430,5 +431,10 @@ public sealed interface Validation<E, A> permits Validation.Invalid, Validation.
   default Try<A> toTryWith(Function<? super List<? super E>, ? extends Throwable> e) {
     Objects.requireNonNull(e);
     return fold(errs -> Try.failure(e.apply(errs)), Try::success);
+  }
+
+  @Override
+  default Iterator<A> iterator() {
+    return fold(_ -> Iterator.empty(), Iterator::of);
   }
 }

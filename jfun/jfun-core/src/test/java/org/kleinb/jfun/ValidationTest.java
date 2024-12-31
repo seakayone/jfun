@@ -673,4 +673,21 @@ class ValidationTest {
     Validation<String, Integer> invalid = Validation.invalid("error");
     assertThat(invalid.toTryWith(_ -> exception)).isEqualTo(Try.failure(exception));
   }
+
+  // .iterator
+
+  @Test
+  void shouldIterateOverValid() {
+    Validation<String, Integer> valid = Validation.valid(42);
+    Iterator<Integer> iter = valid.iterator();
+    assertThat(iter.next()).isEqualTo(42);
+    assertThatThrownBy(iter::next).isInstanceOf(NoSuchElementException.class);
+  }
+
+  @Test
+  void shouldIterateOverInvalid() {
+    Validation<String, Integer> invalid = Validation.invalid("error");
+    Iterator<Integer> iter = invalid.iterator();
+    assertThatThrownBy(iter::next).isInstanceOf(NoSuchElementException.class);
+  }
 }

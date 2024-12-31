@@ -197,24 +197,6 @@ public sealed interface Option<A> extends Iterable<A> permits Option.None, Optio
 
   @Override
   default Iterator<A> iterator() {
-    var self = this;
-    return new Iterator<>() {
-      private Option<A> current = self;
-
-      @Override
-      public boolean hasNext() {
-        return current != null;
-      }
-
-      @Override
-      public A next() {
-        if (current instanceof Some(A value)) {
-          current = null;
-          return value;
-        } else {
-          throw new NoSuchElementException();
-        }
-      }
-    };
+    return fold(Iterator::empty, Iterator::of);
   }
 }

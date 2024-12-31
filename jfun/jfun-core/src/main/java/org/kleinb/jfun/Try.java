@@ -10,7 +10,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public sealed interface Try<A> permits Try.Failure, Try.Success {
+public sealed interface Try<A> extends Iterable<A> permits Try.Failure, Try.Success {
   record Success<A>(A value) implements Try<A> {}
 
   record Failure<A>(Throwable error) implements Try<A> {}
@@ -230,6 +230,11 @@ public sealed interface Try<A> permits Try.Failure, Try.Success {
 
   default List<A> toList() {
     return fold(_ -> List.of(), List::of);
+  }
+
+  @Override
+  default Iterator<A> iterator() {
+    return fold(_ -> Iterator.empty(), Iterator::of);
   }
 }
 

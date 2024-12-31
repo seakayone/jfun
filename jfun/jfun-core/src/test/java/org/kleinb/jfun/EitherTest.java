@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.*;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
-import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.Test;
 import org.kleinb.jfun.Either.Left;
 import org.kleinb.jfun.Either.Right;
@@ -387,11 +386,10 @@ class EitherTest {
   @Test
   void shouldConvertLeftToFailure() {
     Either<Integer, String> either = Either.left(42);
-    assertThat(either.toTry(i -> new RuntimeException("Failed with " + i)))
-        .has(new Condition<>(Try::isFailure, "is failure"))
-        .has(
-            new Condition<>(
-                t -> t.getFailure().getMessage().equals("Failed with 42"), "has correct message"));
+    RuntimeException ex = new RuntimeException("Failed");
+    Try<String> actual = either.toTry(_ -> ex);
+    assertThat(actual.isFailure()).isTrue();
+    assertThat(actual.getFailure()).isSameAs(ex);
   }
 
   // .toValidation
@@ -406,5 +404,24 @@ class EitherTest {
   void shouldConvertLeftToInvalid() {
     Either<Integer, String> either = Either.left(42);
     assertThat(either.toValidation()).isEqualTo(Validation.invalid(42));
+  }
+
+  // .iterator
+
+  @Test
+  void shouldConvertRightToIterator() {
+    Either<Integer, String> either = Either.right("42");
+    Iterator<String> iterator = either.iterator();
+    assertThat(iterator.next()).isEqualTo("42");
+    assertThat(iterator.hasNext()).isFalse();
+    assertThatThrownBy(iterator::next).isInstanceOf(NoSuchElementException.class);
+  }
+
+  @Test
+  void shouldConvertLeftToEmptyIterator() {
+    Either<Integer, String> either = Either.left(42);
+    Iterator<String> iterator = either.iterator();
+    assertThat(iterator.hasNext()).isFalse();
+    assertThatThrownBy(iterator::next).isInstanceOf(NoSuchElementException.class);
   }
 }
