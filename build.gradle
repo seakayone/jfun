@@ -28,7 +28,13 @@ tasks.named('test') {
 }
 
 spotless {
+    format 'misc', {
+        target '*.gradle', '.gitattributes', '.gitignore'
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
     java {
         googleJavaFormat()
+        formatAnnotations()
     }
 }
