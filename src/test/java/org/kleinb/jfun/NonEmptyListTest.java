@@ -20,9 +20,8 @@ class NonEmptyListTest {
   }
 
   @Test
-  void singleConstructorNullIsNotAllowed() {
-    assertThatThrownBy(() -> new NonEmptyList.Single<>(null, 1))
-        .isInstanceOf(NullPointerException.class);
+  void singleConstructorNullIsAllowed() {
+    assertThat(new NonEmptyList.Single<>(null, 1).head()).isNull();
   }
 
   @Test
@@ -38,9 +37,8 @@ class NonEmptyListTest {
   }
 
   @Test
-  void consConstructorNullIsNotAllowedHead() {
-    assertThatThrownBy(() -> new NonEmptyList.Cons<>(null, NonEmptyList.of(1), 2))
-        .isInstanceOf(NullPointerException.class);
+  void consConstructorNullIsAllowedHead() {
+    assertThat(new NonEmptyList.Cons<>(null, NonEmptyList.of(1), 2).head()).isNull();
   }
 
   @Test
@@ -64,9 +62,8 @@ class NonEmptyListTest {
   }
 
   @Test
-  void ofNullIsNotAllowed() {
-    assertThatThrownBy(() -> NonEmptyList.of((Integer) null))
-        .isInstanceOf(NullPointerException.class);
+  void ofNullIsAllowed() {
+    assertThat(NonEmptyList.of((Integer) null).head()).isNull();
   }
 
   @Test
@@ -170,9 +167,8 @@ class NonEmptyListTest {
   }
 
   @Test
-  void prependNullIsNotAllowed() {
-    assertThatThrownBy(() -> NonEmptyList.of(1).prepend(null))
-        .isInstanceOf(NullPointerException.class);
+  void prependNullIsAllowed() {
+    assertThat(NonEmptyList.of(1).prepend(null)).isEqualTo(NonEmptyList.of(null, 1));
   }
 
   // .append
@@ -184,9 +180,8 @@ class NonEmptyListTest {
   }
 
   @Test
-  void appendNullIsNotAllowed() {
-    assertThatThrownBy(() -> NonEmptyList.of(1).append(null))
-        .isInstanceOf(NullPointerException.class);
+  void appendNullIsAllowed() {
+    assertThat(NonEmptyList.of(1).append(null)).containsExactly(1, null);
   }
 
   // .contains
@@ -248,7 +243,7 @@ class NonEmptyListTest {
   @Test
   void mapNullSingle() {
     var nel = NonEmptyList.of(1);
-    assertThatThrownBy(() -> nel.map(_ -> null)).isInstanceOf(NullPointerException.class);
+    assertThat(nel.map(_ -> null)).isEqualTo(NonEmptyList.single(null));
   }
 
   @Test
@@ -260,7 +255,7 @@ class NonEmptyListTest {
   @Test
   void mapNullMultiple() {
     var nel = NonEmptyList.of(1, 2, 3);
-    assertThatThrownBy(() -> nel.map(_ -> null)).isInstanceOf(NullPointerException.class);
+    assertThat(nel.map(_ -> null)).isEqualTo(NonEmptyList.of(null, null, null));
   }
 
   // .iterator
@@ -436,6 +431,13 @@ class NonEmptyListTest {
     var nel = NonEmptyList.of(1, 2, 3);
     var actual = nel.mkString("[", ", ", "]");
     assertThat(actual).isEqualTo("[1, 2, 3]");
+  }
+
+  @Test
+  void mkStringIsNullSafe() {
+    var nel = NonEmptyList.of(null, null, 3);
+    var actual = nel.mkString("[", ", ", "]");
+    assertThat(actual).isEqualTo("[null, null, 3]");
   }
 
   // .toString

@@ -10,7 +10,6 @@ public sealed interface NonEmptyList<A> extends Iterable<A> {
 
   record Single<A>(A elem, int size) implements NonEmptyList<A> {
     public Single {
-      Objects.requireNonNull(elem);
       if (!Objects.equals(size, 1)) {
         throw new IllegalArgumentException("Size must be 1");
       }
@@ -34,7 +33,6 @@ public sealed interface NonEmptyList<A> extends Iterable<A> {
 
   record Cons<A>(A head, NonEmptyList<A> tail, int size) implements NonEmptyList<A> {
     public Cons {
-      Objects.requireNonNull(head);
       Objects.requireNonNull(tail);
       if (!Objects.equals(size, 1 + tail.size())) {
         throw new IllegalArgumentException("Size must be 1 + tail.size()");
@@ -62,7 +60,6 @@ public sealed interface NonEmptyList<A> extends Iterable<A> {
   }
 
   static <A> NonEmptyList<A> cons(A head, NonEmptyList<A> tail) {
-    Objects.requireNonNull(head);
     Objects.requireNonNull(tail);
     return new Cons<>(head, tail, 1 + tail.size());
   }
@@ -170,7 +167,7 @@ public sealed interface NonEmptyList<A> extends Iterable<A> {
     return false;
   }
 
-  default Option<A> find(Predicate<A> p) {
+  default Option<A> find(Predicate<? super A> p) {
     Objects.requireNonNull(p);
 
     for (A value : this) {
@@ -281,7 +278,10 @@ public sealed interface NonEmptyList<A> extends Iterable<A> {
   }
 
   default String mkString(String start, String sep, String end) {
-    return start + reduceMapLeft(Object::toString, (str, a) -> str + sep + a.toString()) + end;
+    Objects.requireNonNull(start);
+    Objects.requireNonNull(sep);
+    Objects.requireNonNull(end);
+    return start + reduceMapLeft(a -> "" + a, (str, a) -> str + sep + a) + end;
   }
 
   @Override
