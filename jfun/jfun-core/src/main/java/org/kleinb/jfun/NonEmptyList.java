@@ -37,6 +37,11 @@ public sealed interface NonEmptyList<A> extends Iterable<A> {
     }
 
     @Override
+    public NonEmptyList<A> tail(){
+        throw new NoSuchElementException("Single does not have a tail");
+    }
+
+    @Override
     public String toString() {
       return mkString("NonEmptyList(", ", ", ")");
     }
@@ -153,6 +158,8 @@ public sealed interface NonEmptyList<A> extends Iterable<A> {
   }
 
   Option<NonEmptyList<A>> tailOption();
+
+  NonEmptyList<A> tail() ;
 
   int size();
 

@@ -127,6 +127,24 @@ class NonEmptyListTest {
     assertThat(nel.headOption()).isEqualTo(Option.some(1));
   }
 
+  // .tail .tailOption
+
+  @Test
+  void tailSingle() {
+    var nel = NonEmptyList.of(1);
+    assertThat(nel.tailOption()).isEqualTo(Option.none());
+    assertThatThrownBy(nel::tail)
+        .isInstanceOf(NoSuchElementException.class)
+        .hasMessage("Single does not have a tail");
+  }
+
+  @Test
+  void tailCons() {
+    var nel = NonEmptyList.of(1, 2, 3);
+    assertThat(nel.tailOption()).isEqualTo(Option.some(NonEmptyList.of(2, 3)));
+    assertThat(nel.tail()).isEqualTo(NonEmptyList.of(2, 3));
+  }
+
   // .concat
 
   @Test
