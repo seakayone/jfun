@@ -267,12 +267,7 @@ public sealed interface NonEmptyList<A> extends Iterable<A> {
 
   default <B> NonEmptyList<B> flatMap(Function1<? super A, NonEmptyList<B>> f) {
     Objects.requireNonNull(f);
-    var fNonNull =
-        f.andThen(
-            e -> {
-              Objects.requireNonNull(e);
-              return e;
-            });
+    var fNonNull = f.andThen(Objects::requireNonNull);
     return reduceMapRight(fNonNull, (a, bs) -> fNonNull.apply(a).concat(bs));
   }
 
