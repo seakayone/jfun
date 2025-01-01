@@ -16,11 +16,12 @@ class NonEmptyListOpticsTest {
 
   @Test
   void testIsoLaws() {
-    assertThat(IsoLaws.roundTripOneWay(listToOptionNonEmptyList, List.of()));
-    assertThat(IsoLaws.roundTripOneWay(listToOptionNonEmptyList, List.of(1, 2, 3)));
+    assertThat(IsoLaws.roundTripOneWay(listToOptionNonEmptyList, List.of())).isTrue();
+    assertThat(IsoLaws.roundTripOneWay(listToOptionNonEmptyList, List.of(1, 2, 3))).isTrue();
 
-    assertThat(IsoLaws.roundTripOtherWay(listToOptionNonEmptyList, Option.none()));
+    assertThat(IsoLaws.roundTripOtherWay(listToOptionNonEmptyList, Option.none())).isTrue();
     assertThat(
-        IsoLaws.roundTripOtherWay(listToOptionNonEmptyList, NonEmptyList.of(List.of(1, 2, 3))));
+            IsoLaws.roundTripOtherWay(listToOptionNonEmptyList, NonEmptyList.of(List.of(1, 2, 3))))
+        .isTrue();
   }
 }

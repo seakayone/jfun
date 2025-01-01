@@ -133,7 +133,7 @@ class NonEmptyListTest {
 
   @Test
   void ofIterableNonEmptyList() {
-    final var nel = NonEmptyList.of(1,2,3);
+    final var nel = NonEmptyList.of(1, 2, 3);
     final var actual = NonEmptyList.of(nel).get();
     assertThat(actual).isSameAs(nel);
   }
