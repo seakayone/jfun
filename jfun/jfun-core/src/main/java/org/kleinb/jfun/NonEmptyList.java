@@ -144,7 +144,7 @@ public sealed interface NonEmptyList<A> extends Iterable<A> {
   }
 
   default NonEmptyList<A> prepend(A a) {
-    return new Cons<>(a, this, 1 + this.size());
+    return cons(a, this);
   }
 
   default NonEmptyList<A> append(A a) {
