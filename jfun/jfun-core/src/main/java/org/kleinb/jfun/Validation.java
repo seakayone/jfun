@@ -51,6 +51,13 @@ public sealed interface Validation<E, A> extends Iterable<A>
     return fromPredicate(error, Objects::nonNull, a);
   }
 
+  static <E, A> Validation<E, A> narrow(Validation<? extends E, ? extends A> validation) {
+    Objects.requireNonNull(validation);
+    @SuppressWarnings("unchecked")
+    Validation<E, A> narrowed = (Validation<E, A>) validation;
+    return narrowed;
+  }
+
   static <E, A1, A2, Z> Validation<E, Z> validateWith(
       Validation<E, A1> v1,
       Validation<E, A2> v2,

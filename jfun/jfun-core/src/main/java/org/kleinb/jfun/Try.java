@@ -52,6 +52,13 @@ public sealed interface Try<A> extends Iterable<A> permits Try.Failure, Try.Succ
     return new Failure<>(t);
   }
 
+  static <A> Try<A> narrow(Try<? extends A> t) {
+    Objects.requireNonNull(t);
+    @SuppressWarnings("unchecked")
+    Try<A> narrowed = (Try<A>) t;
+    return narrowed;
+  }
+
   default boolean isSuccess() {
     return this instanceof Success;
   }
@@ -85,10 +92,7 @@ public sealed interface Try<A> extends Iterable<A> permits Try.Failure, Try.Succ
     if (this instanceof Success<A> success) {
       return success;
     } else {
-      @SuppressWarnings("unchecked")
-      Try<A> aTry = (Try<A>) or.get();
-      Objects.requireNonNull(aTry);
-      return aTry;
+      return narrow(or.get());
     }
   }
 
@@ -126,10 +130,7 @@ public sealed interface Try<A> extends Iterable<A> permits Try.Failure, Try.Succ
   default <B> Try<B> flatMap(Function<? super A, ? extends Try<? extends B>> f) {
     Objects.requireNonNull(f);
     if (this instanceof Success(A value)) {
-      @SuppressWarnings("unchecked")
-      Try<B> aTry = (Try<B>) f.apply(value);
-      Objects.requireNonNull(aTry);
-      return aTry;
+      return narrow(f.apply(value));
     } else {
       @SuppressWarnings("unchecked")
       Try<B> aTry = (Try<B>) this;
@@ -160,10 +161,7 @@ public sealed interface Try<A> extends Iterable<A> permits Try.Failure, Try.Succ
   default Try<A> recoverWith(Function<? super Throwable, ? extends Try<? extends A>> f) {
     Objects.requireNonNull(f);
     if (this instanceof Failure(Throwable t)) {
-      @SuppressWarnings("unchecked")
-      Try<A> recovered = (Try<A>) f.apply(t);
-      Objects.requireNonNull(recovered);
-      return recovered;
+      return narrow(f.apply(t));
     } else {
       return this;
     }

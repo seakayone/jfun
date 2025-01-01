@@ -51,6 +51,13 @@ public sealed interface Option<A> extends Iterable<A> permits Option.None, Optio
     return some(Collections.unmodifiableList(result));
   }
 
+  static <A> Option<A> narrow(Option<? extends A> option) {
+    Objects.requireNonNull(option);
+    @SuppressWarnings("unchecked")
+    final Option<A> narrowed = (Option<A>) option;
+    return narrowed;
+  }
+
   default boolean isSome() {
     return this instanceof Some;
   }
@@ -90,10 +97,7 @@ public sealed interface Option<A> extends Iterable<A> permits Option.None, Optio
   default <B> Option<B> flatMap(Function<? super A, ? extends Option<? extends B>> f) {
     Objects.requireNonNull(f);
     if (this instanceof Some(A value)) {
-      @SuppressWarnings("unchecked")
-      Option<B> option = (Option<B>) f.apply(value);
-      Objects.requireNonNull(option);
-      return option;
+      return narrow(f.apply(value));
     } else {
       return none();
     }
@@ -115,10 +119,7 @@ public sealed interface Option<A> extends Iterable<A> permits Option.None, Optio
     if (this instanceof Some<A> some) {
       return some;
     } else {
-      @SuppressWarnings("unchecked")
-      Option<A> option = (Option<A>) or.get();
-      Objects.requireNonNull(option);
-      return option;
+      return narrow(or.get());
     }
   }
 

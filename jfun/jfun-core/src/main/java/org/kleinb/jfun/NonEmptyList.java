@@ -19,6 +19,13 @@ public sealed interface NonEmptyList<A> extends Iterable<A> {
     return Collector.of(ArrayList::new, ArrayList::add, combiner, NonEmptyList::of);
   }
 
+  static <A> NonEmptyList<A> narrow(NonEmptyList<? extends A> nel) {
+    Objects.requireNonNull(nel);
+    @SuppressWarnings("unchecked")
+    final NonEmptyList<A> narrowed = (NonEmptyList<A>) nel;
+    return narrowed;
+  }
+
   record Single<A>(A elem, int size) implements NonEmptyList<A> {
     public Single {
       if (!Objects.equals(size, 1)) {
@@ -75,9 +82,9 @@ public sealed interface NonEmptyList<A> extends Iterable<A> {
     return new Single<>(a, 1);
   }
 
-  static <A> NonEmptyList<A> cons(A head, NonEmptyList<A> tail) {
+  static <A> NonEmptyList<A> cons(A head, NonEmptyList<? extends A> tail) {
     Objects.requireNonNull(tail);
-    return new Cons<>(head, tail, 1 + tail.size());
+    return new Cons<>(head, narrow(tail), 1 + tail.size());
   }
 
   static <A> NonEmptyList<A> of(A a0) {
@@ -125,16 +132,14 @@ public sealed interface NonEmptyList<A> extends Iterable<A> {
 
   static <A> Option<NonEmptyList<A>> of(Iterable<? extends A> as) {
     Objects.requireNonNull(as);
-    if (as instanceof NonEmptyList<? extends A>) {
-      @SuppressWarnings("unchecked")
-      NonEmptyList<A> as1 = (NonEmptyList<A>) as;
-      return Option.some(as1);
+    if (as instanceof NonEmptyList<? extends A> as0) {
+      return Option.some(narrow(as0));
     } else if (as instanceof java.util.List<? extends A> list) {
       final ListIterator<? extends A> iterator = list.listIterator(list.size());
       if (!iterator.hasPrevious()) {
         return Option.none();
       } else {
-        var result = NonEmptyList.<A>single(iterator.previous());
+        NonEmptyList<A> result = single(iterator.previous());
         while (iterator.hasPrevious()) {
           result = result.prepend(iterator.previous());
         }
@@ -163,9 +168,9 @@ public sealed interface NonEmptyList<A> extends Iterable<A> {
     }
   }
 
-  default NonEmptyList<A> concat(NonEmptyList<A> other) {
+  default NonEmptyList<A> concat(NonEmptyList<? extends A> other) {
     Objects.requireNonNull(other);
-    return foldRight(other, NonEmptyList::cons);
+    return foldRight(narrow(other), NonEmptyList::cons);
   }
 
   default NonEmptyList<A> reverse() {
@@ -265,10 +270,18 @@ public sealed interface NonEmptyList<A> extends Iterable<A> {
     }
   }
 
-  default <B> NonEmptyList<B> flatMap(Function1<? super A, NonEmptyList<B>> f) {
+  default <B> NonEmptyList<B> flatMap(Function1<? super A, ? extends NonEmptyList<? extends B>> f) {
     Objects.requireNonNull(f);
-    var fNonNull = f.andThen(Objects::requireNonNull);
-    return reduceMapRight(fNonNull, (a, bs) -> fNonNull.apply(a).concat(bs));
+    var result = NonEmptyList.<B>narrow(f.apply(head()));
+    return switch (this.tailOption()) {
+      case Option.None() -> result;
+      case Some(NonEmptyList<A> tail) -> {
+        for (A a : tail) {
+          result = result.concat(narrow(f.apply(a)));
+        }
+        yield result;
+      }
+    };
   }
 
   default <B> B foldLeft(B zero, Function2<? super B, ? super A, ? extends B> f) {
@@ -285,7 +298,7 @@ public sealed interface NonEmptyList<A> extends Iterable<A> {
     return this.reverse().foldLeft(zero, f.reversed());
   }
 
-  default A reduce(Function2<A, A, A> r) {
+  default A reduce(Function2<? super A, ? super A, ? extends A> r) {
     Objects.requireNonNull(r);
     return reduceMapLeft(Function1.identity(), r);
   }

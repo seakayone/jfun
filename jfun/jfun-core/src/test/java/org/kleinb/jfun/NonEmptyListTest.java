@@ -548,4 +548,43 @@ class NonEmptyListTest {
     var atomicInt = new AtomicInteger();
     return Stream.generate(atomicInt::getAndIncrement).takeWhile(i -> i < 10_000);
   }
+
+  // .narrow
+  @Test
+  void narrow() {
+    NonEmptyList<Integer> nel = NonEmptyList.of(1, 2, 3);
+    NonEmptyList<Number> actual = NonEmptyList.narrow(nel);
+    assertThat(actual).isSameAs(nel);
+  }
+
+  @Test
+  void narrowNonNull() {
+    assertThatThrownBy(() -> NonEmptyList.narrow(null)).isInstanceOf(NullPointerException.class);
+  }
+
+  @Test
+  void covarianceContravariance() {
+    NonEmptyList<Number> nelNum = NonEmptyList.of(1, 2d, 3L);
+    NonEmptyList<Integer> nelInt = NonEmptyList.of(4, 5, 6);
+
+    // concat
+    assertThat(nelNum.concat(nelInt)).containsExactly(1, 2d, 3L, 4, 5, 6);
+    assertThat(NonEmptyList.<Number>narrow(nelInt).concat(nelNum))
+        .containsExactly(4, 5, 6, 1, 2d, 3L);
+
+    // map
+    assertThat(nelInt.<Number>map(Double::valueOf)).containsExactly(4d, 5d, 6d);
+
+    // flatMap
+    NonEmptyList<Number> flatMap =
+        nelInt.flatMap(
+            n -> {
+              if (n % 2 == 0) {
+                return NonEmptyList.<Integer>of(n / 2);
+              } else {
+                return NonEmptyList.<Float>of(((float) n) / ((float) 2));
+              }
+            });
+    assertThat(flatMap).containsExactly(2, 2.5f, 3);
+  }
 }

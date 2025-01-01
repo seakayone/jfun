@@ -22,6 +22,13 @@ public sealed interface Either<A, B> extends Iterable<B> permits Either.Left, Ei
     return new Right<>(value);
   }
 
+  static <A, B> Either<A, B> narrow(Either<? extends A, ? extends B> either) {
+    Objects.requireNonNull(either);
+    @SuppressWarnings("unchecked")
+    final Either<A, B> narrowed = (Either<A, B>) either;
+    return narrowed;
+  }
+
   default boolean isLeft() {
     return this instanceof Left;
   }
@@ -97,10 +104,7 @@ public sealed interface Either<A, B> extends Iterable<B> permits Either.Left, Ei
       Function<? super B, ? extends Either<? extends A, ? extends C>> f) {
     Objects.requireNonNull(f);
     if (this instanceof Right(B value)) {
-      @SuppressWarnings("unchecked")
-      Either<A, C> either = (Either<A, C>) f.apply(value);
-      Objects.requireNonNull(either);
-      return either;
+      return narrow(f.apply(value));
     } else {
       @SuppressWarnings("unchecked")
       Left<A, C> left = (Left<A, C>) this;
@@ -139,10 +143,7 @@ public sealed interface Either<A, B> extends Iterable<B> permits Either.Left, Ei
     if (isRight()) {
       return this;
     } else {
-      @SuppressWarnings("unchecked")
-      Either<A, B> either = (Either<A, B>) or.get();
-      Objects.requireNonNull(either);
-      return either;
+      return narrow(or.get());
     }
   }
 
