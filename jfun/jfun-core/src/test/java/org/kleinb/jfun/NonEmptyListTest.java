@@ -54,22 +54,67 @@ class NonEmptyListTest {
         .isInstanceOf(IllegalArgumentException.class);
   }
 
-  // of
+  // .of
 
   @Test
-  void ofValue() {
-    var nel = NonEmptyList.of(1);
-    assertThat(nel).containsExactly(1);
-  }
-
-  @Test
-  void ofNullIsAllowed() {
+  void of1() {
+    assertThat(NonEmptyList.of(1)).containsExactly(1);
     assertThat(NonEmptyList.of((Integer) null).head()).isNull();
   }
 
   @Test
-  void ofVararg() {
+  void of2() {
+    assertThat(NonEmptyList.of(1, 2)).containsExactly(1, 2);
+    assertThat(NonEmptyList.of(null, (Integer) null)).containsExactly(null, null);
+  }
+
+  @Test
+  void of3() {
+    assertThat(NonEmptyList.of(1, 2, 3)).containsExactly(1, 2, 3);
+    assertThat(NonEmptyList.of(null, null, (Integer) null)).containsExactly(null, null, null);
+  }
+
+  @Test
+  void of4() {
     assertThat(NonEmptyList.of(1, 2, 3, 4)).containsExactly(1, 2, 3, 4);
+    assertThat(NonEmptyList.of(null, null, null, (Integer) null))
+        .containsExactly(null, null, null, null);
+  }
+
+  @Test
+  void of5() {
+    assertThat(NonEmptyList.of(1, 2, 3, 4, 5)).containsExactly(1, 2, 3, 4, 5);
+    assertThat(NonEmptyList.of(null, null, null, null, (Integer) null))
+        .containsExactly(null, null, null, null, null);
+  }
+
+  @Test
+  void of6() {
+    assertThat(NonEmptyList.of(1, 2, 3, 4, 5, 6)).containsExactly(1, 2, 3, 4, 5, 6);
+    assertThat(NonEmptyList.of(null, null, null, null, null, (Integer) null))
+        .containsExactly(null, null, null, null, null, null);
+  }
+
+  @Test
+  void of7() {
+    assertThat(NonEmptyList.of(1, 2, 3, 4, 5, 6, 7)).containsExactly(1, 2, 3, 4, 5, 6, 7);
+    assertThat(NonEmptyList.of(null, null, null, null, null, null, (Integer) null))
+        .containsExactly(null, null, null, null, null, null, null);
+  }
+
+  @Test
+  void of8() {
+    assertThat(NonEmptyList.of(1, 2, 3, 4, 5, 6, 7, 8)).containsExactly(1, 2, 3, 4, 5, 6, 7, 8);
+    assertThat(NonEmptyList.of(null, null, null, null, null, null, null, (Integer) null))
+        .containsExactly(null, null, null, null, null, null, null, null);
+  }
+
+  @Test
+  void ofVarargs() {
+    assertThat(NonEmptyList.of(1, 2, 3, 4, 5, 6, 7, 8, null))
+        .containsExactly(1, 2, 3, 4, 5, 6, 7, 8, null);
+    assertThat(NonEmptyList.<Integer>of(null, null, null, null, null, null, null, null, null))
+        .containsExactly(null, null, null, null, null, null, null, null, null);
   }
 
   @Test
@@ -88,10 +133,9 @@ class NonEmptyListTest {
 
   @Test
   void ofIterableNonEmptyList() {
-    final var nel = NonEmptyList.of(1);
+    final var nel = NonEmptyList.of(1,2,3);
     final var actual = NonEmptyList.of(nel).get();
     assertThat(actual).isSameAs(nel);
-    assertThat(nel.size()).isEqualTo(1);
   }
 
   @Test

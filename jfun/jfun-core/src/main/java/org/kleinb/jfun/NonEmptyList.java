@@ -37,8 +37,8 @@ public sealed interface NonEmptyList<A> extends Iterable<A> {
     }
 
     @Override
-    public NonEmptyList<A> tail(){
-        throw new NoSuchElementException("Single does not have a tail");
+    public NonEmptyList<A> tail() {
+      throw new NoSuchElementException("Single does not have a tail");
     }
 
     @Override
@@ -80,13 +80,47 @@ public sealed interface NonEmptyList<A> extends Iterable<A> {
     return new Cons<>(head, tail, 1 + tail.size());
   }
 
+  static <A> NonEmptyList<A> of(A a0) {
+    return single(a0);
+  }
+
+  static <A> NonEmptyList<A> of(A a0, A a1) {
+    return cons(a0, single(a1));
+  }
+
+  static <A> NonEmptyList<A> of(A a0, A a1, A a2) {
+    return cons(a0, cons(a1, single(a2)));
+  }
+
+  static <A> NonEmptyList<A> of(A a0, A a1, A a2, A a3) {
+    return cons(a0, cons(a1, cons(a2, single(a3))));
+  }
+
+  static <A> NonEmptyList<A> of(A a0, A a1, A a2, A a3, A a4) {
+    return cons(a0, cons(a1, cons(a2, cons(a3, single(a4)))));
+  }
+
+  static <A> NonEmptyList<A> of(A a0, A a1, A a2, A a3, A a4, A a5) {
+    return cons(a0, cons(a1, cons(a2, cons(a3, cons(a4, single(a5))))));
+  }
+
+  static <A> NonEmptyList<A> of(A a0, A a1, A a2, A a3, A a4, A a5, A a6) {
+    return cons(a0, cons(a1, cons(a2, cons(a3, cons(a4, cons(a5, single(a6)))))));
+  }
+
+  static <A> NonEmptyList<A> of(A a0, A a1, A a2, A a3, A a4, A a5, A a6, A a7) {
+    return cons(a0, cons(a1, cons(a2, cons(a3, cons(a4, cons(a5, cons(a6, single(a7))))))));
+  }
+
   @SafeVarargs
   static <A> NonEmptyList<A> of(A a, A... as) {
-    var result = single(a);
-    for (A next : as) {
-      result = result.prepend(next);
+    Objects.requireNonNull(as);
+    var result = single(as[as.length - 1]);
+    for (int i = as.length - 2; i >= 0; i--) {
+      result = result.prepend(as[i]);
     }
-    return result.reverse();
+    result = result.prepend(a);
+    return result;
   }
 
   static <A> Option<NonEmptyList<A>> of(Iterable<? extends A> as) {
@@ -159,7 +193,7 @@ public sealed interface NonEmptyList<A> extends Iterable<A> {
 
   Option<NonEmptyList<A>> tailOption();
 
-  NonEmptyList<A> tail() ;
+  NonEmptyList<A> tail();
 
   int size();
 
