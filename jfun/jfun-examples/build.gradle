@@ -1,0 +1,8 @@
+plugins {
+    id 'jfun-conventions'
+}
+
+dependencies {
+    implementation project(':jfun-core')
+    implementation project(':jfun-optics')
+}

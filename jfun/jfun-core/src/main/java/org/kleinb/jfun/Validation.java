@@ -58,6 +58,11 @@ public sealed interface Validation<E, A> extends Iterable<A>
     return narrowed;
   }
 
+  static <E, A1, Z> Validation<E, Z> validateWith(Validation<E, A1> v1, Function1<A1, Z> f) {
+    Objects.requireNonNull(v1);
+    return v1.map(f);
+  }
+
   static <E, A1, A2, Z> Validation<E, Z> validateWith(
       Validation<E, A1> v1,
       Validation<E, A2> v2,
