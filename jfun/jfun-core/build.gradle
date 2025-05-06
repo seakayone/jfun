@@ -1,3 +1,70 @@
 plugins {
     id 'jfun-conventions'
+
+    id 'maven-publish'
+    id 'org.jreleaser' version '1.18.0'
+}
+
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'org.kleinb'
+            artifactId = 'jfun-core'
+
+            from components.java
+
+            pom {
+                name = 'jfun-core'
+                description = 'Functional data structures for modern Java'
+                url = 'https://github.com/seakayone/jfun'
+                inceptionYear = '2024'
+                licenses {
+                    license {
+                        name = 'Apache-2.0'
+                        url = 'https://spdx.org/licenses/Apache-2.0.html'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'seakayone'
+                        name = 'Christian Kleinbölting'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:https://github.com/seakayone/jfun'
+                    developerConnection = 'scm:git:ssh://github.com/seakayone/jfun.git'
+                    url = 'https://github.com/seakayone/jfun'
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            url = layout.buildDirectory.dir('staging-deploy')
+        }
+    }
+}
+
+jreleaser {
+    gitRootSearch = true
+    signing {
+        active = 'ALWAYS'
+        armored = true
+        mode = 'FILE'
+        publicKey = '/Users/christian/.jreleaser/public.pgp'
+        secretKey = '/Users/christian/.jreleaser/private.pgp'
+    }
+    deploy {
+        maven {
+            mavenCentral {
+                'release-deploy' {
+                    active = 'RELEASE'
+                    url = 'https://central.sonatype.com/api/v1/publisher'
+                    stagingRepository('build/staging-deploy')
+                }
+            }
+        }
+    }
 }
