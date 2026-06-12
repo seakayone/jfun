@@ -68,11 +68,10 @@ public sealed interface Try<A> extends Iterable<A> permits Try.Failure, Try.Succ
   }
 
   default A get() {
-    if (this instanceof Success(A value)) {
-      return value;
-    } else {
-      return TryOps.sneakyThrow(getFailure());
-    }
+    return switch (this) {
+      case Success(var value) -> value;
+      case Failure<A> _ -> throw new NoSuchElementException("get called on Failure");
+    };
   }
 
   default A getOrElse(A or) {
@@ -80,20 +79,18 @@ public sealed interface Try<A> extends Iterable<A> permits Try.Failure, Try.Succ
   }
 
   default Throwable getFailure() {
-    if (this instanceof Failure(Throwable t)) {
-      return t;
-    } else {
-      throw new NoSuchElementException("getFailure called on Success");
-    }
+    return switch (this) {
+      case Failure(var t) -> t;
+      case Success<A> _ -> throw new NoSuchElementException("getFailure called on Success");
+    };
   }
 
   default Try<A> orElse(Supplier<? extends Try<? extends A>> or) {
     Objects.requireNonNull(or);
-    if (this instanceof Success<A> success) {
-      return success;
-    } else {
-      return narrow(or.get());
-    }
+    return switch (this) {
+      case Success<A> s ->  s;
+      case Failure<A> _ ->  narrow(or.get());
+    };
   }
 
   default boolean contains(A value) {
@@ -236,7 +233,8 @@ public sealed interface Try<A> extends Iterable<A> permits Try.Failure, Try.Succ
   }
 }
 
-interface TryOps {
+final class TryOps {
+  private TryOps() {}
   static <T extends Throwable, R> R sneakyThrow(Throwable t) throws T {
     @SuppressWarnings("unchecked")
     T t1 = (T) t;

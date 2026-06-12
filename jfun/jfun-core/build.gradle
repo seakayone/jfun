@@ -1,10 +1,14 @@
 plugins {
     id 'jfun-conventions'
 
+    id 'scala'
     id 'maven-publish'
     id 'org.jreleaser' version '1.22.0'
 }
 
+scala {
+    scalaVersion = "3.3.0"
+}
 
 publishing {
     publications {
@@ -68,3 +72,10 @@ jreleaser {
         }
     }
 }
+sourceSets {
+    main {
+        scala {
+            srcDirs = ['src/scala']
+        }
+    }
+           }
