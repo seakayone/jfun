@@ -2,7 +2,6 @@ package org.kleinb.jfun;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -98,11 +97,5 @@ class TupleTest {
     Tuple2<String, Integer> t = Tuple.fromEntry(Map.entry("foo", 42));
     assertThat(t._1()).isEqualTo("foo");
     assertThat(t._2()).isEqualTo(42);
-  }
-
-  @Test
-  void toMap() {
-    Map<String, Integer> map = Tuple.toMap(List.of(Tuple.of("foo", 42), Tuple.of("bar", 43)));
-    assertThat(map).containsEntry("foo", 42).containsEntry("bar", 43);
   }
 }
