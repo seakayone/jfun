@@ -21,6 +21,11 @@ release:
     changelog:
       formatted: ALWAYS
       preset: conventional-commits
+      labelers:
+        - label: release
+          title: 'regex:^chore: release '
+      excludeLabels:
+        - release
       contributors:
         format: '- {{contributorName}}{{#contributorUsernameAsLink}} ({{.}}){{/contributorUsernameAsLink}}'
 
