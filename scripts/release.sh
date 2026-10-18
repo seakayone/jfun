@@ -36,7 +36,7 @@ fi
 if ! git diff --quiet; then
   git commit -am "chore: release $version"
 fi
-git tag "v$version"
+git tag -s "v$version" -m "v$version"
 git push origin main "v$version"
 
 scripts/publish.sh
