@@ -6,6 +6,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [23, 25]
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
@@ -13,8 +16,8 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 23
+          java-version: ${{ matrix.java }}
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Build with Gradle
-        run: ./gradlew test
+        run: ./gradlew build -PjavaVersion=${{ matrix.java }}

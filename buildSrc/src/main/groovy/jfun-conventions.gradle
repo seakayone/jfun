@@ -12,7 +12,7 @@ version = '0.0.1'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
+        languageVersion = JavaLanguageVersion.of(providers.gradleProperty('javaVersion').getOrElse('25').toInteger())
     }
 
     withJavadocJar()
@@ -37,7 +37,7 @@ spotless {
         endWithNewline()
     }
     java {
-        googleJavaFormat()
+        googleJavaFormat('1.33.0')
         formatAnnotations()
     }
 }
