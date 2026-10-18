@@ -13,10 +13,10 @@ format:
 release version:
     scripts/release.sh {{version}}
 
-# Release without publishing to Maven Central / GitHub
+# Rehearse a release (build + publish dry run), then revert; no commit, tag or push
 release-dry version:
-    scripts/release.sh {{version}} --no-publish
+    scripts/release.sh {{version}} --dry-run
 
-# Publish the current version (use when a release was tagged but publishing failed)
+# Publish the current version; use `--github-only` if Central succeeded but the GitHub release is missing
 publish *args:
     scripts/publish.sh {{args}}

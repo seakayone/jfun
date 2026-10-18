@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
-# Usage: scripts/publish.sh [--check]
-# Stages jfun-core with Gradle, then deploys to Maven Central and creates the GitHub release with the JReleaser CLI.
-# With --check, only verifies that credentials and signing keys are available.
+# Usage: scripts/publish.sh [--check | --github-only | <jreleaser args, e.g. --dry-run>]
+# Stages jfun-core with Gradle, deploys to Maven Central with the JReleaser CLI and
+# creates the GitHub release with gh.
+#   --check        only verify that tools, credentials and signing keys are available
+#   --github-only  only create the GitHub release (recovery after Central succeeded)
+#   --dry-run      passed to JReleaser; stages locally, uploads nothing, creates no release
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+mode="${1:-}"
 config="$HOME/.jreleaser/config.properties"
 
 has_setting() {
@@ -14,24 +18,47 @@ has_setting() {
 }
 
 missing=()
-for var in JRELEASER_GITHUB_TOKEN JRELEASER_MAVENCENTRAL_USERNAME JRELEASER_MAVENCENTRAL_PASSWORD; do
-  has_setting "$var" || missing+=("$var")
-done
-for key in public.pgp private.pgp; do
-  [[ -f "$HOME/.jreleaser/$key" ]] || missing+=("~/.jreleaser/$key")
-done
+command -v gh >/dev/null || missing+=("gh (not installed)")
+if [[ "$mode" != "--github-only" ]]; then
+  command -v jreleaser >/dev/null || missing+=("jreleaser (not installed; run via mise)")
+  for var in JRELEASER_GITHUB_TOKEN JRELEASER_MAVENCENTRAL_USERNAME JRELEASER_MAVENCENTRAL_PASSWORD; do
+    has_setting "$var" || missing+=("$var")
+  done
+  for key in public.pgp private.pgp; do
+    [[ -f "$HOME/.jreleaser/$key" ]] || missing+=("$HOME/.jreleaser/$key")
+  done
+fi
+if command -v gh >/dev/null && ! gh auth status >/dev/null 2>&1; then
+  missing+=("gh authentication (run gh auth login or set GH_TOKEN)")
+fi
 
 if ((${#missing[@]})); then
-  echo "missing publish settings (set in $config or the environment):" >&2
+  echo "missing publish settings (credentials go in $config or the environment):" >&2
   printf '  - %s\n' "${missing[@]}" >&2
   exit 1
 fi
 
-[[ "${1:-}" == "--check" ]] && { echo "publish settings ok"; exit 0; }
+[[ "$mode" == "--check" ]] && { echo "publish settings ok"; exit 0; }
 
-export JRELEASER_PROJECT_VERSION="$(<version.txt)"
+version="$(<version.txt)"
+
+create_github_release() {
+  gh release view "v$version" >/dev/null 2>&1 \
+    || gh release create "v$version" --title "v$version" --generate-notes --verify-tag
+}
+
+if [[ "$mode" == "--github-only" ]]; then
+  create_github_release
+  exit 0
+fi
+
+export JRELEASER_PROJECT_VERSION="$version"
 export JRELEASER_GPG_PUBLIC_KEY="${JRELEASER_GPG_PUBLIC_KEY:-$HOME/.jreleaser/public.pgp}"
 export JRELEASER_GPG_SECRET_KEY="${JRELEASER_GPG_SECRET_KEY:-$HOME/.jreleaser/private.pgp}"
 
 ./gradlew :jfun-core:publish
-jreleaser full-release --git-root-search "$@"
+jreleaser deploy --git-root-search "$@"
+
+# The native JReleaser CLI cannot create tags (JGit fails under GraalVM), so release.sh
+# pushes the tag and the GitHub release is created here.
+[[ " $* " == *" --dry-run "* ]] || create_github_release
