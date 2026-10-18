@@ -15,9 +15,9 @@ cd "$(dirname "$0")/.."
 [[ -z "$(git status --porcelain)" ]] || { echo "working tree not clean" >&2; exit 1; }
 ! git rev-parse "v$version" >/dev/null 2>&1 || { echo "tag v$version already exists" >&2; exit 1; }
 
-sed -i.bak -E "s/^version = '.*'/version = '$version'/" buildSrc/src/main/groovy/jfun-conventions.gradle
+echo "$version" > version.txt
 sed -i.bak -E "s/(jfun-core:)[0-9]+\.[0-9]+\.[0-9]+/\1$version/" README.md
-rm -f buildSrc/src/main/groovy/jfun-conventions.gradle.bak README.md.bak
+rm -f README.md.bak
 
 ./gradlew clean build
 

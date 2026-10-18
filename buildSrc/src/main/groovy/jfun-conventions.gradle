@@ -8,7 +8,7 @@ repositories {
 }
 
 group = 'org.kleinb'
-version = '0.0.2'
+version = rootProject.file('version.txt').text.trim()
 
 java {
     toolchain {
