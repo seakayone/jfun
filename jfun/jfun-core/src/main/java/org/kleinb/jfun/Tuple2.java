@@ -1,5 +1,6 @@
 package org.kleinb.jfun;
 
+import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -51,6 +52,6 @@ public record Tuple2<T1, T2>(T1 _1, T2 _2) implements Tuple {
   }
 
   public Map.Entry<T1, T2> toEntry() {
-    return Map.entry(_1, _2);
+    return new AbstractMap.SimpleImmutableEntry<>(_1, _2);
   }
 }

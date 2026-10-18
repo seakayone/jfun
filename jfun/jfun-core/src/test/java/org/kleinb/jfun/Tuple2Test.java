@@ -1,6 +1,7 @@
 package org.kleinb.jfun;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import java.util.Map;
@@ -64,5 +65,19 @@ class Tuple2Test {
   void toEntry() {
     Tuple2<Integer, String> t = Tuple.of(42, "foo");
     assertThat(t.toEntry()).isEqualTo(Map.entry(42, "foo"));
+  }
+
+  @Test
+  void toEntryWithNulls() {
+    Map.Entry<Integer, String> entry = Tuple.of((Integer) null, (String) null).toEntry();
+    assertThat(entry.getKey()).isNull();
+    assertThat(entry.getValue()).isNull();
+  }
+
+  @Test
+  void toEntryIsImmutable() {
+    Map.Entry<Integer, String> entry = Tuple.of(42, "foo").toEntry();
+    assertThatThrownBy(() -> entry.setValue("bar"))
+        .isInstanceOf(UnsupportedOperationException.class);
   }
 }
