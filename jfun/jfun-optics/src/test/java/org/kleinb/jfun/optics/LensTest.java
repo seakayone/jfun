@@ -24,7 +24,7 @@ class LensTest {
       Lens.of(Address::city, (city, address) -> new Address(city, address.street()));
 
   final Lens<City, String> cityNameLens =
-      Lens.of(City::cityName, (cityName, _) -> new City(cityName));
+      Lens.of(City::cityName, (cityName, ignored) -> new City(cityName));
 
   final Lens<Person, String> personCityLens = addressLens.andThen(cityLens).andThen(cityNameLens);
 

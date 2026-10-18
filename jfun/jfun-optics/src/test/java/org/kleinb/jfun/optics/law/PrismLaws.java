@@ -10,7 +10,7 @@ public interface PrismLaws {
       case Some(A value) -> {
         return p.reverseGet(value).equals(s);
       }
-      case None<A> _ -> {
+      case None<A> ignored -> {
         return true;
       }
     }

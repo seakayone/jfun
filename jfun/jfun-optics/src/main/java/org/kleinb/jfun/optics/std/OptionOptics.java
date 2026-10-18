@@ -14,7 +14,7 @@ public final class OptionOptics {
   }
 
   static <A> Prism<Option<A>, Void> none() {
-    return Prism.of(PartialFunction.of(Option::isNone, _ -> null), Option::none);
+    return Prism.of(PartialFunction.of(Option::isNone, ignored -> null), Option::none);
   }
 
   static <A> Iso<Option<A>, A> withDefault(A defaultValue) {

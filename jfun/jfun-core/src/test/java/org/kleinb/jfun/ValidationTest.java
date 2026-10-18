@@ -132,7 +132,8 @@ class ValidationTest {
   @Test
   void shouldRejectMapErrorToNull() {
     Validation<String, Integer> invalid = Validation.invalid("a");
-    assertThatThrownBy(() -> invalid.mapError(_ -> null)).isInstanceOf(NullPointerException.class);
+    assertThatThrownBy(() -> invalid.mapError(ignored -> null))
+        .isInstanceOf(NullPointerException.class);
   }
 
   // .isValid , .isInvalid
@@ -374,7 +375,7 @@ class ValidationTest {
   @Test
   void shouldFlatMapValidInvalid() {
     Validation<String, Integer> valid = Validation.valid(42);
-    assertThat(valid.flatMap(_ -> Validation.invalid("error")))
+    assertThat(valid.flatMap(ignored -> Validation.invalid("error")))
         .isEqualTo(Validation.invalid("error"));
   }
 
@@ -722,14 +723,14 @@ class ValidationTest {
   @Test
   void shouldConvertValidToSuccess() {
     Validation<String, Integer> valid = Validation.valid(42);
-    assertThat(valid.toTryWith(_ -> new RuntimeException())).isEqualTo(Try.success(42));
+    assertThat(valid.toTryWith(ignored -> new RuntimeException())).isEqualTo(Try.success(42));
   }
 
   @Test
   void shouldConvertInvalidToFailure() {
     var exception = new RuntimeException("error");
     Validation<String, Integer> invalid = Validation.invalid("error");
-    assertThat(invalid.toTryWith(_ -> exception)).isEqualTo(Try.failure(exception));
+    assertThat(invalid.toTryWith(ignored -> exception)).isEqualTo(Try.failure(exception));
   }
 
   // .iterator

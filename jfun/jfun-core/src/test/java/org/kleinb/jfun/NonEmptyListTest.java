@@ -317,7 +317,7 @@ class NonEmptyListTest {
   @Test
   void mapNullSingle() {
     var nel = NonEmptyList.of(1);
-    assertThat(nel.map(_ -> null)).isEqualTo(NonEmptyList.single(null));
+    assertThat(nel.map(ignored -> null)).isEqualTo(NonEmptyList.single(null));
   }
 
   @Test
@@ -329,7 +329,7 @@ class NonEmptyListTest {
   @Test
   void mapNullMultiple() {
     var nel = NonEmptyList.of(1, 2, 3);
-    assertThat(nel.map(_ -> null)).isEqualTo(NonEmptyList.of(null, null, null));
+    assertThat(nel.map(ignored -> null)).isEqualTo(NonEmptyList.of(null, null, null));
   }
 
   // .iterator
@@ -369,7 +369,7 @@ class NonEmptyListTest {
   @Test
   void flatMapNullSingle() {
     var nel = NonEmptyList.of(1);
-    assertThatThrownBy(() -> nel.flatMap(_ -> null)).isInstanceOf(NullPointerException.class);
+    assertThatThrownBy(() -> nel.flatMap(ignored -> null)).isInstanceOf(NullPointerException.class);
   }
 
   @Test
@@ -387,7 +387,7 @@ class NonEmptyListTest {
   @Test
   void flatMapNullMulti() {
     var nel = NonEmptyList.of(1);
-    assertThatThrownBy(() -> nel.flatMap(_ -> null)).isInstanceOf(NullPointerException.class);
+    assertThatThrownBy(() -> nel.flatMap(ignored -> null)).isInstanceOf(NullPointerException.class);
   }
 
   // .foldLeft

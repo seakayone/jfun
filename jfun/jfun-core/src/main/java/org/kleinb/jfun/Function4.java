@@ -32,7 +32,7 @@ public interface Function4<A, B, C, D, Z> {
    * @return a function that always returns {@code value}
    */
   static <A, B, C, D, Z> Function4<A, B, C, D, Z> constant(Z value) {
-    return (_, _, _, _) -> value;
+    return (ignored1, ignored2, ignored3, ignored4) -> value;
   }
 
   /**

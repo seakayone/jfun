@@ -190,7 +190,7 @@ class TryTest {
     assertThatThrownBy(
             () ->
                 actual.map(
-                    _ -> {
+                    ignored -> {
                       throw new RuntimeException();
                     }))
         .isInstanceOf(RuntimeException.class);
@@ -216,7 +216,7 @@ class TryTest {
     Try<Integer> actual = Try.success(42);
     assertThat(
             actual.mapTry(
-                _ -> {
+                ignored -> {
                   throw exception;
                 }))
         .isEqualTo(Try.failure(exception));
@@ -225,14 +225,14 @@ class TryTest {
   // .flatMap
   @Test
   void shouldFlatMapSuccess() {
-    Try<Integer> actual = Try.success("42").flatMap(_ -> Try.success(42));
+    Try<Integer> actual = Try.success("42").flatMap(ignored -> Try.success(42));
     assertThat(actual).isEqualTo(Try.success(42));
   }
 
   @Test
   void shouldFlatMapFailure() {
     var exception = new Exception("Boom");
-    Try<Integer> actual = Try.<String>failure(exception).flatMap(_ -> Try.success(42));
+    Try<Integer> actual = Try.<String>failure(exception).flatMap(ignored -> Try.success(42));
     assertThat(actual).isEqualTo(Try.failure(exception));
   }
 
@@ -242,7 +242,7 @@ class TryTest {
     assertThatThrownBy(
             () ->
                 actual.flatMap(
-                    _ -> {
+                    ignored -> {
                       throw new RuntimeException();
                     }))
         .isInstanceOf(RuntimeException.class);
@@ -253,14 +253,14 @@ class TryTest {
   @Test
   void shouldRecoverFailure() {
     var exception = new Exception("Boom");
-    Try<Integer> actual = Try.<Integer>failure(exception).recover(_ -> 42);
+    Try<Integer> actual = Try.<Integer>failure(exception).recover(ignored -> 42);
     assertThat(actual).isEqualTo(Try.success(42));
   }
 
   @Test
   void shouldNotRecoverSuccess() {
     Try<Integer> actual = Try.success(42);
-    assertThat(actual.recover(_ -> 0)).isEqualTo(Try.success(42));
+    assertThat(actual.recover(ignored -> 0)).isEqualTo(Try.success(42));
   }
 
   // .recoverWith
@@ -268,14 +268,14 @@ class TryTest {
   @Test
   void shouldRecoverWithFailure() {
     var exception = new Exception("Boom");
-    Try<Integer> actual = Try.<Integer>failure(exception).recoverWith(_ -> Try.success(42));
+    Try<Integer> actual = Try.<Integer>failure(exception).recoverWith(ignored -> Try.success(42));
     assertThat(actual).isEqualTo(Try.success(42));
   }
 
   @Test
   void shouldNotRecoverWithSuccess() {
     Try<Integer> actual = Try.success(42);
-    assertThat(actual.recoverWith(_ -> Try.success(0))).isEqualTo(Try.success(42));
+    assertThat(actual.recoverWith(ignored -> Try.success(0))).isEqualTo(Try.success(42));
   }
 
   // .filter

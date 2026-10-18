@@ -39,7 +39,7 @@ public interface Optional<S, A> {
   }
 
   default Function1<S, Option<S>> replaceOption(A a) {
-    return modifyOption(_ -> a);
+    return modifyOption(ignored -> a);
   }
 
   default Boolean isEmpty(S s) {

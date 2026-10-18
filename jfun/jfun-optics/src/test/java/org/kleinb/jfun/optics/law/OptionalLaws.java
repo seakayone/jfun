@@ -15,6 +15,6 @@ public interface OptionalLaws {
   static <S, A> Boolean setGetOption(S s, A a, Optional<S, A> optional) {
     return optional
         .getOption(optional.replace(a).apply(s))
-        .equals(optional.getOption(s).map(__ -> a));
+        .equals(optional.getOption(s).map(ignored -> a));
   }
 }

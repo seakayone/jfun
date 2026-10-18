@@ -673,10 +673,10 @@ public sealed interface NonEmptyList<A> extends Iterable<A> {
     Objects.requireNonNull(map);
     Objects.requireNonNull(r);
     switch (this) {
-      case Single(A a, _) -> {
+      case Single(A a, var ignored) -> {
         return map.apply(a);
       }
-      case Cons(A head, NonEmptyList<A> tail, _) -> {
+      case Cons(A head, NonEmptyList<A> tail, var ignored) -> {
         return tail.foldLeft(map.apply(head), r);
       }
     }
@@ -755,11 +755,11 @@ public sealed interface NonEmptyList<A> extends Iterable<A> {
       @Override
       public A next() {
         return switch (current) {
-          case Single(A value, _) -> {
+          case Single(A value, var ignored) -> {
             this.current = null;
             yield value;
           }
-          case Cons(A head, NonEmptyList<A> tail, _) -> {
+          case Cons(A head, NonEmptyList<A> tail, var ignored) -> {
             this.current = tail;
             yield head;
           }

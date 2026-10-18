@@ -29,7 +29,7 @@ public class Zooming {
       return Try.of(() -> Objects.requireNonNull(id))
           .mapTry(UUID::fromString)
           .toValidation()
-          .mapError(_ -> "Id must be a valid UUID")
+          .mapError(ignored -> "Id must be a valid UUID")
           .map(Id::new);
     }
   }

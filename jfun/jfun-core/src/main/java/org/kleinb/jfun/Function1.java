@@ -38,7 +38,7 @@ public interface Function1<A, Z> extends java.util.function.Function<A, Z> {
    * @return a function that always returns {@code c}
    */
   static <A, C> Function1<A, C> constant(C c) {
-    return _ -> c;
+    return ignored -> c;
   }
 
   /**

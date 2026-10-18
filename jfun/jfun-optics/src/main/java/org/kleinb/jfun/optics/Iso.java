@@ -10,7 +10,7 @@ public interface Iso<S, A> extends Lens<S, A>, Optional<S, A> {
   }
 
   static <S> Iso<S, Void> unit(Function0<S> f) {
-    return of(_ -> null, _ -> f.get());
+    return of(ignored -> null, ignored -> f.get());
   }
 
   static <S, A> Iso<S, A> of(Function1<S, A> get, Function1<A, S> reverseGet) {
@@ -37,7 +37,7 @@ public interface Iso<S, A> extends Lens<S, A>, Optional<S, A> {
 
   @Override
   default Function1<S, S> replace(A a) {
-    return _ -> reverseGet(a);
+    return ignored -> reverseGet(a);
   }
 
   default Lens<S, A> asLens() {

@@ -446,7 +446,7 @@ public sealed interface Try<A> extends Iterable<A> permits Try.Failure, Try.Succ
    * @return a {@code Some} holding the value, or {@code None} for a {@code Failure}
    */
   default Option<A> toOption() {
-    return fold(_ -> Option.none(), Option::some);
+    return fold(ignored -> Option.none(), Option::some);
   }
 
   /**
@@ -466,7 +466,7 @@ public sealed interface Try<A> extends Iterable<A> permits Try.Failure, Try.Succ
    *     yields an empty one.
    */
   default Optional<A> toOptional() {
-    return fold(_ -> Optional.empty(), Optional::ofNullable);
+    return fold(ignored -> Optional.empty(), Optional::ofNullable);
   }
 
   /**
@@ -490,7 +490,7 @@ public sealed interface Try<A> extends Iterable<A> permits Try.Failure, Try.Succ
    */
   @Override
   default Iterator<A> iterator() {
-    return fold(_ -> Iterator.empty(), Iterator::of);
+    return fold(ignored -> Iterator.empty(), Iterator::of);
   }
 }
 

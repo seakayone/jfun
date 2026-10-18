@@ -28,7 +28,7 @@ public interface Function2<A, B, Z> extends java.util.function.BiFunction<A, B, 
    * @return a function that always returns {@code value}
    */
   static <A, B, Z> Function2<A, B, Z> constant(Z value) {
-    return (_, _) -> value;
+    return (ignored1, ignored2) -> value;
   }
 
   /**

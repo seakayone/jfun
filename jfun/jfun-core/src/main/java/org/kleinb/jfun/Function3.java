@@ -30,7 +30,7 @@ public interface Function3<A, B, C, Z> {
    * @return a function that always returns {@code value}
    */
   static <A, B, C, Z> Function3<A, B, C, Z> constant(Z value) {
-    return (_, _, _) -> value;
+    return (ignored1, ignored2, ignored3) -> value;
   }
 
   /**

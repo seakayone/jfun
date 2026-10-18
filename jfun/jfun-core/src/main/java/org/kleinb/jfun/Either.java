@@ -259,7 +259,7 @@ public sealed interface Either<A, B> extends Iterable<B> permits Either.Left, Ei
       case Right(B value) -> {
         return value;
       }
-      case Left(A _) -> {
+      case Left(A ignored) -> {
         throw new NoSuchElementException("get called on Left");
       }
     }
@@ -276,7 +276,7 @@ public sealed interface Either<A, B> extends Iterable<B> permits Either.Left, Ei
       case Left(A value) -> {
         return value;
       }
-      case Right(B _) -> {
+      case Right(B ignored) -> {
         throw new NoSuchElementException("getLeft called on Right");
       }
     }
@@ -389,7 +389,7 @@ public sealed interface Either<A, B> extends Iterable<B> permits Either.Left, Ei
    * @return a {@code Some} holding the {@code Right} value, or a {@code None} for a {@code Left}
    */
   default Option<B> toOption() {
-    return fold(_ -> Option.none(), Option::some);
+    return fold(ignored -> Option.none(), Option::some);
   }
 
   /**
@@ -400,7 +400,7 @@ public sealed interface Either<A, B> extends Iterable<B> permits Either.Left, Ei
    *     null} also yields an empty one.
    */
   default Optional<B> toOptional() {
-    return fold(_ -> Optional.empty(), Optional::ofNullable);
+    return fold(ignored -> Optional.empty(), Optional::ofNullable);
   }
 
   /**
@@ -446,6 +446,6 @@ public sealed interface Either<A, B> extends Iterable<B> permits Either.Left, Ei
    */
   @Override
   default Iterator<B> iterator() {
-    return fold(_ -> Iterator.empty(), Iterator::of);
+    return fold(ignored -> Iterator.empty(), Iterator::of);
   }
 }

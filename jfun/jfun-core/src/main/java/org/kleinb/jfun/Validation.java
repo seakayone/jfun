@@ -946,7 +946,7 @@ public sealed interface Validation<E, A> extends Iterable<A>
    * @return a {@code Some} holding the value, or {@code None} for an {@code Invalid}
    */
   default Option<A> toOption() {
-    return fold(_ -> Option.none(), Option::some);
+    return fold(ignored -> Option.none(), Option::some);
   }
 
   /**
@@ -970,6 +970,6 @@ public sealed interface Validation<E, A> extends Iterable<A>
    */
   @Override
   default Iterator<A> iterator() {
-    return fold(_ -> Iterator.empty(), Iterator::of);
+    return fold(ignored -> Iterator.empty(), Iterator::of);
   }
 }

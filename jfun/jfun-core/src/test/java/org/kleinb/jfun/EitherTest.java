@@ -90,19 +90,19 @@ class EitherTest {
   @Test
   void shouldExistRight() {
     Either<Integer, String> either = Either.right("42");
-    assertThat(either.exists(_ -> true)).isTrue();
+    assertThat(either.exists(ignored -> true)).isTrue();
   }
 
   @Test
   void shouldNotExistRight() {
     Either<Integer, String> either = Either.right("42");
-    assertThat(either.exists(_ -> false)).isFalse();
+    assertThat(either.exists(ignored -> false)).isFalse();
   }
 
   @Test
   void shouldNotExistLeft() {
     Either<Integer, String> either = Either.left(42);
-    assertThat(either.exists(_ -> true)).isFalse();
+    assertThat(either.exists(ignored -> true)).isFalse();
   }
 
   // .map
@@ -124,7 +124,7 @@ class EitherTest {
   @Test
   void shouldMapLeftRight() {
     Either<Integer, String> either = Either.right("42");
-    assertThat(either.mapLeft(_ -> "not mapped")).isEqualTo(Either.right("42"));
+    assertThat(either.mapLeft(ignored -> "not mapped")).isEqualTo(Either.right("42"));
   }
 
   @Test
@@ -393,7 +393,7 @@ class EitherTest {
   void shouldConvertLeftToFailure() {
     Either<Integer, String> either = Either.left(42);
     RuntimeException ex = new RuntimeException("Failed");
-    Try<String> actual = either.toTry(_ -> ex);
+    Try<String> actual = either.toTry(ignored -> ex);
     assertThat(actual.isFailure()).isTrue();
     assertThat(actual.getFailure()).isSameAs(ex);
   }

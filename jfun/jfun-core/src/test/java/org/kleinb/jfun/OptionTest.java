@@ -127,7 +127,7 @@ class OptionTest {
 
   @Test
   void shouldMapNullToSome() {
-    assertThat(Option.some(42).map(_ -> null)).isEqualTo(Option.some(null));
+    assertThat(Option.some(42).map(ignored -> null)).isEqualTo(Option.some(null));
   }
 
   // .flatMap
@@ -145,7 +145,7 @@ class OptionTest {
 
   @Test
   void shouldFlatMapSomeNone() {
-    assertThat(Option.some(42).flatMap(_ -> Option.none())).isEqualTo(Option.none());
+    assertThat(Option.some(42).flatMap(ignored -> Option.none())).isEqualTo(Option.none());
   }
 
   // .fold

@@ -30,8 +30,8 @@ public interface Prism<S, A> extends Optional<S, A> {
   default Function1<S, S> replace(A a) {
     return s ->
         switch (getOption(s)) {
-          case Some<A> _ -> reverseGet(a);
-          case None<A> _ -> s;
+          case Some<A> ignored -> reverseGet(a);
+          case None<A> ignored -> s;
         };
   }
 
@@ -39,7 +39,7 @@ public interface Prism<S, A> extends Optional<S, A> {
     return s ->
         switch (getOption(s)) {
           case Some(A value) -> replace(f.apply(value)).apply(s);
-          case None<A> _ -> s;
+          case None<A> ignored -> s;
         };
   }
 
