@@ -15,11 +15,24 @@ String message =
 
 ## Usage
 
-Requires Java 21 or later.
+Requires Java 21 or later. The build is tested on Java 21, 23 and 25.
 
 ```groovy
 implementation 'org.kleinb:jfun-core:0.0.5'
 ```
+
+jFun is meant to be a library without transitive dependencies: adding it to your build never
+pulls in third-party libraries.
+
+## Modules
+
+Only `jfun-core` is published to Maven Central at the moment.
+
+| Module          | Description                                                                   | Published |
+|-----------------|-------------------------------------------------------------------------------|-----------|
+| `jfun-core`     | Immutable functional data types and function types for modern Java.           | yes       |
+| `jfun-optics`   | Optics for reading and updating nested immutable data. Builds on `jfun-core`. | not yet   |
+| `jfun-examples` | Runnable examples that show the library in use.                               | no        |
 
 ## Build
 
