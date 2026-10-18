@@ -18,5 +18,5 @@ release-dry version:
     scripts/release.sh {{version}} --no-publish
 
 # Publish the current version (use when a release was tagged but publishing failed)
-publish:
-    scripts/publish.sh
+publish *args:
+    scripts/publish.sh {{args}}
