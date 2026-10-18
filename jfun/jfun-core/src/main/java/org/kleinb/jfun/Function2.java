@@ -57,7 +57,6 @@ public interface Function2<A, B, Z> extends java.util.function.BiFunction<A, B, 
     return (a, b) -> f.apply(a).apply(b);
   }
 
-  @Override
   /**
    * Applies this function to the given arguments.
    *
@@ -65,6 +64,7 @@ public interface Function2<A, B, Z> extends java.util.function.BiFunction<A, B, 
    * @param b the second argument
    * @return the result of applying this function
    */
+  @Override
   Z apply(A a, B b);
 
   /**
