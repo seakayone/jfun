@@ -1,5 +1,6 @@
 package org.kleinb.jfun;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -394,22 +395,22 @@ public sealed interface Either<A, B> extends Iterable<B> permits Either.Left, Ei
   /**
    * Converts to a {@link java.util.Optional}.
    *
-   * @return an {@code Optional} holding the {@code Right} value, or an empty one for a {@code Left}
-   * @throws NullPointerException if this is a {@code Right} holding {@code null}
+   * @return an {@code Optional} holding the {@code Right} value, or an empty one for a {@code
+   *     Left}. As an {@code Optional} cannot hold {@code null}, a {@code Right} holding {@code
+   *     null} also yields an empty one.
    */
   default Optional<B> toOptional() {
-    return fold(_ -> Optional.empty(), Optional::of);
+    return fold(_ -> Optional.empty(), Optional::ofNullable);
   }
 
   /**
    * Converts to a {@link java.util.List}.
    *
-   * @return a single-element list holding the {@code Right} value, or an empty list for a {@code
-   *     Left}
-   * @throws NullPointerException if this is a {@code Right} holding {@code null}
+   * @return an immutable single-element list holding the {@code Right} value, or an empty list for
+   *     a {@code Left}. A {@code Right} holding {@code null} yields a list containing {@code null}.
    */
   default List<B> toList() {
-    return fold(_ -> List.of(), List::of);
+    return fold(_ -> List.of(), Collections::singletonList);
   }
 
   /**

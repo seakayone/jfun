@@ -412,22 +412,22 @@ public sealed interface Option<A> extends Iterable<A> permits Option.None, Optio
   /**
    * Converts to a {@link java.util.List}.
    *
-   * @return a single-element list for a {@code Some}, or an empty list for {@code None}
-   * @throws NullPointerException if this is a {@code Some} holding {@code null}
+   * @return an immutable single-element list for a {@code Some}, or an empty list for {@code None}.
+   *     A {@code Some} holding {@code null} yields a list containing {@code null}.
    */
   default List<A> toList() {
-    return fold(List::of, List::of);
+    return fold(List::of, Collections::singletonList);
   }
 
   /**
    * Converts to a {@link java.util.Optional}.
    *
-   * @return an {@code Optional} holding the value, or an empty one for {@code None}
-   * @throws NullPointerException if this is a {@code Some} holding {@code null}, which an {@code
-   *     Optional} cannot represent
+   * @return an {@code Optional} holding the value, or an empty one for {@code None}. As an {@code
+   *     Optional} cannot hold {@code null}, a {@code Some} holding {@code null} also yields an
+   *     empty one, so the conversion cannot tell it from {@code None}.
    */
   default Optional<A> toOptional() {
-    return fold(Optional::empty, Optional::of);
+    return fold(Optional::empty, Optional::ofNullable);
   }
 
   /**

@@ -359,6 +359,18 @@ class OptionTest {
     assertThat(Option.none().toOptional()).isEqualTo(Optional.empty());
   }
 
+  @Test
+  void shouldConvertSomeNullToEmptyOptional() {
+    assertThat(Option.some(null).toOptional()).isEmpty();
+  }
+
+  @Test
+  void shouldConvertSomeNullToListWithNull() {
+    List<Object> actual = Option.some(null).toList();
+    assertThat(actual).hasSize(1).containsNull();
+    assertThatThrownBy(() -> actual.add("x")).isInstanceOf(UnsupportedOperationException.class);
+  }
+
   // .toRight
   @Test
   void shouldConvertSomeToRight() {

@@ -1,5 +1,6 @@
 package org.kleinb.jfun;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -460,21 +461,22 @@ public sealed interface Try<A> extends Iterable<A> permits Try.Failure, Try.Succ
   /**
    * Converts to a {@link java.util.Optional}.
    *
-   * @return an {@code Optional} holding the value, or an empty one for a {@code Failure}
-   * @throws NullPointerException if this is a {@code Success} holding {@code null}
+   * @return an {@code Optional} holding the value, or an empty one for a {@code Failure}. As an
+   *     {@code Optional} cannot hold {@code null}, a {@code Success} holding {@code null} also
+   *     yields an empty one.
    */
   default Optional<A> toOptional() {
-    return fold(_ -> Optional.empty(), Optional::of);
+    return fold(_ -> Optional.empty(), Optional::ofNullable);
   }
 
   /**
    * Converts to a {@link java.util.List}.
    *
-   * @return a single-element list for a {@code Success}, or an empty list for a {@code Failure}
-   * @throws NullPointerException if this is a {@code Success} holding {@code null}
+   * @return an immutable single-element list for a {@code Success}, or an empty list for a {@code
+   *     Failure}. A {@code Success} holding {@code null} yields a list containing {@code null}.
    */
   default List<A> toList() {
-    return fold(_ -> List.of(), List::of);
+    return fold(_ -> List.of(), Collections::singletonList);
   }
 
   /**

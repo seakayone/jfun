@@ -360,6 +360,12 @@ class EitherTest {
     assertThat(either.toOptional()).isEqualTo(java.util.Optional.empty());
   }
 
+  @Test
+  void shouldConvertRightNullToEmptyOptional() {
+    Either<Integer, String> either = Either.right(null);
+    assertThat(either.toOptional()).isEmpty();
+  }
+
   // .toList
 
   @Test
@@ -423,5 +429,13 @@ class EitherTest {
     Iterator<String> iterator = either.iterator();
     assertThat(iterator.hasNext()).isFalse();
     assertThatThrownBy(iterator::next).isInstanceOf(NoSuchElementException.class);
+  }
+
+  @Test
+  void shouldConvertRightNullToListWithNull() {
+    Either<Integer, String> either = Either.right(null);
+    List<String> actual = either.toList();
+    assertThat(actual).hasSize(1).containsNull();
+    assertThatThrownBy(() -> actual.add("x")).isInstanceOf(UnsupportedOperationException.class);
   }
 }

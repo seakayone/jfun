@@ -443,6 +443,12 @@ class TryTest {
     assertThat(actual.toOptional()).isEqualTo(java.util.Optional.empty());
   }
 
+  @Test
+  void shouldConvertSuccessNullToEmptyOptional() {
+    Try<Integer> actual = Try.success(null);
+    assertThat(actual.toOptional()).isEmpty();
+  }
+
   // .toList
 
   @Test
@@ -456,5 +462,13 @@ class TryTest {
     var exception = new Exception("Boom");
     Try<Integer> actual = Try.failure(exception);
     assertThat(actual.toList()).isEqualTo(List.of());
+  }
+
+  @Test
+  void shouldConvertSuccessNullToListWithNull() {
+    Try<Integer> success = Try.success(null);
+    List<Integer> actual = success.toList();
+    assertThat(actual).hasSize(1).containsNull();
+    assertThatThrownBy(() -> actual.add(1)).isInstanceOf(UnsupportedOperationException.class);
   }
 }
