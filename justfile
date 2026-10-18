@@ -16,3 +16,7 @@ release version:
 # Release without publishing to Maven Central / GitHub
 release-dry version:
     scripts/release.sh {{version}} --no-publish
+
+# Publish the current version (use when a release was tagged but publishing failed)
+publish:
+    scripts/publish.sh

@@ -13,6 +13,7 @@ cd "$(dirname "$0")/.."
 
 [[ "$(git branch --show-current)" == "main" ]] || { echo "must be on main" >&2; exit 1; }
 [[ -z "$(git status --porcelain)" ]] || { echo "working tree not clean" >&2; exit 1; }
+$publish && scripts/publish.sh --check
 ! git rev-parse "v$version" >/dev/null 2>&1 || { echo "tag v$version already exists" >&2; exit 1; }
 
 echo "$version" > version.txt
@@ -28,5 +29,5 @@ git tag "v$version"
 git push origin main "v$version"
 
 if $publish; then
-  ./gradlew :jfun-core:publish :jfun-core:jreleaserFullRelease
+  scripts/publish.sh
 fi
