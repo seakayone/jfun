@@ -21,6 +21,7 @@ java {
 
 tasks.withType(JavaCompile).configureEach {
     options.release = 21
+    options.compilerArgs += ['-Xlint:all', '-Werror']
 }
 
 dependencies {
