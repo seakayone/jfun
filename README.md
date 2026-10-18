@@ -18,7 +18,7 @@ String message =
 Requires Java 21 or later. The build is tested on Java 21, 23 and 25.
 
 ```groovy
-implementation 'org.kleinb:jfun-core:0.0.5'
+implementation 'org.kleinb:jfun-core:0.0.6'
 ```
 
 jFun is meant to be a library without transitive dependencies: adding it to your build never
