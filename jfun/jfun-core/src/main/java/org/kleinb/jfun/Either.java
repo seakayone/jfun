@@ -1,6 +1,6 @@
 package org.kleinb.jfun;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -406,11 +406,13 @@ public sealed interface Either<A, B> extends Iterable<B> permits Either.Left, Ei
   /**
    * Converts to a {@link java.util.List}.
    *
-   * @return an immutable single-element list holding the {@code Right} value, or an empty list for
-   *     a {@code Left}. A {@code Right} holding {@code null} yields a list containing {@code null}.
+   * @return a new mutable {@link ArrayList} holding the {@code Right} value, or no elements for a
+   *     {@code Left}. A {@code Right} holding {@code null} yields a list containing {@code null}.
    */
   default List<B> toList() {
-    return fold(_ -> List.of(), Collections::singletonList);
+    final var result = new ArrayList<B>(1);
+    forEach(result::add);
+    return result;
   }
 
   /**

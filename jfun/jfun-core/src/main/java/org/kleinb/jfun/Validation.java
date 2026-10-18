@@ -1,5 +1,6 @@
 package org.kleinb.jfun;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -8,6 +9,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -40,9 +42,10 @@ public sealed interface Validation<E, A> extends Iterable<A>
   record Valid<E, A>(A value) implements Validation<E, A> {}
 
   /**
-   * The failure case of a {@link Validation}. The errors are copied into an unmodifiable list, and
-   * neither the list nor any error may be {@code null}; the canonical constructor throws a {@link
-   * NullPointerException} otherwise.
+   * The failure case of a {@link Validation}. The errors are copied when the {@code Invalid} is
+   * created, and neither the list nor any error may be {@code null}; the canonical constructor
+   * throws a {@link NullPointerException} otherwise. To keep the {@code Invalid} immutable, {@link
+   * #error()} returns a new mutable list on every call.
    *
    * @param error the accumulated errors
    * @param <E> the type of the errors
@@ -57,6 +60,17 @@ public sealed interface Validation<E, A> extends Iterable<A>
      */
     public Invalid {
       error = List.copyOf(error);
+    }
+
+    /**
+     * Returns a copy of the errors.
+     *
+     * @return a new mutable {@link ArrayList} of the errors; changing it does not affect this
+     *     {@code Invalid}
+     */
+    @Override
+    public List<E> error() {
+      return new ArrayList<>(error);
     }
   }
 
@@ -542,7 +556,8 @@ public sealed interface Validation<E, A> extends Iterable<A>
    *
    * @param validations the validations to collect the errors from
    * @param <E> the type of the errors
-   * @return the errors of all invalid validations; empty if all are valid
+   * @return a new mutable {@link ArrayList} of the errors of all invalid validations; empty if all
+   *     are valid
    * @throws NullPointerException if {@code validations} is {@code null}
    */
   static <E> List<E> errors(List<Validation<E, ?>> validations) {
@@ -555,12 +570,16 @@ public sealed interface Validation<E, A> extends Iterable<A>
    *
    * @param validations the validations to collect the errors from
    * @param <E> the type of the errors
-   * @return the errors of all invalid validations; empty if all are valid
+   * @return a new mutable {@link ArrayList} of the errors of all invalid validations; empty if all
+   *     are valid
    * @throws NullPointerException if {@code validations} is {@code null}
    */
   static <E> List<E> errors(Stream<Validation<E, ?>> validations) {
     Objects.requireNonNull(validations);
-    return validations.filter(Validation::isInvalid).flatMap(v -> v.getError().stream()).toList();
+    return validations
+        .filter(Validation::isInvalid)
+        .flatMap(v -> v.getError().stream())
+        .collect(Collectors.toCollection(ArrayList::new));
   }
 
   /**
@@ -655,7 +674,7 @@ public sealed interface Validation<E, A> extends Iterable<A>
   /**
    * Returns the errors.
    *
-   * @return the errors of an {@code Invalid}
+   * @return a new mutable {@link ArrayList} of the errors of an {@code Invalid}
    * @throws NoSuchElementException if this is a {@code Valid}
    */
   default List<E> getError() {

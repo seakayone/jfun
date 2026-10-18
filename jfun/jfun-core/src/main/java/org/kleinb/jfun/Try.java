@@ -1,6 +1,6 @@
 package org.kleinb.jfun;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -472,11 +472,14 @@ public sealed interface Try<A> extends Iterable<A> permits Try.Failure, Try.Succ
   /**
    * Converts to a {@link java.util.List}.
    *
-   * @return an immutable single-element list for a {@code Success}, or an empty list for a {@code
-   *     Failure}. A {@code Success} holding {@code null} yields a list containing {@code null}.
+   * @return a new mutable {@link ArrayList} with a single element for a {@code Success}, or no
+   *     elements for a {@code Failure}. A {@code Success} holding {@code null} yields a list
+   *     containing {@code null}.
    */
   default List<A> toList() {
-    return fold(_ -> List.of(), Collections::singletonList);
+    final var result = new ArrayList<A>(1);
+    forEach(result::add);
+    return result;
   }
 
   /**

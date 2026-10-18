@@ -465,10 +465,11 @@ class TryTest {
   }
 
   @Test
-  void shouldConvertSuccessNullToListWithNull() {
+  void shouldConvertSuccessNullToMutableListWithNull() {
     Try<Integer> success = Try.success(null);
     List<Integer> actual = success.toList();
     assertThat(actual).hasSize(1).containsNull();
-    assertThatThrownBy(() -> actual.add(1)).isInstanceOf(UnsupportedOperationException.class);
+    actual.add(1);
+    assertThat(actual).hasSize(2);
   }
 }

@@ -55,6 +55,12 @@ class OptionTest {
   }
 
   // .sequence
+  @Test
+  void shouldSequenceToMutableList() {
+    List<Integer> actual = Option.sequence(List.of(Option.some(42))).get();
+    actual.add(43);
+    assertThat(actual).containsExactly(42, 43);
+  }
 
   @Test
   void shouldSequenceSome() {
@@ -365,10 +371,11 @@ class OptionTest {
   }
 
   @Test
-  void shouldConvertSomeNullToListWithNull() {
+  void shouldConvertSomeNullToMutableListWithNull() {
     List<Object> actual = Option.some(null).toList();
     assertThat(actual).hasSize(1).containsNull();
-    assertThatThrownBy(() -> actual.add("x")).isInstanceOf(UnsupportedOperationException.class);
+    actual.add("x");
+    assertThat(actual).hasSize(2);
   }
 
   // .toRight

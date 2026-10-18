@@ -108,7 +108,7 @@ public sealed interface Option<A> extends Iterable<A> permits Option.None, Optio
    *
    * @param options the options to combine
    * @param <A> the type of the values
-   * @return a {@code Some} holding an unmodifiable list of all values if every element is a {@code
+   * @return a {@code Some} holding a new mutable list of all values if every element is a {@code
    *     Some}, otherwise {@code None}
    * @throws NullPointerException if {@code options} is {@code null}
    */
@@ -121,7 +121,7 @@ public sealed interface Option<A> extends Iterable<A> permits Option.None, Optio
       }
       result.add(option.get());
     }
-    return some(Collections.unmodifiableList(result));
+    return some(result);
   }
 
   /**
@@ -412,11 +412,14 @@ public sealed interface Option<A> extends Iterable<A> permits Option.None, Optio
   /**
    * Converts to a {@link java.util.List}.
    *
-   * @return an immutable single-element list for a {@code Some}, or an empty list for {@code None}.
-   *     A {@code Some} holding {@code null} yields a list containing {@code null}.
+   * @return a new mutable {@link ArrayList} with a single element for a {@code Some}, or no
+   *     elements for {@code None}. A {@code Some} holding {@code null} yields a list containing
+   *     {@code null}.
    */
   default List<A> toList() {
-    return fold(List::of, Collections::singletonList);
+    final var result = new ArrayList<A>(1);
+    forEach(result::add);
+    return result;
   }
 
   /**

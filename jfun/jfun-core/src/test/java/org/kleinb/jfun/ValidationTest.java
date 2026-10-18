@@ -108,6 +108,22 @@ class ValidationTest {
   }
 
   @Test
+  void shouldReturnMutableCopyOfErrors() {
+    Validation<String, Integer> invalid = Validation.invalid("a");
+    invalid.getError().add("b");
+    ((Invalid<String, Integer>) invalid).error().add("c");
+    assertThat(invalid.getError()).containsExactly("a");
+  }
+
+  @Test
+  void shouldReturnMutableErrorsFromErrors() {
+    Validation<String, Integer> invalid = Validation.invalid("a");
+    var errors = Validation.errors(java.util.List.<Validation<String, ?>>of(invalid));
+    errors.add("b");
+    assertThat(errors).containsExactly("a", "b");
+  }
+
+  @Test
   void shouldRejectSwapOfValidNull() {
     assertThatThrownBy(() -> Validation.valid(null).swap())
         .isInstanceOf(NullPointerException.class);

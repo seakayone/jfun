@@ -432,10 +432,11 @@ class EitherTest {
   }
 
   @Test
-  void shouldConvertRightNullToListWithNull() {
+  void shouldConvertRightNullToMutableListWithNull() {
     Either<Integer, String> either = Either.right(null);
     List<String> actual = either.toList();
     assertThat(actual).hasSize(1).containsNull();
-    assertThatThrownBy(() -> actual.add("x")).isInstanceOf(UnsupportedOperationException.class);
+    actual.add("x");
+    assertThat(actual).hasSize(2);
   }
 }
