@@ -18,7 +18,7 @@ String message =
 Requires Java 23 or later.
 
 ```groovy
-implementation 'org.kleinb:jfun-core:0.0.1'
+implementation 'org.kleinb:jfun-core:0.0.2'
 ```
 
 ## Build
