@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Usage: scripts/publish.sh [--check]
-# Publishes jfun-core to Maven Central and creates the GitHub release via JReleaser.
+# Stages jfun-core with Gradle, then deploys to Maven Central and creates the GitHub release with the JReleaser CLI.
 # With --check, only verifies that credentials and signing keys are available.
 set -euo pipefail
 
@@ -29,4 +29,9 @@ fi
 
 [[ "${1:-}" == "--check" ]] && { echo "publish settings ok"; exit 0; }
 
-./gradlew :jfun-core:publish :jfun-core:jreleaserFullRelease
+export JRELEASER_PROJECT_VERSION="$(<version.txt)"
+export JRELEASER_GPG_PUBLIC_KEY="${JRELEASER_GPG_PUBLIC_KEY:-$HOME/.jreleaser/public.pgp}"
+export JRELEASER_GPG_SECRET_KEY="${JRELEASER_GPG_SECRET_KEY:-$HOME/.jreleaser/private.pgp}"
+
+./gradlew :jfun-core:publish
+jreleaser full-release --git-root-search "$@"
