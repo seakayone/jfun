@@ -2,12 +2,32 @@ package org.kleinb.jfun;
 
 import java.util.NoSuchElementException;
 
+/**
+ * A {@link java.util.Iterator} with factory methods for the empty and the single-element iterator.
+ * These are the iterators returned by {@code iterator()} of {@link Option}, {@link Either}, {@link
+ * Try} and {@link Validation}.
+ *
+ * @param <A> the element type
+ */
 public interface Iterator<A> extends java.util.Iterator<A> {
+  /**
+   * Returns the empty iterator. The instance is shared.
+   *
+   * @param <A> the element type
+   * @return an iterator without elements
+   */
   @SuppressWarnings("unchecked")
   static <A> Iterator<A> empty() {
     return (Iterator<A>) EmptyIterator.INSTANCE;
   }
 
+  /**
+   * Returns an iterator over exactly one element.
+   *
+   * @param elem the element, which may be {@code null}
+   * @param <A> the element type
+   * @return an iterator over {@code elem}
+   */
   static <A> Iterator<A> of(A elem) {
     return new SingleElementIterator<>(elem);
   }
