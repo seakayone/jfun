@@ -8,7 +8,7 @@ project:
     - Christian Kleinbölting
   license: APACHE-2.0
   inceptionYear: 2025
-  stereotype: CLI
+  stereotype: NONE
   languages:
     java:
       version: 23
@@ -23,14 +23,3 @@ release:
       preset: conventional-commits
       contributors:
         format: '- {{contributorName}}{{#contributorUsernameAsLink}} ({{.}}){{/contributorUsernameAsLink}}'
-
-assemble:
-  javaArchive:
-    helloworld:
-      active: ALWAYS
-      formats: [ ZIP ]
-      fileSets:
-        - input: '.'
-          includes: [ 'LICENSE' ]
-      mainJar:
-        path: target/{{distributionName}}-{{projectVersion}}.jar
