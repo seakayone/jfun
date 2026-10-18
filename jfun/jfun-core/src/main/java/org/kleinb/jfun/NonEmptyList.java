@@ -122,6 +122,9 @@ public sealed interface NonEmptyList<A> extends Iterable<A> {
   @SafeVarargs
   static <A> NonEmptyList<A> of(A a, A... as) {
     Objects.requireNonNull(as);
+    if (as.length == 0) {
+      return single(a);
+    }
     var result = single(as[as.length - 1]);
     for (int i = as.length - 2; i >= 0; i--) {
       result = result.prepend(as[i]);

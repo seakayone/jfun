@@ -118,6 +118,17 @@ class NonEmptyListTest {
   }
 
   @Test
+  void ofVarargsWithEmptyArray() {
+    assertThat(NonEmptyList.<Integer>of(1, new Integer[0])).containsExactly(1).hasSize(1);
+  }
+
+  @Test
+  void ofVarargsWithNullArray() {
+    assertThatThrownBy(() -> NonEmptyList.<Integer>of(1, (Integer[]) null))
+        .isInstanceOf(NullPointerException.class);
+  }
+
+  @Test
   void ofIterableNonEmpty() {
     assertThat(NonEmptyList.of(List.of(1, 2, 3, 4)).get()).containsExactly(1, 2, 3, 4).hasSize(4);
     assertThat(NonEmptyList.of(Set.of(1, 2, 3, 4)).get())
