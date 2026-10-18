@@ -40,13 +40,25 @@ public sealed interface Validation<E, A> extends Iterable<A>
   record Valid<E, A>(A value) implements Validation<E, A> {}
 
   /**
-   * The failure case of a {@link Validation}.
+   * The failure case of a {@link Validation}. The errors are copied into an unmodifiable list, and
+   * neither the list nor any error may be {@code null}; the canonical constructor throws a {@link
+   * NullPointerException} otherwise.
    *
    * @param error the accumulated errors
    * @param <E> the type of the errors
    * @param <A> the type of the (absent) value
    */
-  record Invalid<E, A>(List<E> error) implements Validation<E, A> {}
+  record Invalid<E, A>(List<E> error) implements Validation<E, A> {
+    /**
+     * Creates an {@code Invalid} holding a copy of the given errors.
+     *
+     * @param error the accumulated errors, none of which may be {@code null}
+     * @throws NullPointerException if {@code error} is {@code null} or contains {@code null}
+     */
+    public Invalid {
+      error = List.copyOf(error);
+    }
+  }
 
   /**
    * Creates a {@code Valid} holding the given value.
@@ -78,8 +90,10 @@ public sealed interface Validation<E, A> extends Iterable<A>
    * @param <E> the type of the errors
    * @param <A> the type of the (absent) value
    * @return an {@code Invalid} containing {@code error}
+   * @throws NullPointerException if {@code error} is {@code null}
    */
   static <E, A> Validation<E, A> invalid(E error) {
+    Objects.requireNonNull(error);
     return new Invalid<>(List.of(error));
   }
 
@@ -710,6 +724,8 @@ public sealed interface Validation<E, A> extends Iterable<A>
    * Invalid} into a {@code Valid} holding the list of errors.
    *
    * @return the swapped validation
+   * @throws NullPointerException if this is a {@code Valid} holding {@code null}, which cannot
+   *     become an error
    */
   default Validation<A, List<E>> swap() {
     switch (this) {
@@ -747,7 +763,7 @@ public sealed interface Validation<E, A> extends Iterable<A>
    * @param f the function to apply to each error
    * @param <B> the type of the mapped errors
    * @return an {@code Invalid} holding the mapped errors, or this {@code Valid} unchanged
-   * @throws NullPointerException if {@code f} is {@code null}
+   * @throws NullPointerException if {@code f} is {@code null}, or returns {@code null} for an error
    */
   default <B> Validation<B, A> mapError(Function<? super E, ? extends B> f) {
     Objects.requireNonNull(f);

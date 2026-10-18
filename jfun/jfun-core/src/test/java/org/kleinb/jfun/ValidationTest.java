@@ -77,6 +77,48 @@ class ValidationTest {
     assertThat(actual).isEqualTo(Validation.invalid("Must not be null"));
   }
 
+  @Test
+  void shouldRejectNullError() {
+    assertThatThrownBy(() -> Validation.invalid((String) null))
+        .isInstanceOf(NullPointerException.class);
+  }
+
+  @Test
+  void shouldRejectNullErrors() {
+    assertThatThrownBy(() -> Validation.invalid((java.util.Collection<String>) null))
+        .isInstanceOf(NullPointerException.class);
+    assertThatThrownBy(() -> Validation.invalid(java.util.Arrays.asList("a", null)))
+        .isInstanceOf(NullPointerException.class);
+  }
+
+  @Test
+  void shouldRejectNullInInvalidConstructor() {
+    assertThatThrownBy(() -> new Invalid<String, Integer>(null))
+        .isInstanceOf(NullPointerException.class);
+    assertThatThrownBy(() -> new Invalid<String, Integer>(java.util.Arrays.asList("a", null)))
+        .isInstanceOf(NullPointerException.class);
+  }
+
+  @Test
+  void shouldCopyErrorsInInvalidConstructor() {
+    var errors = new java.util.ArrayList<>(java.util.List.of("a"));
+    var invalid = new Invalid<String, Integer>(errors);
+    errors.add("b");
+    assertThat(invalid.error()).containsExactly("a");
+  }
+
+  @Test
+  void shouldRejectSwapOfValidNull() {
+    assertThatThrownBy(() -> Validation.valid(null).swap())
+        .isInstanceOf(NullPointerException.class);
+  }
+
+  @Test
+  void shouldRejectMapErrorToNull() {
+    Validation<String, Integer> invalid = Validation.invalid("a");
+    assertThatThrownBy(() -> invalid.mapError(_ -> null)).isInstanceOf(NullPointerException.class);
+  }
+
   // .isValid , .isInvalid
   @Test
   void shouldCheckValid() {
