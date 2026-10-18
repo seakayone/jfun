@@ -1,5 +1,6 @@
 [tools]
 gh = "2.102.0"
+git-cliff = "2.14.2"
 java = "temurin-23"
 jreleaser = "1.26.0"
 just = "latest"
