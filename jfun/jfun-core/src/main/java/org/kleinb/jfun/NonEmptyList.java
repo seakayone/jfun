@@ -10,7 +10,7 @@ import org.kleinb.jfun.Option.Some;
 
 public sealed interface NonEmptyList<A> extends Iterable<A> {
 
-  static <A, R> Collector<? super A, ArrayList<A>, Option<NonEmptyList<A>>> collector() {
+  static <A> Collector<? super A, ArrayList<A>, Option<NonEmptyList<A>>> collector() {
     final BinaryOperator<ArrayList<A>> combiner =
         (as1, as2) -> {
           as1.addAll(as2);
