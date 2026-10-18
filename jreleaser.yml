@@ -11,7 +11,7 @@ project:
   stereotype: NONE
   languages:
     java:
-      version: 23
+      version: 21
       groupId: org.kleinb
       artifactId: jfun-core
 

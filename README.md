@@ -15,7 +15,7 @@ String message =
 
 ## Usage
 
-Requires Java 23 or later.
+Requires Java 21 or later.
 
 ```groovy
 implementation 'org.kleinb:jfun-core:0.0.5'
